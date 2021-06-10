@@ -12,6 +12,10 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
 # zsh
 # require fzf command
+# require php7.3
+# require Python3.7 Python3.8
+# require nodebrew
+# require curl
 ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
 
 # git
