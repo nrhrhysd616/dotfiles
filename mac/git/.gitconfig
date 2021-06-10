@@ -1,0 +1,17 @@
+[gpg]
+	program = gpg
+[include]
+	path = ~/.gitconfig.user.local
+[commit]
+	gpgsign = true
+[core]
+	excludesfile = ~/.gitignore_global
+	pager = LESSCHARSET=utf-8 less
+	quotepath = false
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[pull]
+	rebase = false

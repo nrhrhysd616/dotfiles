@@ -1,0 +1,5 @@
+; Please copy and use this file
+[user]
+	signingkey = ; 40 digit signing key 
+	name = ; Full Name
+	email = ; GitHub email address
