@@ -6,6 +6,12 @@ alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
 
+# historyexec command
+function historyexec() {
+	# コマンド履歴を番号なし(-n)降順(-r)直近500件(-500)で取得したものをfzfに渡し、複数選択なし(--no-multi)で選択したコマンドをevalで実行
+	eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
+}
+
 # PHP 7.3
 export PATH="/usr/local/opt/php@7.3/bin:$PATH"
 export PATH="/usr/local/opt/php@7.3/sbin:$PATH"
