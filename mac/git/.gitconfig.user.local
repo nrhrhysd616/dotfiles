@@ -1,4 +1,4 @@
-; Please copy and use this file
+; Please copy and use this file, do not use symbolic link.
 [user]
 	signingkey = ; 40 digit signing key 
 	name = ; Full Name
