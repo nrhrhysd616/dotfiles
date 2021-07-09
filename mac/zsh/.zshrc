@@ -12,6 +12,9 @@ function historyexec() {
 	eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
 }
 
+# fetch gitignore
+function gitignore() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
+
 # PHP 7.3
 export PATH="/usr/local/opt/php@7.3/bin:$PATH"
 export PATH="/usr/local/opt/php@7.3/sbin:$PATH"
