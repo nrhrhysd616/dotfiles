@@ -25,4 +25,6 @@ if [ ! -f ~/.gitconfig.user.local ]; then
 	cp $SCRIPT_DIR/git/.gitconfig.user.local ~/
 fi
 
-
+# System Configuration
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
