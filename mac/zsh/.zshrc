@@ -15,9 +15,9 @@ function historyexec() {
 # fetch gitignore
 function gitignore() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
 
-# PHP 7.3
-export PATH="/usr/local/opt/php@7.3/bin:$PATH"
-export PATH="/usr/local/opt/php@7.3/sbin:$PATH"
+# PHP 7.4
+export PATH="/usr/local/opt/php@7.4/bin:$PATH"
+export PATH="/usr/local/opt/php@7.4/sbin:$PATH"
 
 # Python 3.7
 export PATH="/usr/local/opt/python@3.7/bin:$PATH"

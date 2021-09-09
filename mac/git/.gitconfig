@@ -2,8 +2,6 @@
 	program = gpg
 [include]
 	path = ~/.gitconfig.user.local
-[commit]
-	gpgsign = true
 [core]
 	excludesfile = ~/.gitignore_global
 	pager = LESSCHARSET=utf-8 less
@@ -15,3 +13,9 @@
 	process = git-lfs filter-process
 [pull]
 	rebase = false
+[commit]
+        gpgsign = true
+[push]
+	gpgsign = true
+[tag]
+	gpgsign = true
