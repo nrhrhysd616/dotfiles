@@ -6,6 +6,7 @@
 	excludesfile = ~/.gitignore_global
 	pager = LESSCHARSET=utf-8 less
 	quotepath = false
+	ignorecase = false
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
@@ -15,7 +16,5 @@
 	rebase = false
 [commit]
         gpgsign = true
-[push]
-	gpgsign = true
 [tag]
 	gpgsign = true
