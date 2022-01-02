@@ -5,6 +5,7 @@ alias ls='ls -F'
 alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -A'
+alias speedtest='networkQuality'
 
 # historyexec command
 function historyexec() {
