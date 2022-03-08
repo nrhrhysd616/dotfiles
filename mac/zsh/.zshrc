@@ -28,6 +28,9 @@ export PATH=$NODEBREW_ROOT/current/bin:$PATH
 # curl
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
+# boost
+export BOOST_ROOT=/usr/local/opt/boost
+
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
