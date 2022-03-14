@@ -31,6 +31,9 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 # boost
 export BOOST_ROOT=/usr/local/opt/boost
 
+# go library
+export PATH="$HOME/go/bin:$PATH"
+
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
