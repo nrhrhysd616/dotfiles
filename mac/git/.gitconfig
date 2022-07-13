@@ -14,7 +14,10 @@
 	process = git-lfs filter-process
 [pull]
 	rebase = false
+	ff = only
 [commit]
         gpgsign = true
 [tag]
 	gpgsign = true
+[merge]
+	ff = false
