@@ -24,8 +24,8 @@ export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 export PATH="/usr/local/opt/python@3.9/bin:$PATH"
 
 # nodebrew
-# export NODEBREW_ROOT=/usr/local/var/nodebrew
-# export PATH=$NODEBREW_ROOT/current/bin:$PATH
+export NODEBREW_ROOT=/usr/local/var/nodebrew
+export PATH=$NODEBREW_ROOT/current/bin:$PATH
 
 # curl
 export PATH="/usr/local/opt/curl/bin:$PATH"
