@@ -24,8 +24,8 @@ export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 export PATH="/usr/local/opt/python@3.9/bin:$PATH"
 
 # nodebrew
-export NODEBREW_ROOT=/usr/local/var/nodebrew
-export PATH=$NODEBREW_ROOT/current/bin:$PATH
+# export NODEBREW_ROOT=/usr/local/var/nodebrew
+# export PATH=$NODEBREW_ROOT/current/bin:$PATH
 
 # curl
 export PATH="/usr/local/opt/curl/bin:$PATH"
@@ -41,3 +41,7 @@ local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
 local p_endmark="%B%(?,%F{green}$,%F{red}!!!\$!!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
