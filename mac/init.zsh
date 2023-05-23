@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+# Check macOS
 if [ $(uname) != "Darwin" ] ; then
 	echo "Not macOS!"
 	exit 1
@@ -31,5 +32,6 @@ if [ ! -f ~/.gitconfig.user.local ]; then
 fi
 
 # System Configuration
+# Do not create .DS_Store on USB or Network drives
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
