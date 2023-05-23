@@ -7,6 +7,7 @@
 	pager = LESSCHARSET=utf-8 less
 	quotepath = false
 	ignorecase = false
+	symlinks = true
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
