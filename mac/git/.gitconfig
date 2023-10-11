@@ -22,3 +22,6 @@
 	gpgsign = true
 [merge]
 	ff = false
+[diff "lockb"]
+	textconv = bun
+	binary = true
