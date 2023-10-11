@@ -36,12 +36,13 @@ export BOOST_ROOT=/usr/local/opt/boost
 # go library
 export PATH="$HOME/go/bin:$PATH"
 
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
 local p_endmark="%B%(?,%F{green}$,%F{red}!!!\$!!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
