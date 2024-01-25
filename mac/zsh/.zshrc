@@ -30,9 +30,6 @@ export PATH=$NODEBREW_ROOT/current/bin:$PATH
 # curl
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-# boost
-export BOOST_ROOT=/usr/local/opt/boost
-
 # go library
 export PATH="$HOME/go/bin:$PATH"
 
