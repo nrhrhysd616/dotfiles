@@ -36,6 +36,16 @@
   // フォントサイズ
   "editor.fontSize": 11.5,
 
+  // ## フォーマット設定
+  // ペースト時にフォーマットするか
+  "editor.formatOnPaste": true,
+  // 保存時にフォーマットするか
+  "editor.formatOnSave": true,
+  // 保存時にフォーマットする際のモード file: ファイル全体をフォーマットする modifications: 修正部分のみフォーマットする
+  "editor.formatOnSaveMode": "file",
+  // タイプ時にフォーマットするか
+  "editor.formatOnType": true,
+
   "editor.accessibilitySupport": "off",
   "editor.autoClosingBrackets": "beforeWhitespace",
   "editor.autoClosingComments": "beforeWhitespace",
@@ -49,8 +59,6 @@
   "editor.emptySelectionClipboard": false,
   "editor.linkedEditing": true,
   "editor.trimAutoWhitespace": false,
-  "editor.formatOnPaste": true,
-  "editor.formatOnType": true,
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "files.autoSave": "onFocusChange",
   "workbench.colorTheme": "Monokai Pro",
@@ -102,9 +110,6 @@
   "[xml]": {
     "files.trimFinalNewlines": true
   },
-  "[python]": {
-    "editor.formatOnType": true
-  },
   "editor.inlineSuggest.enabled": true,
   "github.copilot.enable": {
     "*": true,
@@ -122,7 +127,6 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
-  "editor.formatOnSave": true,
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
   "git.autofetch": true
