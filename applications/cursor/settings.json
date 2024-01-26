@@ -1,5 +1,37 @@
 {
   // # エディタ設定
+  "editor.accessibilityPageSize": 10,
+  "editor.accessibilitySupport": "off",
+  "editor.autoClosingBrackets": "beforeWhitespace",
+  "editor.autoClosingComments": "beforeWhitespace",
+  "editor.autoClosingDelete": "auto",
+  "editor.autoClosingOvertype": "auto",
+  "editor.autoClosingQuotes": "beforeWhitespace",
+  "editor.autoIndent": "full",
+  "editor.autoSurround": "languageDefined",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.codeActionWidget.includeNearbyQuickFixes": true,
+  "editor.codeActionWidget.showHeaders": true,
+  "editor.codeLens": true,
+  "editor.codeLensFontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.codeLensFontSize": 0,
+  "editor.colorDecorators": true,
+  "editor.colorDecoratorsActivatedOn": "click",
+  "editor.colorDecoratorsLimit": 30,
+  // 選択範囲コメントアウト時に空行を無視するか
+  "editor.comments.ignoreEmptyLines": false,
+  // コメントアウト時にスペースを挿入するか
+  "editor.comments.insertSpace": true,
+  // コピー時にシンタックスハイライトもコピーするか
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.defaultColorDecorators": true,
+  "editor.defaultFoldingRangeProvider": "all",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.definitionLinkOpensInPeek": true,
+  "editor.detectIndentation": false,
+  "editor.dragAndDrop": false,
+
   // ## カーソル設定
   // カーソルの点滅デザイン
   "editor.cursorBlinking": "smooth",
@@ -31,7 +63,7 @@
   // ## フォント設定
   // フォントファミリー
   "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  // フォントの合字を有効にするか(詳細は: https://github.com/tonsky/FiraCode などで)
+  // フォントの合字を有効にするか(詳細はhttps://github.com/tonsky/FiraCode などで)
   "editor.fontLigatures": true,
   // フォントサイズ
   "editor.fontSize": 11.5,
@@ -46,16 +78,22 @@
   // タイプ時にフォーマットするか
   "editor.formatOnType": true,
 
-  "editor.accessibilitySupport": "off",
-  "editor.autoClosingBrackets": "beforeWhitespace",
-  "editor.autoClosingComments": "beforeWhitespace",
-  "editor.autoClosingQuotes": "beforeWhitespace",
-  "editor.colorDecoratorsActivatedOn": "click",
-  "editor.colorDecoratorsLimit": 100,
-  "editor.columnSelection": false,
-  "editor.comments.ignoreEmptyLines": false,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.dragAndDrop": false,
+  // ## 差分エディタ設定
+  "diffEditor.codeLens": true,
+  // 差分エディタの差分を表示するアルゴリズム
+  "diffEditor.diffAlgorithm": "advanced",
+  // 差分エディタのときに空白をハイライトするか
+  "diffEditor.experimental.showEmptyDecorations": true,
+  // 差分エディタのときに移動を検知するか
+  "diffEditor.experimental.showMoves": true,
+  // 差分エディタのときに変更されていない領域でのコンテキストの表示行数
+  "diffEditor.hideUnchangedRegions.contextLineCount": 3,
+  // 差分エディタのときに変更されていない領域を表示にするか
+  "diffEditor.hideUnchangedRegions.enabled": false,
+  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
+  "diffEditor.hideUnchangedRegions.revealLineCount": 20,
+  "diffEditor.ignoreTrimWhitespace": false,
+
   "editor.emptySelectionClipboard": false,
   "editor.linkedEditing": true,
   "editor.trimAutoWhitespace": false,
@@ -122,9 +160,9 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "diffEditor.ignoreTrimWhitespace": true
   },
-  "diffEditor.ignoreTrimWhitespace": false,
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
   "editor.minimap.enabled": true,
