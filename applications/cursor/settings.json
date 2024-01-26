@@ -1,5 +1,41 @@
 {
+  // # エディタ設定
+  // ## カーソル設定
+  // カーソルの点滅デザイン
   "editor.cursorBlinking": "smooth",
+  // カーソル移動時のアニメーション
+  "editor.cursorSmoothCaretAnimation": "off",
+  // カーソルスタイル
+  "editor.cursorStyle": "line",
+  // カーソルを移動した際に追従してスクロールする行数
+  "editor.cursorSurroundingLines": 20,
+  // カーソルを移動した際に追従してスクロールするタイミング default: キーボードでの移動時のみ追従スクロール all: 常に追従スクロール
+  "editor.cursorSurroundingLinesStyle": "default",
+  // カーソルの幅
+  "editor.cursorWidth": 2,
+
+  // ## 検索設定
+  // 検索時に上部に余白を追加するか
+  "editor.find.addExtraSpaceOnTop": true,
+  // 検索時に選択範囲内のテキストを自動的に検索文字列に設定するか
+  "editor.find.autoFindInSelection": "never",
+  // 検索時に検索窓タイプ中にカーソルを自動で移動するか
+  "editor.find.cursorMoveOnType": true,
+  // 検索時にグローバルなクリップボードを使用するか
+  "editor.find.globalFindClipboard": true,
+  // 検索ループを有効にするか
+  "editor.find.loop": true,
+  // 選択範囲を検索語にするか
+  "editor.find.seedSearchStringFromSelection": "always",
+
+  // ## フォント設定
+  // フォントファミリー
+  "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+  // フォントの合字を有効にするか(詳細は: https://github.com/tonsky/FiraCode などで)
+  "editor.fontLigatures": true,
+  // フォントサイズ
+  "editor.fontSize": 11.5,
+
   "editor.accessibilitySupport": "off",
   "editor.autoClosingBrackets": "beforeWhitespace",
   "editor.autoClosingComments": "beforeWhitespace",
