@@ -61,14 +61,14 @@ else
 	echo "python3.9 already installed."
 fi
 
-# nodebrew install
-type nodebrew > /dev/null 2>&1
-if [ $? -ne 0 ] ; then # nodebrew not found
-	echo "nodebrew not installed. install nodebrew."
-	brew install nodebrew
-	echo "nodebrew installed."
+type volta > /dev/null 2>&1
+if [ $? -ne 0 ] ; then # volta not found
+	echo "volta not installed. install volta."
+	# @see https://docs.volta.sh/guide/getting-started
+	curl https://get.volta.sh | bash
+	echo "volta installed."
 else
-	echo "nodebrew already installed."
+	echo "volta already installed."
 fi
 
 # go install
