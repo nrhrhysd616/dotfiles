@@ -16,8 +16,6 @@ function historyexec() {
 # fetch gitignore
 function gitignore() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
 
-# Python 3.7
-export PATH="/usr/local/opt/python@3.7/bin:$PATH"
 # Python 3.8
 export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 # Python 3.9

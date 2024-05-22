@@ -41,16 +41,6 @@ else
 	echo "fzf already installed."
 fi
 
-# Python3.7 install
-type python3.7 > /dev/null 2>&1
-if [ $? -ne 0 ] ; then # python3.7 not found
-	echo "python3.7 not installed. install python3.7."
-	brew install python@3.7
-	echo "python3.7 installed."
-else
-	echo "python3.7 already installed."
-fi
-
 # Python3.8 install
 type python3.8 > /dev/null 2>&1
 if [ $? -ne 0 ] ; then # python3.8 not found
