@@ -44,6 +44,9 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# iTerm2 shell integration load
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
