@@ -1,20 +1,103 @@
 {
-  "editor.cursorBlinking": "smooth",
+  // # エディタ設定
+  "editor.accessibilityPageSize": 10,
   "editor.accessibilitySupport": "off",
   "editor.autoClosingBrackets": "beforeWhitespace",
   "editor.autoClosingComments": "beforeWhitespace",
+  "editor.autoClosingDelete": "auto",
+  "editor.autoClosingOvertype": "auto",
   "editor.autoClosingQuotes": "beforeWhitespace",
+  "editor.autoIndent": "full",
+  "editor.autoSurround": "languageDefined",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.codeActionWidget.includeNearbyQuickFixes": true,
+  "editor.codeActionWidget.showHeaders": true,
+  "editor.codeLens": true,
+  "editor.codeLensFontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.codeLensFontSize": 0,
+  "editor.colorDecorators": true,
   "editor.colorDecoratorsActivatedOn": "click",
-  "editor.colorDecoratorsLimit": 100,
-  "editor.columnSelection": false,
+  "editor.colorDecoratorsLimit": 30,
+  // 選択範囲コメントアウト時に空行を無視するか
   "editor.comments.ignoreEmptyLines": false,
+  // コメントアウト時にスペースを挿入するか
+  "editor.comments.insertSpace": true,
+  // コピー時にシンタックスハイライトもコピーするか
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.defaultColorDecorators": true,
+  "editor.defaultFoldingRangeProvider": "all",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.definitionLinkOpensInPeek": true,
+  "editor.detectIndentation": false,
   "editor.dragAndDrop": false,
+
+  // ## カーソル設定
+  // カーソルの点滅デザイン
+  "editor.cursorBlinking": "smooth",
+  // カーソル移動時のアニメーション
+  "editor.cursorSmoothCaretAnimation": "off",
+  // カーソルスタイル
+  "editor.cursorStyle": "line",
+  // カーソルを移動した際に追従してスクロールする行数
+  "editor.cursorSurroundingLines": 20,
+  // カーソルを移動した際に追従してスクロールするタイミング default: キーボードでの移動時のみ追従スクロール all: 常に追従スクロール
+  "editor.cursorSurroundingLinesStyle": "default",
+  // カーソルの幅
+  "editor.cursorWidth": 2,
+
+  // ## 検索設定
+  // 検索時に上部に余白を追加するか
+  "editor.find.addExtraSpaceOnTop": true,
+  // 検索時に選択範囲内のテキストを自動的に検索文字列に設定するか
+  "editor.find.autoFindInSelection": "never",
+  // 検索時に検索窓タイプ中にカーソルを自動で移動するか
+  "editor.find.cursorMoveOnType": true,
+  // 検索時にグローバルなクリップボードを使用するか
+  "editor.find.globalFindClipboard": true,
+  // 検索ループを有効にするか
+  "editor.find.loop": true,
+  // 選択範囲を検索語にするか
+  "editor.find.seedSearchStringFromSelection": "always",
+
+  // ## フォント設定
+  // フォントファミリー
+  "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+  // フォントの合字を有効にするか(詳細はhttps://github.com/tonsky/FiraCode などで)
+  "editor.fontLigatures": true,
+  // フォントサイズ
+  "editor.fontSize": 11.5,
+
+  // ## フォーマット設定
+  // ペースト時にフォーマットするか
+  "editor.formatOnPaste": true,
+  // 保存時にフォーマットするか
+  "editor.formatOnSave": true,
+  // 保存時にフォーマットする際のモード file: ファイル全体をフォーマットする modifications: 修正部分のみフォーマットする
+  "editor.formatOnSaveMode": "file",
+  // タイプ時にフォーマットするか
+  "editor.formatOnType": true,
+
+  // ## 差分エディタ設定
+  "diffEditor.codeLens": true,
+  // 差分エディタの差分を表示するアルゴリズム
+  "diffEditor.diffAlgorithm": "advanced",
+  // 差分エディタのときに空白をハイライトするか
+  "diffEditor.experimental.showEmptyDecorations": true,
+  // 差分エディタのときに移動を検知するか
+  "diffEditor.experimental.showMoves": true,
+  // 差分エディタのときに変更されていない領域でのコンテキストの表示行数
+  "diffEditor.hideUnchangedRegions.contextLineCount": 3,
+  // 差分エディタのときに変更されていない領域を表示にするか
+  "diffEditor.hideUnchangedRegions.enabled": false,
+  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
+  "diffEditor.hideUnchangedRegions.revealLineCount": 20,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.dropIntoEditor.enabled": true,
+
   "editor.emptySelectionClipboard": false,
   "editor.linkedEditing": true,
   "editor.trimAutoWhitespace": false,
-  "editor.formatOnPaste": true,
-  "editor.formatOnType": true,
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "files.autoSave": "onFocusChange",
   "workbench.colorTheme": "Monokai Pro",
@@ -35,22 +118,22 @@
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-11",
-      "path": "/Users/nrhrhysd616/.sdkman/candidates/java/11.0.17-amzn"
+      "path": "${userHome}/.sdkman/candidates/java/11.0.17-amzn"
     },
     {
       "name": "JavaSE-17",
-      "path": "/Users/nrhrhysd616/.sdkman/candidates/java/17.0.5-amzn"
+      "path": "${userHome}/.sdkman/candidates/java/17.0.5-amzn"
     },
     {
       "name": "JavaSE-18",
-      "path": "/Users/nrhrhysd616/.sdkman/candidates/java/18.0.2-amzn",
+      "path": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
       "default": true
     }
   ],
   "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/mac/java/java-formatter-profile-nrhrhysd616-google-style.xml",
   "java.import.generatesMetadataFilesAtProjectRoot": true,
-  "java.import.gradle.java.home": "/Users/nrhrhysd616/.sdkman/candidates/java/17.0.5-amzn",
-  "java.jdt.ls.java.home": "/Users/nrhrhysd616/.sdkman/candidates/java/18.0.2-amzn",
+  "java.import.gradle.java.home": "${userHome}/.sdkman/candidates/java/17.0.5-amzn",
+  "java.jdt.ls.java.home": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
   "java.referencesCodeLens.enabled": true,
   "todo-tree.general.tags": ["BUG", "FIXME", "TODO", "[ ]", "[x]"],
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
@@ -66,9 +149,6 @@
   "[xml]": {
     "files.trimFinalNewlines": true
   },
-  "[python]": {
-    "editor.formatOnType": true
-  },
   "editor.inlineSuggest.enabled": true,
   "github.copilot.enable": {
     "*": true,
@@ -81,13 +161,13 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "diffEditor.ignoreTrimWhitespace": true
   },
-  "diffEditor.ignoreTrimWhitespace": false,
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
-  "editor.formatOnSave": true,
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
-  "git.autofetch": true
+  "git.autofetch": true,
+  "cursor.cpp.disabledLanguages": ["scminput"]
 }
