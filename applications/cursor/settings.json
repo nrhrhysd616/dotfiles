@@ -93,6 +93,7 @@
   "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
   "diffEditor.hideUnchangedRegions.revealLineCount": 20,
   "diffEditor.ignoreTrimWhitespace": false,
+  "editor.dropIntoEditor.enabled": true,
 
   "editor.emptySelectionClipboard": false,
   "editor.linkedEditing": true,
@@ -167,5 +168,6 @@
   "prettier.printWidth": 100,
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
-  "git.autofetch": true
+  "git.autofetch": true,
+  "cursor.cpp.disabledLanguages": ["scminput"]
 }
