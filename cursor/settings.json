@@ -1,5 +1,14 @@
 {
-  // # エディタ設定
+  // Cursor設定
+  "cursor.aipreview.enabled": true,
+  "cursor.chat.alwaysSearchWeb": true,
+  "cursor.chat.defaultNoContext": true,
+  "cursor.chat.smoothStreaming": true,
+  "cursor.chat.terminalShowHoverHint": true,
+  "cursor.cmdk.autoSelect": true,
+  "cursor.cpp.disabledLanguages": [],
+  "cursor.general.enableShadowWorkspace": false,
+  // エディター設定
   "editor.accessibilityPageSize": 10,
   "editor.accessibilitySupport": "off",
   "editor.autoClosingBrackets": "beforeWhitespace",
@@ -11,6 +20,7 @@
   "editor.autoSurround": "languageDefined",
   "editor.bracketPairColorization.enabled": true,
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.codeActionsOnSave": {},
   "editor.codeActionWidget.includeNearbyQuickFixes": true,
   "editor.codeActionWidget.showHeaders": true,
   "editor.codeLens": true,
@@ -19,11 +29,9 @@
   "editor.colorDecorators": true,
   "editor.colorDecoratorsActivatedOn": "click",
   "editor.colorDecoratorsLimit": 30,
-  // 選択範囲コメントアウト時に空行を無視するか
+  "editor.columnSelection": false,
   "editor.comments.ignoreEmptyLines": false,
-  // コメントアウト時にスペースを挿入するか
   "editor.comments.insertSpace": true,
-  // コピー時にシンタックスハイライトもコピーするか
   "editor.copyWithSyntaxHighlighting": false,
   "editor.defaultColorDecorators": true,
   "editor.defaultFoldingRangeProvider": "all",
@@ -31,9 +39,151 @@
   "editor.definitionLinkOpensInPeek": true,
   "editor.detectIndentation": false,
   "editor.dragAndDrop": false,
+  "editor.dropIntoEditor.enabled": false,
+  "editor.dropIntoEditor.showDropSelector": "afterDrop",
+  "editor.emptySelectionClipboard": false,
+  "editor.fastScrollSensitivity": 3,
+  "editor.folding": true,
+  "editor.foldingHighlight": true,
+  "editor.foldingImportsByDefault": false,
+  "editor.foldingMaximumRegions": 3000,
+  "editor.foldingStrategy": "auto",
+  "editor.glyphMargin": true,
+  "editor.gotoLocation.alternativeDeclarationCommand": "editor.action.goToReferences",
+  "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.goToReferences",
+  "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
+  "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences",
+  "editor.gotoLocation.alternativeTypeDefinitionCommand": "editor.action.goToReferences",
+  "editor.gotoLocation.multipleDeclarations": "peek",
+  "editor.gotoLocation.multipleDefinitions": "peek",
+  "editor.gotoLocation.multipleImplementations": "peek",
+  "editor.gotoLocation.multipleReferences": "peek",
+  "editor.gotoLocation.multipleTypeDefinitions": "peek",
+  "editor.guides.bracketPairs": true,
+  "editor.guides.bracketPairsHorizontal": "active",
+  "editor.guides.highlightActiveBracketPair": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.guides.indentation": true,
+  "editor.hideCursorInOverviewRuler": false,
+  "editor.hover.above": true,
+  "editor.hover.delay": 500,
+  "editor.hover.enabled": true,
+  "editor.hover.hidingDelay": 300,
+  "editor.hover.sticky": true,
+  "editor.indentSize": "tabSize",
+  "editor.inlayHints.enabled": "on",
+  "editor.inlayHints.fontFamily": "",
+  "editor.inlayHints.fontSize": 0,
+  "editor.inlayHints.padding": false,
+  "editor.inlineCompletionsAccessibilityVerbose": false,
+  "editor.insertSpaces": true,
+  "editor.language.brackets": null,
+  "editor.language.colorizedBracketPairs": null,
+  "editor.largeFileOptimizations": true,
+  "editor.letterSpacing": 0,
+  "editor.lightbulb.enabled": "on",
+  "editor.lineHeight": 0,
+  "editor.lineNumbers": "on",
+  "editor.linkedEditing": true,
+  "editor.links": true,
+  "editor.matchBrackets": "always",
+  "editor.maxTokenizationLineLength": 15000,
+  "editor.mouseWheelScrollSensitivity": 1,
+  "editor.mouseWheelZoom": false,
+  "editor.multiCursorLimit": 3000,
+  "editor.multiCursorMergeOverlapping": true,
+  "editor.multiCursorModifier": "alt",
+  "editor.multiCursorPaste": "spread",
+  "editor.occurrencesHighlight": "singleFile",
+  "editor.overviewRulerBorder": true,
+  "editor.padding.bottom": 0,
+  "editor.padding.top": 0,
+  "editor.parameterHints.cycle": true,
+  "editor.parameterHints.enabled": true,
+  "editor.pasteAs.enabled": true,
+  "editor.pasteAs.showPasteSelector": "afterPaste",
+  "editor.peekWidgetDefaultFocus": "tree",
+  "editor.rename.enablePreview": true,
+  "editor.renderControlCharacters": true,
+  "editor.renderFinalNewline": "on",
+  "editor.renderLineHighlight": "line",
+  "editor.renderLineHighlightOnlyWhenFocus": false,
+  "editor.renderWhitespace": "all",
+  "editor.roundedSelection": true,
+  "editor.rulers": [100, 150],
+  "editor.scrollbar.horizontal": "auto",
+  "editor.scrollbar.horizontalScrollbarSize": 10,
+  "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": false,
+  "editor.scrollbar.scrollByPage": false,
+  "editor.scrollbar.vertical": "auto",
+  "editor.scrollbar.verticalScrollbarSize": 15,
+  "editor.scrollBeyondLastColumn": 4,
+  "editor.scrollBeyondLastLine": true,
+  "editor.scrollPredominantAxis": true,
+  "editor.selectionHighlight": true,
+  "editor.semanticHighlighting.enabled": "configuredByTheme",
+  "editor.semanticTokenColorCustomizations": {},
+  "editor.showDeprecated": true,
+  "editor.showFoldingControls": "mouseover",
+  "editor.showUnused": true,
+  "editor.smartSelect.selectLeadingAndTrailingWhitespace": true,
+  "editor.smartSelect.selectSubwords": true,
+  "editor.smoothScrolling": true,
+  "editor.snippets.codeActions.enabled": false, // よくわからない…
+  "editor.stablePeek": false,
+  "editor.stickyScroll.defaultModel": "outlineModel",
+  "editor.stickyScroll.enabled": true,
+  "editor.stickyScroll.maxLineCount": 10,
+  "editor.stickyScroll.scrollWithEditor": true,
+  "editor.stickyTabStops": false,
+  "editor.tabCompletion": "on",
+  "editor.tabFocusMode": false,
+  "editor.tabSize": 2,
+  "editor.tokenColorCustomizations": {
+    "[*Light*]": {
+      "textMateRules": [
+        {
+          "scope": "ref.matchtext",
+          "settings": {
+            "foreground": "#000"
+          }
+        }
+      ]
+    },
+    "[*Dark*]": {
+      "textMateRules": [
+        {
+          "scope": "ref.matchtext",
+          "settings": {
+            "foreground": "#fff"
+          }
+        }
+      ]
+    }
+  },
+  "editor.trimAutoWhitespace": false,
+  "editor.unfoldOnClickAfterEndOfLine": false,
+  "editor.unicodeHighlight.allowedCharacters": {},
+  "editor.unicodeHighlight.allowedLocales": {
+    "_os": true,
+    "_vscode": true
+  },
+  "editor.unicodeHighlight.ambiguousCharacters": true,
+  "editor.unicodeHighlight.includeComments": "inUntrustedWorkspace",
+  "editor.unicodeHighlight.includeStrings": true,
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  "editor.unicodeHighlight.nonBasicASCII": "inUntrustedWorkspace",
+  "editor.unusualLineTerminators": "prompt",
+  "editor.useTabStops": true,
+  "editor.wordBreak": "normal",
+  "editor.wordSegmenterLocales": null,
+  "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
+  "editor.wordWrap": "off",
+  "editor.wordWrapColumn": 100,
+  "editor.wrappingIndent": "same",
+  "editor.wrappingStrategy": "simple",
+  // ここまで設定完了
 
-  // ## カーソル設定
-  // カーソルの点滅デザイン
   "editor.cursorBlinking": "smooth",
   // カーソル移動時のアニメーション
   "editor.cursorSmoothCaretAnimation": "off",
@@ -93,11 +243,6 @@
   "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
   "diffEditor.hideUnchangedRegions.revealLineCount": 20,
   "diffEditor.ignoreTrimWhitespace": false,
-  "editor.dropIntoEditor.enabled": true,
-
-  "editor.emptySelectionClipboard": false,
-  "editor.linkedEditing": true,
-  "editor.trimAutoWhitespace": false,
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "files.autoSave": "onFocusChange",
   "workbench.colorTheme": "Monokai Pro",
@@ -130,7 +275,7 @@
       "default": true
     }
   ],
-  "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/mac/java/java-formatter-profile-nrhrhysd616-google-style.xml",
+  "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/java/java-formatter-profile-nrhrhysd616-google-style.xml",
   "java.import.generatesMetadataFilesAtProjectRoot": true,
   "java.import.gradle.java.home": "${userHome}/.sdkman/candidates/java/17.0.5-amzn",
   "java.jdt.ls.java.home": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
@@ -169,7 +314,5 @@
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
   "git.autofetch": true,
-  "cursor.cpp.disabledLanguages": ["scminput"],
-  "github.copilot.editor.enableAutoCompletions": true,
-  "cursor.aipreview.enabled": true
+  "github.copilot.editor.enableAutoCompletions": true
 }
