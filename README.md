@@ -6,10 +6,8 @@
 
 ```zsh
 $git clone git@github.com:nrhrhysd616/dotfiles.git
-$chmod 744 dotfiles/applications/mac-init.zsh
-$chmod 744 dotfiles/mac/init.zsh
-$zsh dotfiles/applications/mac-init.zsh
-$zsh dotfiles/mac/init.zsh
+$chmod 744 dotfiles/mac-init.zsh
+$zsh dotfiles/mac-init.zsh
 ```
 
 ### システム設定
