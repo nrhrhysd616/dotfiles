@@ -169,5 +169,7 @@
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
   "git.autofetch": true,
-  "cursor.cpp.disabledLanguages": ["scminput"]
+  "cursor.cpp.disabledLanguages": ["scminput"],
+  "github.copilot.editor.enableAutoCompletions": true,
+  "cursor.aipreview.enabled": true
 }
