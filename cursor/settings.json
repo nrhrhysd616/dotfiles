@@ -1,7 +1,7 @@
 {
   // Cursor設定
   "cursor.aipreview.enabled": true,
-  "cursor.chat.alwaysSearchWeb": true,
+  "cursor.chat.alwaysSearchWeb": false,
   "cursor.chat.defaultNoContext": true,
   "cursor.chat.smoothStreaming": true,
   "cursor.chat.terminalShowHoverHint": true,
@@ -97,7 +97,7 @@
   "editor.occurrencesHighlight": "singleFile",
   "editor.overviewRulerBorder": true,
   "editor.padding.bottom": 0,
-  "editor.padding.top": 0,
+  "editor.padding.top": 5,
   "editor.parameterHints.cycle": true,
   "editor.parameterHints.enabled": true,
   "editor.pasteAs.enabled": true,
@@ -182,9 +182,8 @@
   "editor.wordWrapColumn": 100,
   "editor.wrappingIndent": "same",
   "editor.wrappingStrategy": "simple",
-  // ここまで設定完了
-
   "editor.cursorBlinking": "smooth",
+  // ここまで完了
   // カーソル移動時のアニメーション
   "editor.cursorSmoothCaretAnimation": "off",
   // カーソルスタイル
@@ -314,5 +313,11 @@
   "editor.minimap.enabled": true,
   "workbench.activityBar.location": "top",
   "git.autofetch": true,
-  "github.copilot.editor.enableAutoCompletions": true
+  "github.copilot.editor.enableAutoCompletions": true,
+  // 言語別設定
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+  },
+  // 拡張機能設定は以下に記述
+  "redhat.telemetry.enabled": false
 }
