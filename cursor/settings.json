@@ -319,5 +319,7 @@
     "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
   },
   // 拡張機能設定は以下に記述
-  "redhat.telemetry.enabled": false
+  "redhat.telemetry.enabled": false,
+  // bmewburn.vscode-intelephense-client
+  "intelephense.format.braces": "k&r"
 }
