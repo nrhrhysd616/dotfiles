@@ -49,6 +49,10 @@ __installCommand 'sdkman' 'curl -s "https://get.sdkman.io"' 'curl -s "https://ge
 # bun install
 # @see https://bun.sh/docs/installation
 __installCommand 'bun' 'bun --version' 'volta install bun'
+# aws cli install
+__installCommand 'aws' 'aws --version' 'brew install awscli'
+# install Fira Code font
+__installCommand 'Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew tap homebrew/cask-fonts; brew install --cask font-fira-code'
 
 # zsh
 # require curl
