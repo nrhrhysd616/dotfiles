@@ -48,7 +48,7 @@ __installCommand 'go' 'go version' 'brew install go'
 __installCommand 'sdkman' 'curl -s "https://get.sdkman.io"' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
 # bun install
 # @see https://bun.sh/docs/installation
-__installCommand 'bun' 'bun --version' 'brew tap oven-sh/bun; brew install bun'
+__installCommand 'bun' 'bun --version' 'volta install bun'
 
 # zsh
 # require curl
