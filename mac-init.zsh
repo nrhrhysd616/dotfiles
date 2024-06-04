@@ -15,17 +15,17 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)
 # @param checkCommand Command to check if installed (ex. 'brew list git')
 # @param installCommand Command to install (ex. 'brew install git')
 function __installCommand() {
-    command=$1
-    checkCommand=$2
-    installCommand=$3
-	eval $checkCommand > /dev/null 2>&1
-	if [ $? -ne 0 ] ; then # $1 not found
-		echo "$command not installed. install $command."
-		eval $installCommand
-		echo "$command installed."
-	else
-		echo "$command already installed."
-	fi
+  command=$1
+  checkCommand=$2
+  installCommand=$3
+  eval $checkCommand > /dev/null 2>&1
+  if [ $? -ne 0 ] ; then # $1 not found
+    echo "$command not installed. install $command."
+    eval $installCommand
+    echo "$command installed."
+  else
+    echo "$command already installed."
+  fi
 }
 
 # brew install
@@ -63,13 +63,12 @@ __installCommand 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
 __installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
 
 # zsh
-# require curl
 # require fzf command
+# require curl
 # require Python3.8 Python3.9
-# require nodebrew
+# require volta
 # require go
 # require sdkman
-# require bun
 ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
 echo ".zshrc file created."
 
@@ -77,7 +76,7 @@ echo ".zshrc file created."
 ln -nfs $SCRIPT_DIR/git/.gitconfig ~/
 ln -nfs $SCRIPT_DIR/git/.gitignore_global ~/
 if [ ! -f ~/.gitconfig.user.local ]; then
-	cp $SCRIPT_DIR/git/.gitconfig.user.local ~/
+  cp $SCRIPT_DIR/git/.gitconfig.user.local ~/
 fi
 echo "git configuration files created."
 
