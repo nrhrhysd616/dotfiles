@@ -4,9 +4,9 @@
 if [ $(uname) != "Darwin" ] ; then
 	echo "Not macOS!"
 	exit 1
-else
-	echo "This is macOS! Execute mac-init.zsh"
 fi
+
+echo "This is macOS! Execute mac-init.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
@@ -57,10 +57,10 @@ __installCommand 'sam' 'sam --version' 'brew install aws-sam-cli'
 __installCommand 'Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew tap homebrew/cask-fonts; brew install --cask font-fira-code'
 # install ngrok
 # @see https://ngrok.com/docs/getting-started/
-__installCommand 'ngrok' 'ngrok --v' 'brew install ngrok/ngrok/ngrok'
+__installCommand 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
 # install stripe cli
 # @see https://docs.stripe.com/stripe-cli?locale=ja-JP
-__installCommand 'stripe' 'stripe --v' 'brew install stripe/stripe-cli/stripe'
+__installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
 
 # zsh
 # require curl
