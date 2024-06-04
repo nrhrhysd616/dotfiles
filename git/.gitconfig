@@ -1,27 +1,27 @@
 [gpg]
-	program = gpg
+  program = gpg
 [include]
-	path = ~/.gitconfig.user.local
+  path = ~/.gitconfig.user.local
 [core]
-	excludesfile = ~/.gitignore_global
-	pager = LESSCHARSET=utf-8 less
-	quotepath = false
-	ignorecase = false
-	symlinks = true
+  excludesfile = ~/.gitignore_global
+  pager = LESSCHARSET=utf-8 less
+  quotepath = false
+  ignorecase = false
+  symlinks = true
 [filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
 [pull]
-	rebase = false
-	ff = only
+  rebase = false
+  ff = only
 [commit]
-        gpgsign = true
+  gpgsign = true
 [tag]
-	gpgsign = true
+  gpgsign = true
 [merge]
-	ff = false
+  ff = false
 [diff "lockb"]
-	textconv = bun
-	binary = true
+  textconv = bun
+  binary = true
