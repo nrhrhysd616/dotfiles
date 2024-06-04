@@ -51,8 +51,16 @@ __installCommand 'sdkman' 'curl -s "https://get.sdkman.io"' 'curl -s "https://ge
 __installCommand 'bun' 'bun --version' 'volta install bun'
 # aws cli install
 __installCommand 'aws' 'aws --version' 'brew install awscli'
+# aws sam cli install
+__installCommand 'sam' 'sam --version' 'brew install aws-sam-cli'
 # install Fira Code font
 __installCommand 'Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew tap homebrew/cask-fonts; brew install --cask font-fira-code'
+# install ngrok
+# @see https://ngrok.com/docs/getting-started/
+__installCommand 'ngrok' 'ngrok --v' 'brew install ngrok/ngrok/ngrok'
+# install stripe cli
+# @see https://docs.stripe.com/stripe-cli?locale=ja-JP
+__installCommand 'stripe' 'stripe --v' 'brew install stripe/stripe-cli/stripe'
 
 # zsh
 # require curl
