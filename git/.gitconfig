@@ -1,13 +1,11 @@
-[gpg]
-  program = gpg
-[include]
-  path = ~/.gitconfig.user.local
 [core]
   excludesfile = ~/.gitignore_global
   pager = LESSCHARSET=utf-8 less
   quotepath = false
   ignorecase = false
   symlinks = true
+[gpg]
+  program = gpg
 [filter "lfs"]
   required = true
   clean = git-lfs clean -- %f
@@ -25,3 +23,5 @@
 [diff "lockb"]
   textconv = bun
   binary = true
+[include]
+  path = ~/.gitconfig.user.local
