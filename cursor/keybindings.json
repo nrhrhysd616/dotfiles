@@ -47,6 +47,11 @@
     "key": "cmd+l",
     "command": "-aichat.newchataction"
   },
+  // 既存の選択エリアのAIチャットへの挿入を無効化
+  {
+    "key": "shift+cmd+l",
+    "command": "-aichat.insertselectionintochat"
+  },
   // 既存の選択エリアのGit Stagingを無効化
   {
     "key": "cmd+k alt+cmd+s",
@@ -58,6 +63,11 @@
     "key": "cmd+k cmd+n",
     "command": "-git.unstageSelectedRanges",
     "when": "isInDiffEditor && !operationInProgress"
+  },
+  // 既存の閉じたエディターを再オープンするショートカットを無効化
+  {
+    "key": "shift+cmd+t",
+    "command": "-workbench.action.reopenClosedEditor"
   },
   // 有効化設定----------------------------------------------------------------------------
   // 1行選択
@@ -82,6 +92,11 @@
   {
     "key": "cmd+t",
     "command": "workbench.action.toggleAuxiliaryBar"
+  },
+  // 選択エリアのAIチャットへの挿入
+  {
+    "key": "shift+cmd+t",
+    "command": "aichat.insertselectionintochat"
   },
   // 選択エリアのGit Staging
   {
