@@ -30,6 +30,8 @@ function __installCommand() {
 
 # brew install
 __installCommand 'brew' 'brew --version' '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+# sqlite3 install
+__installCommand 'sqlite3' 'brew list sqlite3' 'brew install sqlite; brew link sqlite'
 # git brew install
 __installCommand 'git' 'brew list git' 'brew install git'
 # curl install
