@@ -285,7 +285,7 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
-    "diffEditor.ignoreTrimWhitespace": true
+    "diffEditor.ignoreTrimWhitespace": false
   },
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
