@@ -50,5 +50,5 @@ fi
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
-local p_endmark="%B%(?,%F{green}$,%F{red}!!!\$!!!)%f%b"
+local p_endmark="%B%(?,%F{green}$,%F{red}!!\$!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
