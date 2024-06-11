@@ -263,15 +263,6 @@
   "protoc": {
     "path": "/usr/local/bin/protoc"
   },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[xml]": {
-    "files.trimFinalNewlines": true
-  },
   "editor.inlineSuggest.enabled": true,
   "github.copilot.enable": {
     "*": true,
@@ -279,13 +270,6 @@
     "markdown": true,
     "scminput": false,
     "yaml": true
-  },
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
-    "diffEditor.ignoreTrimWhitespace": false
   },
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
@@ -299,6 +283,16 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "diffEditor.ignoreTrimWhitespace": false
+  },
+  "[xml]": {
+    "files.trimFinalNewlines": true
   },
   // 拡張機能設定は以下に記述
   "redhat.telemetry.enabled": false,
