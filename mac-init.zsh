@@ -50,7 +50,7 @@ __installCommand 'go' 'go version' 'brew install go'
 __installCommand 'sdkman' 'curl -s "https://get.sdkman.io"' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
 # bun install
 # @see https://bun.sh/docs/installation
-__installCommand 'bun' 'bun --version' 'volta install bun'
+__installCommand 'bun' 'bun --version' 'volta install node;volta install bun'
 # aws cli install
 __installCommand 'aws' 'aws --version' 'brew install awscli'
 # aws sam cli install
