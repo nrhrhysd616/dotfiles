@@ -41,7 +41,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # Herd configurations
 [[ -d "$HOME/Library/Application Support/Herd" ]] # @see https://zsh.sourceforge.io/Doc/Release/Conditional-Expressions.html#Conditional-Expressions
 if [ $? -eq 0 ] ; then
-  [[ -f "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh" ]] && builtin source "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh"
   # Herd injected PHP binary.
   export PATH="$HOME/Library/Application Support/Herd/bin":$PATH
   # Herd injected PHP 8.3 configuration.
