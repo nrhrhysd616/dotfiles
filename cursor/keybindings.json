@@ -69,6 +69,17 @@
     "key": "shift+cmd+t",
     "command": "-workbench.action.reopenClosedEditor"
   },
+  // 既存のcopilotのインラインサジェストを無効化
+  {
+    "key": "alt+\\",
+    "command": "-editor.action.inlineSuggest.trigger",
+    "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
+  },
+  // 既存の行移動を無効化
+  {
+    "key": "ctrl+g",
+    "command": "-workbench.action.gotoLine"
+  },
   // 有効化設定----------------------------------------------------------------------------
   // 1行選択
   {
@@ -109,5 +120,11 @@
     "key": "cmd+shift+s cmd+shift+s",
     "command": "git.unstageSelectedRanges",
     "when": "isInDiffEditor && !operationInProgress"
+  },
+  // copilotのインラインサジェスト
+  {
+    "key": "ctrl+g",
+    "command": "editor.action.inlineSuggest.trigger",
+    "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
   }
 ]
