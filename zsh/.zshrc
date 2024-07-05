@@ -9,8 +9,8 @@ alias speedtest='networkQuality'
 
 # historyexec command
 function historyexec() {
-	# コマンド履歴を番号なし(-n)降順(-r)直近500件(-500)で取得したものをfzfに渡し、複数選択なし(--no-multi)で選択したコマンドをevalで実行
-	eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
+  # コマンド履歴を番号なし(-n)降順(-r)直近500件(-500)で取得したものをfzfに渡し、複数選択なし(--no-multi)で選択したコマンドをevalで実行
+  eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
 }
 
 # fetch gitignore

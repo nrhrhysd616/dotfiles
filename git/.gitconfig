@@ -25,3 +25,8 @@
   binary = true
 [include]
   path = ~/.gitconfig.user.local
+[alias]
+  # git aliasの一覧確認
+  alias = !git config --get-regexp 'alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
+  # originから$1ブランチをpullし、現在のブランチを最新の$1ブランチへリベースする (git pull origin $1 && git rebase $1)
+  pr = "!f(){ git pull origin $1 && git rebase $1;};f"
