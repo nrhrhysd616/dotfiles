@@ -5,7 +5,9 @@
   ignorecase = false
   symlinks = true
 [gpg]
-  program = gpg
+  format = ssh
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 [filter "lfs"]
   required = true
   clean = git-lfs clean -- %f
@@ -23,10 +25,10 @@
 [diff "lockb"]
   textconv = bun
   binary = true
+[alias]
+  # git alias git aliasの一覧確認
+  alias = !git config --get-regexp 'alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
+  # git pr ${branch-name} originから$1ブランチをpullし、現在のブランチを最新の$1ブランチへリベースする (git pull origin $1 && git rebase $1)
+  pr = "!f(){ git pull origin $1 && git rebase $1;};f"
 [include]
   path = ~/.gitconfig.user.local
-[alias]
-  # git aliasの一覧確認
-  alias = !git config --get-regexp 'alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
-  # originから$1ブランチをpullし、現在のブランチを最新の$1ブランチへリベースする (git pull origin $1 && git rebase $1)
-  pr = "!f(){ git pull origin $1 && git rebase $1;};f"

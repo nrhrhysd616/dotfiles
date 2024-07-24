@@ -1,5 +1,5 @@
-; Please copy and use this file, do not use symbolic link.
+# Please copy and use this file, do not use symbolic link.
 [user]
-	signingkey = ; 40 digit signing key 
-	name = ; Full Name
-	email = ; GitHub email address
+  signingkey = # GPG or SSH signing key
+  name = # Full Name
+  email = # GitHub email address
