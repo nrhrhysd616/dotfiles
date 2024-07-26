@@ -1,0 +1,46 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  // 無効化設定----------------------------------------------------------------------------
+  // 既存の選択エリアのGit Stagingを無効化
+  {
+    "key": "cmd+k alt+cmd+s",
+    "command": "-git.stageSelectedRanges",
+    "when": "isInDiffEditor && !operationInProgress"
+  },
+  // 既存の選択エリアのGit Unstagingを無効化
+  {
+    "key": "cmd+k cmd+n",
+    "command": "-git.unstageSelectedRanges",
+    "when": "isInDiffEditor && !operationInProgress"
+  },
+  // 既存のcopilotのインラインサジェストを無効化
+  {
+    "key": "alt+\\",
+    "command": "-editor.action.inlineSuggest.trigger",
+    "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
+  },
+  // 既存の行移動を無効化
+  {
+    "key": "ctrl+g",
+    "command": "-workbench.action.gotoLine"
+  },
+  // 有効化設定----------------------------------------------------------------------------
+  // 選択エリアのGit Staging
+  {
+    "key": "cmd+s cmd+s",
+    "command": "git.stageSelectedRanges",
+    "when": "isInDiffEditor && !operationInProgress"
+  },
+  // 選択エリアのGit Unstaging
+  {
+    "key": "cmd+shift+s cmd+shift+s",
+    "command": "git.unstageSelectedRanges",
+    "when": "isInDiffEditor && !operationInProgress"
+  },
+  // copilotのインラインサジェスト
+  {
+    "key": "ctrl+g",
+    "command": "editor.action.inlineSuggest.trigger",
+    "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
+  }
+]

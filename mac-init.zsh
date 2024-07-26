@@ -90,6 +90,7 @@ ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Curso
 # VSCode user settings
 # Require VSCode application
 ln -nfs $SCRIPT_DIR/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
+ln -nfs $SCRIPT_DIR/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
 
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o ~/.iterm2_shell_integration.zsh
