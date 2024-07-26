@@ -87,6 +87,10 @@ echo "git configuration files created."
 ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
 ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
 
+# VSCode user settings
+# Require VSCode application
+ln -nfs $SCRIPT_DIR/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
+
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o ~/.iterm2_shell_integration.zsh
 echo "iTerm2 shell integration installed."
