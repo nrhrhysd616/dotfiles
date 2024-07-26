@@ -229,6 +229,7 @@
   "workbench.sideBar.location": "left",
   "workbench.editor.decorations.badges": true,
   "workbench.editor.enablePreview": false,
+  "workbench.activityBar.orientation": "vertical",
   "explorer.autoReveal": false,
   "terminal.explorerKind": "external",
   "terminal.external.osxExec": "iTerm.app",
@@ -274,7 +275,6 @@
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
   "editor.minimap.enabled": true,
-  "workbench.activityBar.location": "top",
   "git.autofetch": true,
   "github.copilot.editor.enableAutoCompletions": true,
   // 言語別設定
