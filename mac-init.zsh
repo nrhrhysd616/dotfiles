@@ -92,6 +92,11 @@ ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Curso
 ln -nfs $SCRIPT_DIR/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
 ln -nfs $SCRIPT_DIR/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
 
+# VSCode - Insiders user settings
+# Require VSCode application
+ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json ~/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
+ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json ~/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
+
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o ~/.iterm2_shell_integration.zsh
 echo "iTerm2 shell integration installed."
