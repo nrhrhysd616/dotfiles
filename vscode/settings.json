@@ -270,22 +270,22 @@
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-11",
-      "path": "${userHome}/.sdkman/candidates/java/11.0.17-amzn"
+      "path": "~/.sdkman/candidates/java/11.0.17-amzn"
     },
     {
       "name": "JavaSE-17",
-      "path": "${userHome}/.sdkman/candidates/java/17.0.5-amzn"
+      "path": "~/.sdkman/candidates/java/17.0.5-amzn"
     },
     {
       "name": "JavaSE-18",
-      "path": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
+      "path": "~/.sdkman/candidates/java/18.0.2-amzn",
       "default": true
     }
   ],
   "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/java/java-formatter-profile-nrhrhysd616-google-style.xml",
   "java.import.generatesMetadataFilesAtProjectRoot": true,
-  "java.import.gradle.java.home": "${userHome}/.sdkman/candidates/java/17.0.5-amzn",
-  "java.jdt.ls.java.home": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
+  "java.import.gradle.java.home": "~/.sdkman/candidates/java/17.0.5-amzn",
+  "java.jdt.ls.java.home": "~/.sdkman/candidates/java/18.0.2-amzn",
   "java.referencesCodeLens.enabled": true,
   "todo-tree.general.tags": ["BUG", "FIXME", "TODO", "[ ]", "[x]"],
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
