@@ -318,7 +318,8 @@
     "diffEditor.ignoreTrimWhitespace": false
   },
   "[xml]": {
-    "files.trimFinalNewlines": true
+    "files.trimFinalNewlines": true,
+    "editor.defaultFormatter": "redhat.vscode-xml"
   },
   // 拡張機能設定は以下に記述
   "redhat.telemetry.enabled": false,
