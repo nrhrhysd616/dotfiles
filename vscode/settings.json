@@ -304,6 +304,9 @@
   "git.autofetch": true,
   "github.copilot.editor.enableAutoCompletions": true,
   // 言語別設定
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
   "[php]": {
     "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
   },
