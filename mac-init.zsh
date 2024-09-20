@@ -76,7 +76,7 @@ source ~/.zshrc
 echo ".zshrc file created."
 
 # Java install
-# sdkコマンドのパスを.zshrcで通してから実行可能
+# After set sdk command path in .zshrc, install Java
 __installCommand 'Java11' 'sdk home java 11.0.24-amzn' 'sdk install java 11.0.24-amzn'
 __installCommand 'Java17' 'sdk home java 17.0.12-amzn' 'sdk install java 17.0.12-amzn'
 __installCommand 'Java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
