@@ -2,8 +2,8 @@
 
 # Check macOS
 if [ $(uname) != "Darwin" ] ; then
-	echo "Not macOS!"
-	exit 1
+  echo "Not macOS!"
+  exit 1
 fi
 
 echo "This is macOS! Execute mac-init.zsh"
@@ -72,7 +72,14 @@ __installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
 # require go
 # require sdkman
 ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
+source ~/.zshrc
 echo ".zshrc file created."
+
+# Java install
+# sdkコマンドのパスを.zshrcで通してから実行可能
+__installCommand 'Java11' 'sdk home java 11.0.24-amzn' 'sdk install java 11.0.24-amzn'
+__installCommand 'Java17' 'sdk home java 17.0.12-amzn' 'sdk install java 17.0.12-amzn'
+__installCommand 'Java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
 
 # git setting
 ln -nfs $SCRIPT_DIR/git/.gitconfig ~/
