@@ -63,6 +63,9 @@ __installCommand 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
 # install stripe cli
 # @see https://docs.stripe.com/stripe-cli?locale=ja-JP
 __installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
+# install vhs
+# @see https://github.com/charmbracelet/vhs
+__installCommand 'vhs' 'vhs -v' 'brew install vhs'
 
 # zsh
 # require fzf command
