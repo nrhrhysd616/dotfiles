@@ -24,7 +24,7 @@
   "editor.comments.ignoreEmptyLines": false,
   "editor.comments.insertSpace": true,
   "editor.copyWithSyntaxHighlighting": false,
-  "editor.defaultColorDecorators": true,
+  "editor.defaultColorDecorators": "auto",
   "editor.defaultFoldingRangeProvider": null,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": true,
