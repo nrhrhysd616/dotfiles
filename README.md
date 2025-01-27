@@ -4,22 +4,28 @@
 
 ### シェル環境構築
 
-```zsh
-$git clone git@github.com:nrhrhysd616/dotfiles.git
-$chmod 744 dotfiles/mac-init.zsh
-$zsh dotfiles/mac-init.zsh
-```
+1. 事前に[Homebrew](https://brew.sh/ja/)・[VSCode](https://code.visualstudio.com/download)・[VSCode Insiders](https://code.visualstudio.com/insiders/)をインストール・起動しておく
+
+2. 以下のZshコマンドを順番に実行
+
+    ```zsh
+    $git clone git@github.com:nrhrhysd616/dotfiles.git
+    $chmod 744 dotfiles/mac-init.zsh
+    $zsh dotfiles/mac-init.zsh
+    ```
+
+3. iTerm2の設定を反映
+
+    iTerm2を起動しメニューの「Settings...」から以下を設定  
+    General -> Settings -> Import All Settings And Data...を選択  
+    `dotfiles/iterm2/iTerm2-all-settings.itermexport`のファイルを選択してインポート
 
 ### システム設定
 
-* AppleID > iCloud > iCloudを使用しているアプリ
+* iCloud
 
-  パスワードとキーチェーン**以外はオフ**
-  
-* AppleID > iCloud > iCloudを使用しているアプリ > その他のアプリを表示…
+  各種必要に応じて設定
 
-  必要に応じてオン
-  
 * アクセシビリティ > ディスプレイ
 
   ポインタの枠線のカラー > 白
@@ -27,5 +33,5 @@ $zsh dotfiles/mac-init.zsh
   
 * キーボード > キーボードショートカット…
 
-  スクリーンショット**以外のショートカットを削除**  
+  スクリーンショット**以外のショートカットをすべて削除**  
   「F1、F2などのキーを標準のファンクションキーとして利用」はオン

@@ -10,6 +10,17 @@ echo "This is macOS! Execute mac-init.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
+# zsh
+# require fzf command
+# require curl
+# require Python3.8 Python3.9
+# require volta
+# require go
+# require sdkman
+ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
+source ~/.zshrc
+echo ".zshrc file created."
+
 # install command function
 # @param command command name (ex. 'git')
 # @param checkCommand Command to check if installed (ex. 'brew list git')
@@ -28,8 +39,6 @@ function __installCommand() {
   fi
 }
 
-# brew install
-__installCommand 'brew' 'brew --version' '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
 # sqlite3 install
 __installCommand 'sqlite3' 'brew list sqlite3' 'brew install sqlite'
 # git brew install
@@ -39,7 +48,7 @@ __installCommand 'curl' 'curl --version' 'brew install curl'
 # fzf install
 __installCommand 'fzf' 'fzf --version' 'brew install fzf'
 # python3.8 install
-__installCommand 'python3.8' 'python3.8 --version' 'brew install python@3.8'
+# __installCommand 'python3.8' 'python3.8 --version' 'brew install python@3.8'
 # python3.9 install
 __installCommand 'python3.9' 'python3.9 --version' 'brew install python@3.9'
 # volta install
@@ -47,7 +56,7 @@ __installCommand 'volta' 'volta --version' 'curl https://get.volta.sh | bash'
 # go install
 __installCommand 'go' 'go version' 'brew install go'
 # sdkman install
-__installCommand 'sdkman' 'curl -s "https://get.sdkman.io"' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
+__installCommand 'sdkman' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
 # bun install
 # @see https://bun.sh/docs/installation
 __installCommand 'bun' 'bun --version' 'volta install node;volta install bun'
@@ -55,8 +64,9 @@ __installCommand 'bun' 'bun --version' 'volta install node;volta install bun'
 __installCommand 'aws' 'aws --version' 'brew install awscli'
 # aws sam cli install
 __installCommand 'sam' 'sam --version' 'brew install aws-sam-cli'
-# install Fira Code font
-__installCommand 'Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew tap homebrew/cask-fonts; brew install --cask font-fira-code'
+# install Font Fira Code
+# Bug: フォントのインストール場所がおかしいため、手動で移動してbrewから削除
+__installCommand 'Font Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew install font-fira-code && mv ~/\$\{HOME\}/Library/Fonts/* ~/Library/Fonts/ && rm -rf ~/\$\{HOME\} && brew uninstall font-fira-code'
 # install ngrok
 # @see https://ngrok.com/docs/getting-started/
 __installCommand 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
@@ -67,21 +77,10 @@ __installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
 # @see https://github.com/charmbracelet/vhs
 __installCommand 'vhs' 'vhs -v' 'brew install vhs'
 
-# zsh
-# require fzf command
-# require curl
-# require Python3.8 Python3.9
-# require volta
-# require go
-# require sdkman
-ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
-source ~/.zshrc
-echo ".zshrc file created."
-
 # Java install
 # After set sdk command path in .zshrc, install Java
-__installCommand 'Java11' 'sdk home java 11.0.24-amzn' 'sdk install java 11.0.24-amzn'
-__installCommand 'Java17' 'sdk home java 17.0.12-amzn' 'sdk install java 17.0.12-amzn'
+__installCommand 'Java11' 'sdk home java 11.0.26-amzn' 'sdk install java 11.0.26-amzn'
+__installCommand 'Java17' 'sdk home java 17.0.14-amzn' 'sdk install java 17.0.14-amzn'
 __installCommand 'Java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
 
 # git setting
@@ -94,8 +93,9 @@ echo "git configuration files created."
 
 # Cursor user settings
 # Require Cursor application
-ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
-ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+# Cursor未使用なためコメントアウト
+# ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
+# ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
 
 # VSCode user settings
 # Require VSCode application

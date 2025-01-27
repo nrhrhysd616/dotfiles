@@ -1,3 +1,6 @@
+# homebrew PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Alias
 alias cdproject='cd ~/Documents/project/'
 alias ..='cd ..'
