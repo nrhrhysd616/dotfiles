@@ -20,6 +20,12 @@
     General -> Settings -> Import All Settings And Data...を選択  
     `dotfiles/iterm2/iTerm2-all-settings.itermexport`のファイルを選択してインポート
 
+4. `.gitconfig.user.local`ファイルを編集
+
+    * signingkey: ssh公開鍵の情報
+    * name: アルファベットフルネーム
+    * email: sshキーの設定と同一のGithubで利用しているメールアドレス
+
 ### システム設定
 
 * iCloud
