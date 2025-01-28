@@ -21,6 +21,9 @@ ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
 source ~/.zshrc
 echo ".zshrc file created."
 
+# Xcode Command Line Tools install
+xcode-select --install
+
 # install command function
 # @param command command name (ex. 'git')
 # @param checkCommand Command to check if installed (ex. 'brew list git')
@@ -113,8 +116,15 @@ echo "iTerm2 shell integration installed."
 
 # System Configuration
 # Do not create .DS_Store on USB or Network drives
+defaults write -g KeyRepeat -int 1 
+defaults write -g InitialKeyRepeat -int 10
+networksetup -setdnsservers Wi-Fi 2001:4860:4860::8844 2001:4860:4860::8888 8.8.4.4 8.8.8.8
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write -g AppleShowAllExtensions -bool true
+defaults write com.apple.finder WarnOnEmptyTrash -bool false
+defaults write com.apple.finder _FXShowPosixPathInTitle -boolean true && killall Finder
+
 echo "macOS System Configuration done."
 
 echo "Complete!"
