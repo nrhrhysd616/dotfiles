@@ -2,7 +2,7 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Alias
-alias cdproject='cd ~/Documents/project/'
+alias cdproject='cd ~/Documents/Project/'
 alias ..='cd ..'
 alias ls='ls -F'
 alias la='ls -A'
