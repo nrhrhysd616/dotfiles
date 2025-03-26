@@ -10,6 +10,9 @@ echo "This is macOS! Execute mac-init.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
+# Homebrew install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 # zsh
 # require fzf command
 # require curl
