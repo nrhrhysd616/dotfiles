@@ -1,5 +1,10 @@
 # homebrew PATH
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ "$(uname -m)" = "arm64" ]; then
+  # For arm64
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  # For x86_64
+fi
 
 # Alias
 alias cdproject='cd ~/Documents/Project/'
