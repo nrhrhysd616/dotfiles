@@ -4,7 +4,7 @@
 
 ### シェル環境構築
 
-1. 事前に[Homebrew](https://brew.sh/ja/)・[VSCode](https://code.visualstudio.com/download)・[VSCode Insiders](https://code.visualstudio.com/insiders/)をインストール・起動しておく
+1. [VSCode](https://code.visualstudio.com/download)・[VSCode Insiders](https://code.visualstudio.com/insiders/)をインストール・起動しておく
 
 2. 以下のZshコマンドを順番に実行
 
@@ -25,6 +25,10 @@
     * signingkey: ssh公開鍵の情報
     * name: アルファベットフルネーム
     * email: sshキーの設定と同一のGithubで利用しているメールアドレス
+
+5. VSCodeのClineのCustom Instructionsを手動で設定する
+
+    現状設定のエクスポートなどができず、`settings.json`ファイルでの外出しも不可能なため手動
 
 ### システム設定
 
