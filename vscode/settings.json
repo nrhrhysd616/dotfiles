@@ -319,12 +319,12 @@
     "plaintext": true,
     "markdown": true,
     "scminput": false,
-    "yaml": true
+    "yaml": true,
+    "enableAutoCompletions": true
   },
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
   "git.autofetch": true,
-  "github.copilot.editor.enableAutoCompletions": true,
   // 言語別設定
   "[java]": {
     "editor.defaultFormatter": "redhat.java"

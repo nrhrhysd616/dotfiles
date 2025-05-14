@@ -6,7 +6,7 @@ if [ $(uname) != "Darwin" ] ; then
   exit 1
 fi
 
-echo "This is macOS! Execute mac-init.zsh"
+echo "This is macOS! Execute init-mac.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
@@ -100,8 +100,8 @@ echo "git configuration files created."
 # Cursor user settings
 # Require Cursor application
 # Cursor未使用なためコメントアウト
-# ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
-# ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
+ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
 
 # VSCode user settings
 # Require VSCode application

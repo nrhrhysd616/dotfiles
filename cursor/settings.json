@@ -1,14 +1,5 @@
 {
-  // Cursor設定
-  "cursor.aipreview.enabled": true,
-  "cursor.chat.alwaysSearchWeb": false,
-  "cursor.chat.defaultNoContext": true,
-  "cursor.chat.smoothStreaming": true,
-  "cursor.chat.terminalShowHoverHint": true,
-  "cursor.cmdk.autoSelect": true,
-  "cursor.cpp.disabledLanguages": [],
-  "cursor.general.enableShadowWorkspace": false,
-  // エディター設定
+  // # Text Editor settings
   "editor.accessibilityPageSize": 10,
   "editor.accessibilitySupport": "off",
   "editor.autoClosingBrackets": "beforeWhitespace",
@@ -20,6 +11,7 @@
   "editor.autoSurround": "languageDefined",
   "editor.bracketPairColorization.enabled": true,
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.codeActions.triggerOnFocusChange": false,
   "editor.codeActionsOnSave": {},
   "editor.codeActionWidget.includeNearbyQuickFixes": true,
   "editor.codeActionWidget.showHeaders": true,
@@ -33,15 +25,23 @@
   "editor.comments.ignoreEmptyLines": false,
   "editor.comments.insertSpace": true,
   "editor.copyWithSyntaxHighlighting": false,
-  "editor.defaultColorDecorators": true,
+  "editor.defaultColorDecorators": "auto",
   "editor.defaultFoldingRangeProvider": null,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": true,
   "editor.detectIndentation": false,
   "editor.dragAndDrop": false,
   "editor.dropIntoEditor.enabled": false,
+  "editor.dropIntoEditor.preferences": [],
   "editor.dropIntoEditor.showDropSelector": "afterDrop",
   "editor.emptySelectionClipboard": false,
+  "editor.experimental.asyncTokenization": true,
+  "editor.experimental.asyncTokenizationLogging": false,
+  "editor.experimental.asyncTokenizationVerification": false,
+  "editor.experimental.preferTreeSitter": [],
+  "editor.experimental.treeSitterTelemetry": false,
+  "editor.experimentalEditContextEnabled": false,
+  "editor.experimentalWhitespaceRendering": "svg",
   "editor.fastScrollSensitivity": 3,
   "editor.folding": true,
   "editor.foldingHighlight": true,
@@ -72,8 +72,9 @@
   "editor.hover.sticky": true,
   "editor.indentSize": "tabSize",
   "editor.inlayHints.enabled": "on",
-  "editor.inlayHints.fontFamily": "",
+  "editor.inlayHints.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
   "editor.inlayHints.fontSize": 0,
+  "editor.inlayHints.maximumLength": 0,
   "editor.inlayHints.padding": false,
   "editor.inlineCompletionsAccessibilityVerbose": false,
   "editor.insertSpaces": true,
@@ -95,12 +96,16 @@
   "editor.multiCursorModifier": "alt",
   "editor.multiCursorPaste": "spread",
   "editor.occurrencesHighlight": "singleFile",
+  "editor.occurrencesHighlightDelay": 200,
+  "editor.overtypeCursorStyle": "line",
+  "editor.overtypeOnPaste": true,
   "editor.overviewRulerBorder": true,
   "editor.padding.bottom": 0,
   "editor.padding.top": 5,
   "editor.parameterHints.cycle": true,
   "editor.parameterHints.enabled": true,
   "editor.pasteAs.enabled": true,
+  "editor.pasteAs.preferences": [],
   "editor.pasteAs.showPasteSelector": "afterPaste",
   "editor.peekWidgetDefaultFocus": "tree",
   "editor.rename.enablePreview": true,
@@ -110,7 +115,7 @@
   "editor.renderLineHighlightOnlyWhenFocus": false,
   "editor.renderWhitespace": "all",
   "editor.roundedSelection": true,
-  "editor.rulers": [100, 150],
+  "editor.rulers": [80, 100, 150],
   "editor.scrollbar.horizontal": "auto",
   "editor.scrollbar.horizontalScrollbarSize": 10,
   "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": false,
@@ -182,50 +187,95 @@
   "editor.wordWrapColumn": 100,
   "editor.wrappingIndent": "same",
   "editor.wrappingStrategy": "simple",
+  // ## Cursor settings
   "editor.cursorBlinking": "smooth",
   "editor.cursorSmoothCaretAnimation": "off",
   "editor.cursorStyle": "line",
   "editor.cursorSurroundingLines": 20,
   "editor.cursorSurroundingLinesStyle": "default",
   "editor.cursorWidth": 2,
+  // ## Find settings
   "editor.find.addExtraSpaceOnTop": true,
   "editor.find.autoFindInSelection": "never",
   "editor.find.cursorMoveOnType": true,
   "editor.find.globalFindClipboard": true,
+  "editor.find.history": "workspace",
   "editor.find.loop": true,
   "editor.find.seedSearchStringFromSelection": "always",
+  // ## Font settings
   "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
   // フォントの合字を有効にするか(詳細はhttps://github.com/tonsky/FiraCode などで)
   "editor.fontLigatures": true,
   "editor.fontSize": 11.5,
   "editor.fontVariations": false,
   "editor.fontWeight": "normal",
+  // ## Formatting settings
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.formatOnType": true,
-  // ここまで完了
-
-  // ## 差分エディタ設定
+  // ## Diff Editor settings
   "diffEditor.codeLens": true,
-  // 差分エディタの差分を表示するアルゴリズム
   "diffEditor.diffAlgorithm": "advanced",
-  // 差分エディタのときに空白をハイライトするか
   "diffEditor.experimental.showEmptyDecorations": true,
-  // 差分エディタのときに移動を検知するか
   "diffEditor.experimental.showMoves": true,
-  // 差分エディタのときに変更されていない領域でのコンテキストの表示行数
+  "diffEditor.experimental.useTrueInlineView": true,
   "diffEditor.hideUnchangedRegions.contextLineCount": 3,
-  // 差分エディタのときに変更されていない領域を表示にするか
-  "diffEditor.hideUnchangedRegions.enabled": false,
+  "diffEditor.hideUnchangedRegions.enabled": true,
   "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
   "diffEditor.hideUnchangedRegions.revealLineCount": 20,
   "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.maxComputationTime": 5000,
+  "diffEditor.maxFileSize": 100,
+  "diffEditor.renderGutterMenu": true,
+  "diffEditor.renderIndicators": true,
+  "diffEditor.renderMarginRevertIcon": true,
+  "diffEditor.renderSideBySide": true,
+  "diffEditor.renderSideBySideInlineBreakpoint": 1000,
+  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
+  "diffEditor.wordWrap": "inherit",
+  // ## Multi-File Diff Editor settings
+  "multiDiffEditor.experimental.enabled": true,
+  // ## Minimap settings (右側に出てくるファイル全体が見れるプレビュー)
+  "editor.minimap.autohide": false,
+  "editor.minimap.enabled": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.minimap.renderCharacters": true,
+  "editor.minimap.scale": 1,
+  "editor.minimap.sectionHeaderFontSize": 9,
+  "editor.minimap.sectionHeaderLetterSpacing": 2,
+  "editor.minimap.showMarkSectionHeaders": true,
+  "editor.minimap.showRegionSectionHeaders": true,
+  "editor.minimap.showSlider": "always",
+  "editor.minimap.side": "right",
+  "editor.minimap.size": "proportional",
+  // ## Suggestions settings
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.inlineSuggest.edits.experimental.enabled": true,
+  "editor.inlineSuggest.edits.experimental.onlyShowWhenCloseToCursor": true,
+  "editor.inlineSuggest.edits.experimental.useInterleavedLinesDiff": "never",
+  "editor.inlineSuggest.edits.experimental.useMixedLinesDiff": "never",
+  "editor.inlineSuggest.enabled": true,
+  "editor.inlineSuggest.fontFamily": "default",
+  "editor.inlineSuggest.showToolbar": "onHover",
+  "editor.inlineSuggest.suppressSuggestions": false,
+  "editor.inlineSuggest.syntaxHighlightingEnabled": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "off"
+  },
+  "editor.quickSuggestionsDelay": 10,
+  "editor.screenReaderAnnounceInlineSuggestion": false,
+  "editor.snippetSuggestions": "inline",
+  // ここまで設定完了
+
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "files.autoSave": "onFocusChange",
-  "workbench.colorTheme": "Monokai Pro",
+  "workbench.colorTheme": "Monokai Pro (Filter Machine)",
   "workbench.editor.decorations.colors": true,
-  "workbench.iconTheme": "Monokai Pro Icons",
+  "workbench.iconTheme": "Monokai Pro (Filter Machine) Icons",
   "workbench.sideBar.location": "left",
   "workbench.editor.decorations.badges": true,
   "workbench.editor.enablePreview": false,
@@ -242,42 +292,43 @@
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-11",
-      "path": "${userHome}/.sdkman/candidates/java/11.0.17-amzn"
+      "path": "~/.sdkman/candidates/java/11.0.26-amzn"
     },
     {
       "name": "JavaSE-17",
-      "path": "${userHome}/.sdkman/candidates/java/17.0.5-amzn"
+      "path": "~/.sdkman/candidates/java/17.0.14-amzn"
     },
     {
       "name": "JavaSE-18",
-      "path": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
+      "path": "~/.sdkman/candidates/java/18.0.2-amzn",
       "default": true
     }
   ],
   "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/java/java-formatter-profile-nrhrhysd616-google-style.xml",
   "java.import.generatesMetadataFilesAtProjectRoot": true,
-  "java.import.gradle.java.home": "${userHome}/.sdkman/candidates/java/17.0.5-amzn",
-  "java.jdt.ls.java.home": "${userHome}/.sdkman/candidates/java/18.0.2-amzn",
+  "java.import.gradle.java.home": "~/.sdkman/candidates/java/17.0.12-amzn",
+  "java.jdt.ls.java.home": "~/.sdkman/candidates/java/18.0.2-amzn",
   "java.referencesCodeLens.enabled": true,
   "todo-tree.general.tags": ["BUG", "FIXME", "TODO", "[ ]", "[x]"],
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
   "protoc": {
     "path": "/usr/local/bin/protoc"
   },
-  "editor.inlineSuggest.enabled": true,
   "github.copilot.enable": {
     "*": true,
     "plaintext": true,
     "markdown": true,
     "scminput": false,
-    "yaml": true
+    "yaml": true,
+    "enableAutoCompletions": true
   },
   "github.copilot.editor.enableCodeActions": false,
   "prettier.printWidth": 100,
-  "editor.minimap.enabled": true,
   "git.autofetch": true,
-  "github.copilot.editor.enableAutoCompletions": true,
   // 言語別設定
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
   "[php]": {
     "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
   },
@@ -292,7 +343,8 @@
     "diffEditor.ignoreTrimWhitespace": false
   },
   "[xml]": {
-    "files.trimFinalNewlines": true
+    "files.trimFinalNewlines": true,
+    "editor.defaultFormatter": "redhat.vscode-xml"
   },
   // 拡張機能設定は以下に記述
   "redhat.telemetry.enabled": false,

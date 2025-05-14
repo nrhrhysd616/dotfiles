@@ -10,8 +10,8 @@
 
     ```zsh
     $git clone git@github.com:nrhrhysd616/dotfiles.git
-    $chmod 744 dotfiles/mac-init.zsh
-    $zsh dotfiles/mac-init.zsh
+    $chmod 744 dotfiles/init-mac.zsh
+    $zsh dotfiles/init-mac.zsh
     ```
 
 3. iTerm2の設定を反映
