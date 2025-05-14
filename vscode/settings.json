@@ -351,5 +351,6 @@
   // bmewburn.vscode-intelephense-client
   "intelephense.format.braces": "k&r",
   // Prisma.prisma
-  "prisma.showPrismaDataPlatformNotification": false
+  "prisma.showPrismaDataPlatformNotification": false,
+  "cline.preferredLanguage": "Japanese - 日本語"
 }
