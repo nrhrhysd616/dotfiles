@@ -1,3 +1,5 @@
-Think in English, Answer in Japanese.
+Think in English, Answer in only Japanese.
+
+Select the language for code generation comments and documentation by following the instructions.
 
 When a precise action is not possible, seek information to take precise action during planning.

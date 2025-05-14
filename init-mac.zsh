@@ -1,133 +1,217 @@
 #!/usr/bin/env zsh
 
+# Define colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions for better output
+function print_section() {
+  echo "\n${BLUE}=== $1 ===${NC}"
+}
+
+function print_success() {
+  echo "${GREEN}✓ $1${NC}"
+}
+
+function print_warning() {
+  echo "${YELLOW}⚠ $1${NC}"
+}
+
+function print_error() {
+  echo "${RED}✗ $1${NC}"
+}
+
 # Check macOS
+print_section "Environment Check"
 if [ $(uname) != "Darwin" ] ; then
-  echo "Not macOS!"
+  print_error "Not macOS!"
   exit 1
 fi
 
-echo "This is macOS! Execute init-mac.zsh"
+print_success "This is macOS! Execute init-mac.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-# Homebrew install
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# zsh
-# require fzf command
-# require curl
-# require Python3.8 Python3.9
-# require volta
-# require go
-# require sdkman
-ln -nfs $SCRIPT_DIR/zsh/.zshrc ~/
-source ~/.zshrc
-echo ".zshrc file created."
-
-# Xcode Command Line Tools install
-xcode-select --install
-
-# install command function
-# @param command command name (ex. 'git')
-# @param checkCommand Command to check if installed (ex. 'brew list git')
-# @param installCommand Command to install (ex. 'brew install git')
-function __installCommand() {
-  command=$1
-  checkCommand=$2
-  installCommand=$3
-  eval $checkCommand > /dev/null 2>&1
-  if [ $? -ne 0 ] ; then # $1 not found
-    echo "$command not installed. install $command."
-    eval $installCommand
-    echo "$command installed."
+# Homebrew check and install
+if command -v brew &>/dev/null; then
+  print_success "Homebrew already installed"
+  # Update Homebrew
+  brew update
+else
+  print_section "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  
+  # Set Homebrew path based on architecture
+  if [[ $(uname -m) == "arm64" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
   else
-    echo "$command already installed."
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+fi
+
+# zsh configuration
+print_section "ZSH Configuration"
+# Dependencies:
+# - fzf command
+# - curl
+# - Python3.9
+# - volta
+# - go
+# - sdkman
+ln -nfs $SCRIPT_DIR/zsh/.zshrc $HOME/
+source $HOME/.zshrc
+print_success ".zshrc file created"
+
+# Xcode Command Line Tools check and install
+if xcode-select -p &>/dev/null; then
+  print_success "Xcode Command Line Tools already installed"
+else
+  print_section "Installing Xcode Command Line Tools"
+  xcode-select --install
+  print_warning "Please wait for the installation to complete..."
+fi
+
+# Enhanced install command function
+# @param name Display name (ex. 'Git')
+# @param command Command name (ex. 'git')
+# @param checkCommand Command to check if installed (ex. 'git --version')
+# @param installCommand Command to install (ex. 'brew install git')
+function install_command() {
+  local name=$1
+  local command=$2
+  local checkCommand=$3
+  local installCommand=$4
+  
+  echo -n "Checking ${name}... "
+  
+  if eval "$checkCommand" &>/dev/null; then
+    print_success "Already installed"
+    return 0
+  else
+    echo -n "Installing... "
+    if eval "$installCommand"; then
+      print_success "Installed successfully"
+      return 0
+    else
+      print_error "Installation failed"
+      return 1
+    fi
   fi
 }
 
-# sqlite3 install
-__installCommand 'sqlite3' 'brew list sqlite3' 'brew install sqlite'
-# git brew install
-__installCommand 'git' 'brew list git' 'brew install git'
+print_section "Installing Development Tools"
+
+# SQLite3 install
+install_command 'SQLite3' 'sqlite3' 'brew list sqlite3' 'brew install sqlite'
+
+# Git install
+install_command 'Git' 'git' 'brew list git' 'brew install git'
+
 # curl install
-__installCommand 'curl' 'curl --version' 'brew install curl'
+install_command 'curl' 'curl' 'curl --version' 'brew install curl'
+
 # fzf install
-__installCommand 'fzf' 'fzf --version' 'brew install fzf'
-# python3.8 install
-# __installCommand 'python3.8' 'python3.8 --version' 'brew install python@3.8'
-# python3.9 install
-__installCommand 'python3.9' 'python3.9 --version' 'brew install python@3.9'
+install_command 'fzf' 'fzf' 'fzf --version' 'brew install fzf'
+
+# Python 3.9 install
+install_command 'Python 3.9' 'python3.9' 'python3.9 --version' 'brew install python@3.9'
+
 # volta install
-__installCommand 'volta' 'volta --version' 'curl https://get.volta.sh | bash'
-# go install
-__installCommand 'go' 'go version' 'brew install go'
-# sdkman install
-__installCommand 'sdkman' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
-# bun install
+install_command 'Volta' 'volta' 'volta --version' 'curl https://get.volta.sh | bash'
+
+# Go install
+install_command 'Go' 'go' 'go version' 'brew install go'
+
+# SDKMAN install
+install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
+
+# Bun install
 # @see https://bun.sh/docs/installation
-__installCommand 'bun' 'bun --version' 'volta install node;volta install bun'
-# aws cli install
-__installCommand 'aws' 'aws --version' 'brew install awscli'
-# aws sam cli install
-__installCommand 'sam' 'sam --version' 'brew install aws-sam-cli'
-# install Font Fira Code
-# Bug: フォントのインストール場所がおかしいため、手動で移動してbrewから削除
-__installCommand 'Font Fira Code' 'ls ~/Library/Fonts/FiraCode-Regular.ttf' 'brew install font-fira-code && mv ~/\$\{HOME\}/Library/Fonts/* ~/Library/Fonts/ && rm -rf ~/\$\{HOME\} && brew uninstall font-fira-code'
-# install ngrok
+install_command 'Bun' 'bun' 'bun --version' 'volta install node;volta install bun'
+
+# AWS CLI install
+install_command 'AWS CLI' 'aws' 'aws --version' 'brew install awscli'
+
+# AWS SAM CLI install
+install_command 'AWS SAM CLI' 'sam' 'sam --version' 'brew install aws-sam-cli'
+
+# Font Fira Code install
+# Bug: Font installation path issue, manually move and remove from brew
+install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Regular.ttf' 'brew install font-fira-code && mv $HOME/\$\{HOME\}/Library/Fonts/* $HOME/Library/Fonts/ && rm -rf $HOME/\$\{HOME\} && brew uninstall font-fira-code'
+
+# ngrok install
 # @see https://ngrok.com/docs/getting-started/
-__installCommand 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
-# install stripe cli
-# @see https://docs.stripe.com/stripe-cli?locale=ja-JP
-__installCommand 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
-# install vhs
+install_command 'ngrok' 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
+
+# Stripe CLI install
+# @see https://docs.stripe.com/stripe-cli
+install_command 'Stripe CLI' 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
+
+# VHS install
 # @see https://github.com/charmbracelet/vhs
-__installCommand 'vhs' 'vhs -v' 'brew install vhs'
+install_command 'VHS' 'vhs' 'vhs -v' 'brew install vhs'
 
-# Java install
-# After set sdk command path in .zshrc, install Java
-__installCommand 'Java11' 'sdk home java 11.0.26-amzn' 'sdk install java 11.0.26-amzn'
-__installCommand 'Java17' 'sdk home java 17.0.14-amzn' 'sdk install java 17.0.14-amzn'
-__installCommand 'Java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
+print_section "Installing Java"
+# After setting sdk command path in .zshrc, install Java
+install_command 'Java 11' 'java11' 'sdk home java 11.0.26-amzn' 'sdk install java 11.0.26-amzn'
+install_command 'Java 17' 'java17' 'sdk home java 17.0.14-amzn' 'sdk install java 17.0.14-amzn'
+install_command 'Java 18' 'java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
 
-# git setting
-ln -nfs $SCRIPT_DIR/git/.gitconfig ~/
-ln -nfs $SCRIPT_DIR/git/.gitignore_global ~/
-if [ ! -f ~/.gitconfig.user.local ]; then
-  cp $SCRIPT_DIR/git/.gitconfig.user.local ~/
+print_section "Setting Up Configuration Files"
+
+# Git configuration
+ln -nfs $SCRIPT_DIR/git/.gitconfig $HOME/
+ln -nfs $SCRIPT_DIR/git/.gitignore_global $HOME/
+if [ ! -f $HOME/.gitconfig.user.local ]; then
+  cp $SCRIPT_DIR/git/.gitconfig.user.local $HOME/
 fi
-echo "git configuration files created."
+print_success "Git configuration files created"
 
 # Cursor user settings
-# Require Cursor application
-# Cursor未使用なためコメントアウト
-ln -nfs $SCRIPT_DIR/cursor/settings.json ~/Library/Application\ Support/Cursor/User/settings.json
-ln -nfs $SCRIPT_DIR/cursor/keybindings.json ~/Library/Application\ Support/Cursor/User/keybindings.json
+# Requires Cursor application
+# Currently commented out as Cursor is not in use
+ln -nfs $SCRIPT_DIR/cursor/settings.json $HOME/Library/Application\ Support/Cursor/User/settings.json
+ln -nfs $SCRIPT_DIR/cursor/keybindings.json $HOME/Library/Application\ Support/Cursor/User/keybindings.json
+print_success "Cursor configuration files created"
 
 # VSCode user settings
-# Require VSCode application
-ln -nfs $SCRIPT_DIR/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
-ln -nfs $SCRIPT_DIR/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
+# Requires VSCode application
+ln -nfs $SCRIPT_DIR/vscode/settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+ln -nfs $SCRIPT_DIR/vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
+print_success "VSCode configuration files created"
 
-# VSCode - Insiders user settings
-# Require VSCode application
-ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json ~/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
-ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json ~/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
+# VSCode Insiders user settings
+# Requires VSCode Insiders application
+ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
+ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
+print_success "VSCode Insiders configuration files created"
 
 # iTerm2 shell integration install
-curl -sL https://iterm2.com/shell_integration/zsh -o ~/.iterm2_shell_integration.zsh
-echo "iTerm2 shell integration installed."
+curl -sL https://iterm2.com/shell_integration/zsh -o $HOME/.iterm2_shell_integration.zsh
+print_success "iTerm2 shell integration installed"
 
-# System Configuration
-# Do not create .DS_Store on USB or Network drives
+print_section "System Configuration"
+
+# Keyboard settings
 defaults write -g KeyRepeat -int 1 
 defaults write -g InitialKeyRepeat -int 10
+print_success "Keyboard settings applied"
+
+# DNS settings
 networksetup -setdnsservers Wi-Fi 2001:4860:4860::8844 2001:4860:4860::8888 8.8.4.4 8.8.8.8
+print_success "DNS settings applied"
+
+# Finder and system settings
+# Do not create .DS_Store on USB or Network drives
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write -g AppleShowAllExtensions -bool true
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
 defaults write com.apple.finder _FXShowPosixPathInTitle -boolean true && killall Finder
+print_success "Finder settings applied"
 
-echo "macOS System Configuration done."
-
-echo "Complete!"
+print_section "Setup Complete"
+print_success "macOS environment setup completed successfully!"
