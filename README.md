@@ -4,7 +4,12 @@
 
 ### シェル環境構築
 
-1. [VSCode](https://code.visualstudio.com/download)・[VSCode Insiders](https://code.visualstudio.com/insiders/)・[Cursor](https://www.cursor.com/ja)をインストール・起動しておく
+1. 以下のアプリケーションをインストール&一度起動しておく
+
+    - [VSCode](https://code.visualstudio.com/download)
+    - [VSCode Insiders](https://code.visualstudio.com/insiders/)
+    - [Cursor](https://www.cursor.com/ja)
+    - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 2. 以下のZshコマンドを順番に実行
 
@@ -22,9 +27,9 @@
 
 4. `.gitconfig.user.local`ファイルを編集
 
-    * signingkey: ssh公開鍵の情報
-    * name: アルファベットフルネーム
-    * email: sshキーの設定と同一のGithubで利用しているメールアドレス
+    - signingkey: ssh公開鍵の情報
+    - name: アルファベットフルネーム
+    - email: sshキーの設定と同一のGithubで利用しているメールアドレス
 
 5. VSCodeのClineのCustom Instructionsを手動で設定する
 
@@ -32,16 +37,16 @@
 
 ### システム設定
 
-* iCloud
+- iCloud
 
   各種必要に応じて設定
 
-* アクセシビリティ > ディスプレイ
+- アクセシビリティ > ディスプレイ
 
   ポインタの枠線のカラー > 白
   ポインタの塗りつぶしカラー > オレンジ
   
-* キーボード > キーボードショートカット…
+- キーボード > キーボードショートカット…
 
   スクリーンショット**以外のショートカットをすべて削除**  
   「F1、F2などのキーを標準のファンクションキーとして利用」はオン

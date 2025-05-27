@@ -189,6 +189,29 @@ ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Sup
 ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
 print_success "VSCode Insiders configuration files created"
 
+# Cline MCP settings
+print_section "VSCode Cline extension Configuration"
+CLINE_EXTENSION_DIR="$HOME/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev"
+CLINE_SETTINGS_FILE="$CLINE_EXTENSION_DIR/settings/cline_mcp_settings.json"
+
+if [ -d "$CLINE_EXTENSION_DIR" ]; then
+  print_success "VSCode Cline extension detected"
+  mkdir -p "$CLINE_EXTENSION_DIR/settings"
+  
+  if [ ! -f "$CLINE_SETTINGS_FILE" ]; then
+    cp "$SCRIPT_DIR/vscode/cline_mcp_settings.json" "$CLINE_SETTINGS_FILE"
+    print_success "VSCode Cline MCP configuration file copied"
+    print_warning "Please set your GITHUB_PERSONAL_ACCESS_TOKEN environment variable"
+    print_warning "or edit the configuration file to add your GitHub access token:"
+    print_warning "$CLINE_SETTINGS_FILE"
+  else
+    print_success "VSCode Cline MCP configuration file already exists"
+  fi
+else
+  print_warning "VSCode Cline extension not found. Please install the Cline extension in VSCode first."
+  print_warning "Extension ID: saoudrizwan.claude-dev"
+fi
+
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o $HOME/.iterm2_shell_integration.zsh
 print_success "iTerm2 shell integration installed"
