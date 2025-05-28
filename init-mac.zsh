@@ -132,6 +132,9 @@ install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | 
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'bun --version' 'volta install node;volta install bun'
 
+# Claude Code CLI install (requires Bun)
+install_command 'Claude Code' 'claude' 'claude -v' 'bun install -g @anthropic-ai/claude-code'
+
 # AWS CLI install
 install_command 'AWS CLI' 'aws' 'aws --version' 'brew install awscli'
 
