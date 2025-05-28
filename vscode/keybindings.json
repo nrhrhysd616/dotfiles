@@ -42,5 +42,13 @@
     "key": "ctrl+g",
     "command": "editor.action.inlineSuggest.trigger",
     "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
-  }
+},
+{
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+        "text": "\\\r\n"
+    },
+    "when": "terminalFocus"
+}
 ]
