@@ -431,6 +431,7 @@
     "Green Component" : 0.19215686269999999
   },
   "Screen" : -1,
+  "Send Session Ended Alert" : false,
   "Non Ascii Font" : "Monaco 12",
   "Ansi 13 Color" : {
     "Red Component" : 0.72941176470000002,
@@ -448,5 +449,6 @@
     "Blue Component" : 0.97254901959999995,
     "Alpha Component" : 1,
     "Green Component" : 0.62745098040000002
-  }
+  },
+  "Send Idle Alert" : false
 }
