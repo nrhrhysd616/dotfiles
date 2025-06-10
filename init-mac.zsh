@@ -147,7 +147,7 @@ install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Reg
 
 # ngrok install
 # @see https://ngrok.com/docs/getting-started/
-install_command 'ngrok' 'ngrok' 'ngrok -v' 'brew install ngrok/ngrok/ngrok'
+install_command 'ngrok' 'ngrok' 'ngrok -v' 'brew install ngrok'
 
 # Stripe CLI install
 # @see https://docs.stripe.com/stripe-cli
