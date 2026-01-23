@@ -32,3 +32,5 @@
   pr = "!f(){ git pull origin $1 && git rebase $1;};f"
 [include]
   path = ~/.gitconfig.user.local
+[init]
+	defaultBranch = main
