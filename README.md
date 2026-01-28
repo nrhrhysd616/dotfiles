@@ -35,6 +35,51 @@
 
     現状設定のエクスポートなどができず、`settings.json`ファイルでの外出しも不可能なため手動
 
+### miseの使い方
+
+[mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、Bunなどをmiseで管理しています。
+
+- **インストール済みツールの確認**
+
+  ```zsh
+  mise list
+  ```
+
+- **利用可能なバージョンの確認**
+
+  ```zsh
+  mise ls-remote python
+  mise ls-remote node
+  ```
+
+- **グローバルバージョンの変更**
+
+  ```zsh
+  # 特定バージョンを指定
+  mise use -g python@3.12
+  mise use -g node@20
+  
+  # 最新版にアップデート
+  mise use -g python@latest
+  mise use -g node@lts
+  ```
+
+- **プロジェクトごとのバージョン指定**
+
+  ```zsh
+  # プロジェクトディレクトリで実行
+  cd /path/to/project
+  mise use python@3.11  # .tool-versionsファイルが生成される
+  ```
+
+- **現在のバージョン確認**
+
+  ```zsh
+  python --version
+  node --version
+  bun --version
+  ```
+
 ### システム設定
 
 - iCloud
