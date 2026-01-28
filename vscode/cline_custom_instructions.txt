@@ -1,0 +1,5 @@
+Think in English, Answer in only Japanese.
+
+Select the language for code generation comments and documentation by following the instructions.
+
+If you are unable to take precise action, please ask me for additional information or gather information from outside sources in order to take precise action.

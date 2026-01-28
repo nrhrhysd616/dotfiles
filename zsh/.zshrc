@@ -1,5 +1,13 @@
+# homebrew PATH
+if [ "$(uname -m)" = "arm64" ]; then
+  # For arm64
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  # For x86_64
+fi
+
 # Alias
-alias cdproject='cd ~/Documents/project/'
+alias cdproject='cd ~/Documents/Project/'
 alias ..='cd ..'
 alias ls='ls -F'
 alias la='ls -A'
@@ -9,8 +17,8 @@ alias speedtest='networkQuality'
 
 # historyexec command
 function historyexec() {
-	# コマンド履歴を番号なし(-n)降順(-r)直近500件(-500)で取得したものをfzfに渡し、複数選択なし(--no-multi)で選択したコマンドをevalで実行
-	eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
+  # コマンド履歴を番号なし(-n)降順(-r)直近500件(-500)で取得したものをfzfに渡し、複数選択なし(--no-multi)で選択したコマンドをevalで実行
+  eval `history -n -r -500 | fzf --no-multi --prompt="Command history >"`
 }
 
 # fetch gitignore
@@ -31,32 +39,30 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 # go library
 export PATH="$HOME/go/bin:$PATH"
 
+# SQLite3
+export PATH="/usr/local/opt/sqlite/bin:$PATH"
+
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 # iTerm2 shell integration load
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+[[ -s "${HOME}/.iterm2_shell_integration.zsh" ]] && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # Herd configurations
-# Herd injected NVM configuration
-export NVM_DIR="/Users/nrhrhysd616/Library/Application Support/Herd/config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[[ -f "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh" ]] && builtin source "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh"
-# Herd injected PHP binary.
-export PATH="/Users/nrhrhysd616/Library/Application Support/Herd/bin/":$PATH
-# Herd injected PHP 8.3 configuration.
-export HERD_PHP_83_INI_SCAN_DIR="/Users/nrhrhysd616/Library/Application Support/Herd/config/php/83/"
+[[ -d "$HOME/Library/Application Support/Herd" ]] # @see https://zsh.sourceforge.io/Doc/Release/Conditional-Expressions.html#Conditional-Expressions
+if [ $? -eq 0 ] ; then
+  # Herd injected PHP binary.
+  export PATH="$HOME/Library/Application Support/Herd/bin":$PATH
+  # Herd injected PHP 8.3 configuration.
+  export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
+fi
+
+# Claude code
+export PATH="$HOME/.bun/bin:$PATH"
 
 # Prompt
 local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
-local p_endmark="%B%(?,%F{green}$,%F{red}!!!\$!!!)%f%b"
+local p_endmark="%B%(?,%F{green}$,%F{red}!!\$!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
