@@ -30,7 +30,9 @@
   alias = !git config --get-regexp 'alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
   # git pr ${branch-name} originから$1ブランチをpullし、現在のブランチを最新の$1ブランチへリベースする (git pull origin $1 && git rebase $1)
   pr = "!f(){ git pull origin $1 && git rebase $1;};f"
+[init]
+  defaultBranch = main
 [include]
   path = ~/.gitconfig.user.local
-[init]
-	defaultBranch = main
+[ghq]
+root = ~/Documents/Project
