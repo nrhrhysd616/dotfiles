@@ -109,6 +109,9 @@ install_command 'SQLite3' 'sqlite3' 'brew list sqlite3' 'brew install sqlite'
 # Git install
 install_command 'Git' 'git' 'brew list git' 'brew install git'
 
+# ghq install
+install_command 'ghq' 'ghq' 'ghq --version' 'brew install ghq'
+
 # curl install
 install_command 'curl' 'curl' 'curl --version' 'brew install curl'
 
