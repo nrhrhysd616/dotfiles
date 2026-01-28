@@ -67,7 +67,7 @@
   "editor.hideCursorInOverviewRuler": false,
   "editor.hover.above": true,
   "editor.hover.delay": 500,
-  "editor.hover.enabled": true,
+  "editor.hover.enabled": "on",
   "editor.hover.hidingDelay": 300,
   "editor.hover.sticky": true,
   "editor.indentSize": "tabSize",
@@ -230,7 +230,7 @@
   // ## Multi-File Diff Editor settings
   "multiDiffEditor.experimental.enabled": true,
   // ## Minimap settings (右側に出てくるファイル全体が見れるプレビュー)
-  "editor.minimap.autohide": false,
+  "editor.minimap.autohide": "none",
   "editor.minimap.enabled": true,
   "editor.minimap.maxColumn": 80,
   "editor.minimap.renderCharacters": true,
@@ -287,5 +287,6 @@
   },
   // 拡張機能設定は以下に記述
   // bmewburn.vscode-intelephense-client
-  "intelephense.format.braces": "k&r"
+  "intelephense.format.braces": "k&r",
+  "chat.tools.terminal.outputLocation": "chat"
 }

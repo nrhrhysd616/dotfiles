@@ -57,8 +57,7 @@ print_section "ZSH Configuration"
 # Dependencies:
 # - fzf command
 # - curl
-# - Python3.9
-# - volta
+# - mise (multi-language version manager)
 # - go
 # - sdkman
 ln -nfs $SCRIPT_DIR/zsh/.zshrc $HOME/
@@ -116,11 +115,8 @@ install_command 'curl' 'curl' 'curl --version' 'brew install curl'
 # fzf install
 install_command 'fzf' 'fzf' 'fzf --version' 'brew install fzf'
 
-# Python 3.9 install
-install_command 'Python 3.9' 'python3.9' 'python3.9 --version' 'brew install python@3.9'
-
-# volta install
-install_command 'Volta' 'volta' 'volta --version' 'curl https://get.volta.sh | bash'
+# mise install (multi-language version manager)
+install_command 'mise' 'mise' 'mise --version' 'brew install mise'
 
 # Go install
 install_command 'Go' 'go' 'go version' 'brew install go'
@@ -128,12 +124,20 @@ install_command 'Go' 'go' 'go version' 'brew install go'
 # SDKMAN install
 install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
 
-# Bun install
-# @see https://bun.sh/docs/installation
-install_command 'Bun' 'bun' 'bun --version' 'volta install node;volta install bun'
+print_section "Installing mise-managed tools"
 
-# Claude Code CLI install (requires Bun)
-install_command 'Claude Code' 'claude' 'claude -v' 'bun install -g @anthropic-ai/claude-code'
+# Python install via mise
+install_command 'Python (latest)' 'python' 'mise which python' 'mise use -g python@latest'
+
+# Node.js install via mise
+install_command 'Node.js (latest LTS)' 'node' 'mise which node' 'mise use -g node@lts'
+
+# Bun install via mise
+# @see https://bun.sh/docs/installation
+install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
+
+# Claude Code CLI install
+install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash'
 
 # AWS CLI install
 install_command 'AWS CLI' 'aws' 'aws --version' 'brew install awscli'

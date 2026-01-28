@@ -24,14 +24,11 @@ function historyexec() {
 # fetch gitignore
 function gitignore() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
 
-# Python 3.8
-export PATH="/usr/local/opt/python@3.8/bin:$PATH"
-# Python 3.9
-export PATH="/usr/local/opt/python@3.9/bin:$PATH"
+# mise (multi-language version manager)
+eval "$(mise activate zsh)"
 
-# volta
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+# $HOME/.local/bin PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 # curl
 export PATH="/usr/local/opt/curl/bin:$PATH"
