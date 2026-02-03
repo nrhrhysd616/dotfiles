@@ -55,7 +55,7 @@ if [ $? -eq 0 ] ; then
   export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
 fi
 
-# Claude code
+# Bun binary path
 export PATH="$HOME/.bun/bin:$PATH"
 
 # Prompt
