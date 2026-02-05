@@ -199,6 +199,12 @@ ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Sup
 ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
 print_success "VSCode Insiders configuration files created"
 
+# Claude Code user-level configuration
+print_section "Claude Code User Configuration"
+mkdir -p $HOME/.claude
+ln -nfs $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
+print_success "Claude Code user-level CLAUDE.md created"
+
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
 CLINE_EXTENSION_DIR="$HOME/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev"
