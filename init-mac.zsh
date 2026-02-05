@@ -220,9 +220,6 @@ if [ -d "$CLINE_EXTENSION_DIR" ]; then
   if [ ! -f "$CLINE_SETTINGS_FILE" ]; then
     cp "$SCRIPT_DIR/vscode/cline_mcp_settings.json" "$CLINE_SETTINGS_FILE"
     print_success "VSCode Cline MCP configuration file copied"
-    print_warning "Please set your GITHUB_PERSONAL_ACCESS_TOKEN environment variable"
-    print_warning "or edit the configuration file to add your GitHub access token:"
-    print_warning "$CLINE_SETTINGS_FILE"
   else
     print_success "VSCode Cline MCP configuration file already exists"
   fi
