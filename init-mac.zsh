@@ -112,6 +112,9 @@ install_command 'Git' 'git' 'brew list git' 'brew install git'
 # ghq install
 install_command 'ghq' 'ghq' 'ghq --version' 'brew install ghq'
 
+# GitHub CLI install
+install_command 'GitHub CLI' 'gh' 'gh --version' 'brew install gh'
+
 # curl install
 install_command 'curl' 'curl' 'curl --version' 'brew install curl'
 
