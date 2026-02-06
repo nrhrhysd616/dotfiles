@@ -1,3 +1,8 @@
+# Nix PATH - 最優先で読み込み
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
 # homebrew PATH
 if [ "$(uname -m)" = "arm64" ]; then
   # For arm64
@@ -30,15 +35,6 @@ eval "$(mise activate zsh)"
 # $HOME/.local/bin PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-# curl
-export PATH="/usr/local/opt/curl/bin:$PATH"
-
-# go library
-export PATH="$HOME/go/bin:$PATH"
-
-# SQLite3
-export PATH="/usr/local/opt/sqlite/bin:$PATH"
-
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
@@ -54,9 +50,6 @@ if [ $? -eq 0 ] ; then
   # Herd injected PHP 8.3 configuration.
   export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
 fi
-
-# Bun binary path
-export PATH="$HOME/.bun/bin:$PATH"
 
 # Prompt
 local p_current="%F{green}@%2d%f"
