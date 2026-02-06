@@ -12,6 +12,10 @@ function print_section() {
   echo "\n${BLUE}=== $1 ===${NC}"
 }
 
+function print_info() {
+  echo "${BLUE}ℹ $1${NC}"
+}
+
 function print_success() {
   echo "${GREEN}✓ $1${NC}"
 }
@@ -35,15 +39,38 @@ print_success "This is macOS! Execute init-mac.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-# Homebrew check and install
+# Nix check and install
+if command -v nix &>/dev/null; then
+  print_success "Nix already installed"
+else
+  print_section "Installing Nix"
+  curl -L https://nixos.org/nix/install | sh -s -- --daemon
+  print_success "Nix installed. Please restart terminal and re-run this script"
+  exit 0
+fi
+
+# Nixの環境読み込み
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+# Nix設定: 実験的機能を有効化
+print_section "Configuring Nix and Homebrew"
+mkdir -p ~/.config/nix
+if ! grep -q "experimental-features" ~/.config/nix/nix.conf 2>/dev/null; then
+  echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+  print_success "Nix experimental features enabled"
+else
+  print_success "Nix experimental features already enabled"
+fi
+
+# Homebrew check and install (一部パッケージで使用)
 if command -v brew &>/dev/null; then
   print_success "Homebrew already installed"
-  # Update Homebrew
-  brew update
 else
   print_section "Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  
+
   # Set Homebrew path based on architecture
   if [[ $(uname -m) == "arm64" ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -84,15 +111,15 @@ function install_command() {
   local checkCommand=$3
   local installCommand=$4
   
-  echo -n "Checking ${name}... "
+  print_info "Checking ${name}... "
   
   if eval "$checkCommand" &>/dev/null; then
     print_success "Already installed"
     return 0
   else
-    echo -n "Installing... "
+    print_info "Installing... "
     if eval "$installCommand"; then
-      print_success "Installed successfully"
+      print_success "Installed successfully!"
       return 0
     else
       print_error "Installation failed"
@@ -103,29 +130,27 @@ function install_command() {
 
 print_section "Installing Development Tools"
 
-# SQLite3 install
-install_command 'SQLite3' 'sqlite3' 'brew list sqlite3' 'brew install sqlite'
 
 # Git install
-install_command 'Git' 'git' 'brew list git' 'brew install git'
+install_command 'Git' 'git' 'which git' 'nix profile add nixpkgs#git'
 
 # ghq install
-install_command 'ghq' 'ghq' 'ghq --version' 'brew install ghq'
+install_command 'ghq' 'ghq' 'ghq --version' 'nix profile add nixpkgs#ghq'
 
 # GitHub CLI install
-install_command 'GitHub CLI' 'gh' 'gh --version' 'brew install gh'
+install_command 'GitHub CLI' 'gh' 'gh --version' 'nix profile add nixpkgs#gh'
 
 # curl install
-install_command 'curl' 'curl' 'curl --version' 'brew install curl'
+install_command 'curl' 'curl' 'which curl' 'nix profile add nixpkgs#curl'
 
 # fzf install
-install_command 'fzf' 'fzf' 'fzf --version' 'brew install fzf'
+install_command 'fzf' 'fzf' 'fzf --version' 'nix profile add nixpkgs#fzf'
 
 # mise install (multi-language version manager)
-install_command 'mise' 'mise' 'mise --version' 'brew install mise'
+install_command 'mise' 'mise' 'mise --version' 'nix profile add nixpkgs#mise'
 
 # Go install
-install_command 'Go' 'go' 'go version' 'brew install go'
+install_command 'Go' 'go' 'go version' 'nix profile add nixpkgs#go'
 
 # SDKMAN install
 install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
@@ -146,10 +171,10 @@ install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
 install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash'
 
 # AWS CLI install
-install_command 'AWS CLI' 'aws' 'aws --version' 'brew install awscli'
+install_command 'AWS CLI' 'aws' 'aws --version' 'nix profile add nixpkgs#awscli2'
 
 # AWS SAM CLI install
-install_command 'AWS SAM CLI' 'sam' 'sam --version' 'brew install aws-sam-cli'
+install_command 'AWS SAM CLI' 'sam' 'sam --version' 'nix profile add nixpkgs#aws-sam-cli'
 
 # Font Fira Code install
 # Bug: Font installation path issue, manually move and remove from brew
@@ -157,20 +182,20 @@ install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Reg
 
 # ngrok install
 # @see https://ngrok.com/docs/getting-started/
-install_command 'ngrok' 'ngrok' 'ngrok -v' 'brew install ngrok'
+install_command 'ngrok' 'ngrok' 'ngrok version' 'brew install ngrok'
 
 # Stripe CLI install
 # @see https://docs.stripe.com/stripe-cli
-install_command 'Stripe CLI' 'stripe' 'stripe -v' 'brew install stripe/stripe-cli/stripe'
+install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#stripe-cli'
 
 # VHS install
 # @see https://github.com/charmbracelet/vhs
-install_command 'VHS' 'vhs' 'vhs -v' 'brew install vhs'
+install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs'
 
 print_section "Installing Java"
 # After setting sdk command path in .zshrc, install Java
-install_command 'Java 11' 'java11' 'sdk home java 11.0.26-amzn' 'sdk install java 11.0.26-amzn'
-install_command 'Java 17' 'java17' 'sdk home java 17.0.14-amzn' 'sdk install java 17.0.14-amzn'
+install_command 'Java 11' 'java11' 'sdk home java 11.0.29-amzn' 'sdk install java 11.0.29-amzn'
+install_command 'Java 17' 'java17' 'sdk home java 17.0.17-amzn' 'sdk install java 17.0.17-amzn'
 install_command 'Java 18' 'java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
 
 print_section "Setting Up Configuration Files"
