@@ -170,6 +170,9 @@ install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
 # Claude Code CLI install
 install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash'
 
+# Codex CLI install
+install_command 'Codex CLI' 'codex' 'codex --version' 'brew install codex'
+
 # AWS CLI install
 install_command 'AWS CLI' 'aws' 'aws --version' 'nix profile add nixpkgs#awscli2'
 
