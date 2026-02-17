@@ -163,6 +163,9 @@ install_command 'Python (latest)' 'python' 'mise which python' 'mise use -g pyth
 # Node.js install via mise
 install_command 'Node.js (latest LTS)' 'node' 'mise which node' 'mise use -g node@lts'
 
+# pnpm install via mise
+install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest'
+
 # Bun install via mise
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
