@@ -1,361 +1,344 @@
 {
-  // # Text Editor settings
-  "editor.accessibilityPageSize": 10,
+  // =============================================
+  // Text Editor - テキストエディタ
+  // =============================================
+
+  // スクリーンリーダーのサポートを無効化（デフォルト: "auto"）パフォーマンス向上のため
   "editor.accessibilitySupport": "off",
+  // 空白文字の前でのみ括弧を自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingBrackets": "beforeWhitespace",
+  // 空白文字の前でのみコメントを自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingComments": "beforeWhitespace",
-  "editor.autoClosingDelete": "auto",
-  "editor.autoClosingOvertype": "auto",
+  // 空白文字の前でのみ引用符を自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingQuotes": "beforeWhitespace",
-  "editor.autoIndent": "full",
-  "editor.autoSurround": "languageDefined",
-  "editor.bracketPairColorization.enabled": true,
+  // 括弧の種類（(), [], {}）ごとに独立した色プールを使用（デフォルト: false）
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
-  "editor.codeActions.triggerOnFocusChange": false,
-  "editor.codeActionsOnSave": {},
-  "editor.codeActionWidget.includeNearbyQuickFixes": true,
-  "editor.codeActionWidget.showHeaders": true,
-  "editor.codeLens": true,
+  // CodeLensのフォントファミリーを明示指定
   "editor.codeLensFontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  "editor.codeLensFontSize": 0,
-  "editor.colorDecorators": true,
+  // カラーデコレーターをクリック時のみアクティブ化（デフォルト: "clickAndHover"）
   "editor.colorDecoratorsActivatedOn": "click",
+  // カラーデコレーターの最大表示数を制限（デフォルト: 500）
   "editor.colorDecoratorsLimit": 30,
-  "editor.columnSelection": false,
+  // 空行もコメントトグルの対象にする（デフォルト: true=空行を無視）
   "editor.comments.ignoreEmptyLines": false,
-  "editor.comments.insertSpace": true,
+  // コピー時にシンタックスハイライトを含めない（デフォルト: true）
   "editor.copyWithSyntaxHighlighting": false,
-  "editor.defaultColorDecorators": "auto",
-  "editor.defaultFoldingRangeProvider": null,
+  // デフォルトのフォーマッターにPrettierを使用
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // 定義リンクをPeekビューで開く（デフォルト: false=別タブで開く）
   "editor.definitionLinkOpensInPeek": true,
+  // インデントの自動検出を無効化（デフォルト: true）tabSize設定を常に適用
   "editor.detectIndentation": false,
+  // テキストのドラッグ＆ドロップを無効化（デフォルト: true）誤操作防止
   "editor.dragAndDrop": false,
+  // エディタへのファイルドロップを無効化（デフォルト: true）
   "editor.dropIntoEditor.enabled": false,
-  "editor.dropIntoEditor.preferences": [],
-  "editor.dropIntoEditor.showDropSelector": "afterDrop",
+  // 選択範囲がない時のクリップボードコピーを無効化（デフォルト: true=行全体をコピー）
   "editor.emptySelectionClipboard": false,
-  "editor.experimental.asyncTokenization": true,
-  "editor.experimental.asyncTokenizationLogging": false,
-  "editor.experimental.asyncTokenizationVerification": false,
-  "editor.experimental.preferTreeSitter": [],
-  "editor.experimental.treeSitterTelemetry": false,
-  "editor.experimentalEditContextEnabled": false,
-  "editor.experimentalWhitespaceRendering": "svg",
+  // Alt+スクロール時の高速スクロール感度（デフォルト: 5）
   "editor.fastScrollSensitivity": 3,
-  "editor.folding": true,
-  "editor.foldingHighlight": true,
-  "editor.foldingImportsByDefault": false,
+  // 折りたたみ可能な最大リージョン数（デフォルト: 5000）
   "editor.foldingMaximumRegions": 3000,
-  "editor.foldingStrategy": "auto",
-  "editor.glyphMargin": true,
+  // 各種定義ジャンプで結果が見つからない時の代替コマンドを参照一覧に統一
   "editor.gotoLocation.alternativeDeclarationCommand": "editor.action.goToReferences",
   "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.goToReferences",
   "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
   "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences",
   "editor.gotoLocation.alternativeTypeDefinitionCommand": "editor.action.goToReferences",
-  "editor.gotoLocation.multipleDeclarations": "peek",
-  "editor.gotoLocation.multipleDefinitions": "peek",
-  "editor.gotoLocation.multipleImplementations": "peek",
-  "editor.gotoLocation.multipleReferences": "peek",
-  "editor.gotoLocation.multipleTypeDefinitions": "peek",
+  // 括弧ペアのガイド線を表示（デフォルト: false）
   "editor.guides.bracketPairs": true,
-  "editor.guides.bracketPairsHorizontal": "active",
-  "editor.guides.highlightActiveBracketPair": true,
-  "editor.guides.highlightActiveIndentation": true,
-  "editor.guides.indentation": true,
-  "editor.hideCursorInOverviewRuler": false,
-  "editor.hover.above": true,
+  // ホバー表示までの遅延時間（デフォルト: 300ms）
   "editor.hover.delay": 500,
-  "editor.hover.enabled": "on",
-  "editor.hover.hidingDelay": 300,
-  "editor.hover.sticky": true,
-  "editor.indentSize": "tabSize",
-  "editor.inlayHints.enabled": "on",
+  // インレイヒントのフォントファミリーを明示指定
   "editor.inlayHints.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  "editor.inlayHints.fontSize": 0,
-  "editor.inlayHints.maximumLength": 0,
-  "editor.inlayHints.padding": false,
-  "editor.inlineCompletionsAccessibilityVerbose": false,
-  "editor.insertSpaces": true,
-  "editor.language.brackets": null,
-  "editor.language.colorizedBracketPairs": null,
-  "editor.largeFileOptimizations": true,
-  "editor.letterSpacing": 0,
-  "editor.lightbulb.enabled": "on",
-  "editor.lineHeight": 0,
-  "editor.lineNumbers": "on",
+  // リンク編集を有効化（デフォルト: false）HTMLタグの開始/終了タグを連動編集
   "editor.linkedEditing": true,
-  "editor.links": true,
-  "editor.matchBrackets": "always",
+  // トークン化する最大行長（デフォルト: 20000）
   "editor.maxTokenizationLineLength": 15000,
-  "editor.mouseWheelScrollSensitivity": 1,
-  "editor.mouseWheelZoom": false,
+  // マルチカーソルの最大数（デフォルト: 10000）
   "editor.multiCursorLimit": 3000,
-  "editor.multiCursorMergeOverlapping": true,
-  "editor.multiCursorModifier": "alt",
-  "editor.multiCursorPaste": "spread",
-  "editor.occurrencesHighlight": "singleFile",
+  // 出現箇所ハイライトの表示遅延（デフォルト: 0ms）
   "editor.occurrencesHighlightDelay": 200,
-  "editor.overtypeCursorStyle": "line",
-  "editor.overtypeOnPaste": true,
-  "editor.overviewRulerBorder": true,
-  "editor.padding.bottom": 0,
+  // エディタ上部のパディング（デフォルト: 0px）
   "editor.padding.top": 5,
+  // パラメータヒントの循環表示を有効化（最後の後に最初に戻る）
   "editor.parameterHints.cycle": true,
-  "editor.parameterHints.enabled": true,
-  "editor.pasteAs.enabled": true,
-  "editor.pasteAs.preferences": [],
-  "editor.pasteAs.showPasteSelector": "afterPaste",
-  "editor.peekWidgetDefaultFocus": "tree",
-  "editor.rename.enablePreview": true,
+  // 制御文字（見えない文字）を可視化
   "editor.renderControlCharacters": true,
-  "editor.renderFinalNewline": "on",
-  "editor.renderLineHighlight": "line",
-  "editor.renderLineHighlightOnlyWhenFocus": false,
+  // すべての空白文字を常に表示（デフォルト: "selection"=選択時のみ）
   "editor.renderWhitespace": "all",
-  "editor.roundedSelection": true,
+  // ルーラーを80, 100, 150文字目に表示（コード幅の目安）
   "editor.rulers": [80, 100, 150],
-  "editor.scrollbar.horizontal": "auto",
+  // 水平スクロールバーの高さ（デフォルト: 12px）
   "editor.scrollbar.horizontalScrollbarSize": 10,
-  "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": false,
-  "editor.scrollbar.scrollByPage": false,
-  "editor.scrollbar.vertical": "auto",
+  // 垂直スクロールバーの幅（デフォルト: 14px）
   "editor.scrollbar.verticalScrollbarSize": 15,
+  // 最終列以降のスクロール余白（デフォルト: 5文字分）
   "editor.scrollBeyondLastColumn": 4,
-  "editor.scrollBeyondLastLine": true,
-  "editor.scrollPredominantAxis": true,
-  "editor.selectionHighlight": true,
-  "editor.semanticHighlighting.enabled": "configuredByTheme",
-  "editor.semanticTokenColorCustomizations": {},
-  "editor.showDeprecated": true,
-  "editor.showFoldingControls": "mouseover",
-  "editor.showUnused": true,
-  "editor.smartSelect.selectLeadingAndTrailingWhitespace": true,
-  "editor.smartSelect.selectSubwords": true,
+  // スムーズスクロールを有効化（デフォルト: false）アニメーション付きスクロール
   "editor.smoothScrolling": true,
-  "editor.snippets.codeActions.enabled": false, // よくわからない…
-  "editor.stablePeek": false,
-  "editor.stickyScroll.defaultModel": "outlineModel",
-  "editor.stickyScroll.enabled": true,
+  // スニペットのコードアクションを無効化
+  "editor.snippets.codeActions.enabled": false,
+  // スティッキースクロールの最大表示行数（デフォルト: 5）
   "editor.stickyScroll.maxLineCount": 10,
-  "editor.stickyScroll.scrollWithEditor": true,
-  "editor.stickyTabStops": false,
+  // Tabキーで補完候補を確定（デフォルト: "off"）
   "editor.tabCompletion": "on",
-  "editor.tabFocusMode": false,
+  // タブサイズを2スペースに（デフォルト: 4）
   "editor.tabSize": 2,
+  // トークンカラーのカスタマイズ（ライト/ダークテーマでの検索マッチテキスト色）
   "editor.tokenColorCustomizations": {
     "[*Light*]": {
       "textMateRules": [
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#000"
-          }
-        }
-      ]
+            "foreground": "#000",
+          },
+        },
+      ],
     },
     "[*Dark*]": {
       "textMateRules": [
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#fff"
-          }
-        }
-      ]
-    }
+            "foreground": "#fff",
+          },
+        },
+      ],
+    },
   },
+  // 自動挿入された末尾空白のトリムを無効化（デフォルト: true）
   "editor.trimAutoWhitespace": false,
-  "editor.unfoldOnClickAfterEndOfLine": false,
-  "editor.unicodeHighlight.allowedCharacters": {},
-  "editor.unicodeHighlight.allowedLocales": {
-    "_os": true,
-    "_vscode": true
-  },
-  "editor.unicodeHighlight.ambiguousCharacters": true,
-  "editor.unicodeHighlight.includeComments": "inUntrustedWorkspace",
-  "editor.unicodeHighlight.includeStrings": true,
-  "editor.unicodeHighlight.invisibleCharacters": true,
-  "editor.unicodeHighlight.nonBasicASCII": "inUntrustedWorkspace",
-  "editor.unusualLineTerminators": "prompt",
-  "editor.useTabStops": true,
-  "editor.wordBreak": "normal",
-  "editor.wordSegmenterLocales": "ja",
-  "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
-  "editor.wordWrap": "off",
+  // 単語分割に日本語ロケールを使用（日本語の単語境界を正しく認識）
+  "editor.wordSegmenterLocales": ["ja"],
+  // ワードラップの列数（デフォルト: 80）
   "editor.wordWrapColumn": 100,
-  "editor.wrappingIndent": "same",
-  "editor.wrappingStrategy": "simple",
-  // ## Cursor settings
-  "editor.cursorBlinking": "smooth",
-  "editor.cursorSmoothCaretAnimation": "off",
-  "editor.cursorStyle": "line",
-  "editor.cursorSurroundingLines": 20,
-  "editor.cursorSurroundingLinesStyle": "default",
-  "editor.cursorWidth": 2,
-  // ## Find settings
-  "editor.find.addExtraSpaceOnTop": true,
-  "editor.find.autoFindInSelection": "never",
-  "editor.find.cursorMoveOnType": true,
-  "editor.find.globalFindClipboard": true,
-  "editor.find.history": "workspace",
-  "editor.find.loop": true,
-  "editor.find.seedSearchStringFromSelection": "always",
-  // ## Font settings
-  "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  // フォントの合字を有効にするか(詳細はhttps://github.com/tonsky/FiraCode などで)
-  "editor.fontLigatures": true,
-  "editor.fontSize": 11.5,
-  "editor.fontVariations": false,
-  "editor.fontWeight": "normal",
-  // ## Formatting settings
-  "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "file",
-  "editor.formatOnType": true,
-  // ## Diff Editor settings
-  "diffEditor.codeLens": true,
-  "diffEditor.diffAlgorithm": "advanced",
-  "diffEditor.experimental.showEmptyDecorations": true,
-  "diffEditor.experimental.showMoves": true,
-  "diffEditor.experimental.useTrueInlineView": true,
-  "diffEditor.hideUnchangedRegions.contextLineCount": 3,
-  "diffEditor.hideUnchangedRegions.enabled": true,
-  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
-  "diffEditor.hideUnchangedRegions.revealLineCount": 20,
-  "diffEditor.ignoreTrimWhitespace": false,
-  "diffEditor.maxComputationTime": 5000,
-  "diffEditor.maxFileSize": 100,
-  "diffEditor.renderGutterMenu": true,
-  "diffEditor.renderIndicators": true,
-  "diffEditor.renderMarginRevertIcon": true,
-  "diffEditor.renderSideBySide": true,
-  "diffEditor.renderSideBySideInlineBreakpoint": 1000,
-  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
-  "diffEditor.wordWrap": "inherit",
-  // ## Multi-File Diff Editor settings
-  "multiDiffEditor.experimental.enabled": true,
-  // ## Minimap settings (右側に出てくるファイル全体が見れるプレビュー)
-  "editor.minimap.autohide": "none",
-  "editor.minimap.enabled": true,
-  "editor.minimap.maxColumn": 80,
-  "editor.minimap.renderCharacters": true,
-  "editor.minimap.scale": 1,
-  "editor.minimap.sectionHeaderFontSize": 9,
-  "editor.minimap.sectionHeaderLetterSpacing": 2,
-  "editor.minimap.showMarkSectionHeaders": true,
-  "editor.minimap.showRegionSectionHeaders": true,
-  "editor.minimap.showSlider": "always",
-  "editor.minimap.side": "right",
-  "editor.minimap.size": "proportional",
-  // ## Suggestions settings
-  "editor.acceptSuggestionOnCommitCharacter": true,
-  "editor.acceptSuggestionOnEnter": "on",
-  "editor.inlineSuggest.edits.experimental.enabled": true,
-  "editor.inlineSuggest.edits.experimental.onlyShowWhenCloseToCursor": true,
-  "editor.inlineSuggest.edits.experimental.useInterleavedLinesDiff": "never",
-  "editor.inlineSuggest.edits.experimental.useMixedLinesDiff": "never",
-  "editor.inlineSuggest.enabled": true,
-  "editor.inlineSuggest.fontFamily": "default",
-  "editor.inlineSuggest.showToolbar": "onHover",
-  "editor.inlineSuggest.suppressSuggestions": false,
-  "editor.inlineSuggest.syntaxHighlightingEnabled": true,
-  "editor.quickSuggestions": {
-    "other": "on",
-    "comments": "off",
-    "strings": "off"
-  },
-  "editor.quickSuggestionsDelay": 10,
-  "editor.screenReaderAnnounceInlineSuggestion": false,
-  "editor.snippetSuggestions": "inline",
-  // ここまで設定完了
 
+  // =============================================
+  // Text Editor > Cursor - カーソル
+  // =============================================
+
+  // カーソルの点滅スタイルをスムーズアニメーションに（デフォルト: "blink"）
+  "editor.cursorBlinking": "smooth",
+  // カーソル周辺に常に20行の表示を確保（デフォルト: 0）スクロール位置が安定する
+  "editor.cursorSurroundingLines": 20,
+  // カーソルの幅を2pxに設定
+  "editor.cursorWidth": 2,
+
+  // =============================================
+  // Text Editor > Find - 検索
+  // =============================================
+
+  // グローバル検索クリップボードを使用（デフォルト: false）他アプリとの検索文字列共有
+  "editor.find.globalFindClipboard": true,
+
+  // =============================================
+  // Text Editor > Font - フォント
+  // =============================================
+
+  // フォントファミリー（Fira Codeを優先使用）
+  "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+  // フォント合字を有効化（デフォルト: false）=> → ≠ などの合字表示
+  "editor.fontLigatures": true,
+  // フォントサイズ（デフォルト: 12px）
+  "editor.fontSize": 11.5,
+
+  // =============================================
+  // Text Editor > Formatting - 書式設定
+  // =============================================
+
+  // ペースト時に自動フォーマット（デフォルト: false）
+  "editor.formatOnPaste": true,
+  // 保存時に自動フォーマット（デフォルト: false）
+  "editor.formatOnSave": true,
+  // 入力時に自動フォーマット（デフォルト: false）
+  "editor.formatOnType": true,
+
+  // =============================================
+  // Text Editor > Minimap - ミニマップ（右側のファイル全体プレビュー）
+  // =============================================
+
+  // ミニマップの最大列数（デフォルト: 120）
+  "editor.minimap.maxColumn": 80,
+  // セクションヘッダーの文字間隔（デフォルト: 1）
+  "editor.minimap.sectionHeaderLetterSpacing": 2,
+  // ミニマップのスライダーを常に表示（デフォルト: "mouseover"）
+  "editor.minimap.showSlider": "always",
+
+  // =============================================
+  // Text Editor > Suggestions - 補完候補
+  // =============================================
+
+  // 補完候補の選択方法：最近使用かつプレフィックス一致を優先（デフォルト: "first"）
   "editor.suggestSelection": "recentlyUsedByPrefix",
+
+  // =============================================
+  // Diff Editor - 差分エディタ
+  // =============================================
+
+  // 差分エディタでCodeLensを表示（デフォルト: false）
+  "diffEditor.codeLens": true,
+  // 変更のない領域を折りたたんで非表示にする（デフォルト: false）
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  // 折りたたむ最小行数（デフォルト: 3）
+  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
+  // 末尾空白の差分を無視しない（デフォルト: true=無視する）
+  "diffEditor.ignoreTrimWhitespace": false,
+  // 差分計算の最大ファイルサイズ（デフォルト: 50MB）
+  "diffEditor.maxFileSize": 100,
+  // サイドバイサイド表示からインライン表示に切り替える幅（デフォルト: 900px）
+  "diffEditor.renderSideBySideInlineBreakpoint": 1000,
+
+  // =============================================
+  // Files - ファイル
+  // =============================================
+
+  // フォーカスが外れた時にファイルを自動保存（デフォルト: "off"）
   "files.autoSave": "onFocusChange",
+
+  // =============================================
+  // Workbench - ワークベンチ
+  // =============================================
+
+  // カラーテーマ
   "workbench.colorTheme": "Monokai Pro (Filter Machine)",
-  "workbench.editor.decorations.colors": true,
+  // アイコンテーマ
   "workbench.iconTheme": "Monokai Pro (Filter Machine) Icons",
-  "workbench.sideBar.location": "left",
-  "workbench.editor.decorations.badges": true,
+  // タブのプレビューモードを無効化（デフォルト: true）シングルクリックでもタブを確定的に開く
   "workbench.editor.enablePreview": false,
-  "workbench.activityBar.orientation": "vertical",
+
+  // =============================================
+  // Features > Explorer - エクスプローラー
+  // =============================================
+
+  // アクティブファイルのエクスプローラー上での自動追跡を無効化（デフォルト: true）
   "explorer.autoReveal": false,
+
+  // =============================================
+  // Features > Terminal - ターミナル
+  // =============================================
+
+  // 外部ターミナルを使用（エクスプローラーから開く時）
   "terminal.explorerKind": "external",
+  // macOSの外部ターミナルアプリにiTermを指定（デフォルト: Terminal.app）
   "terminal.external.osxExec": "iTerm.app",
+  // 統合ターミナルのカーソルスタイル（デフォルト: "block"）
   "terminal.integrated.cursorStyle": "line",
+
+  // =============================================
+  // Features > SCM (Git) - ソース管理
+  // =============================================
+
+  // Git同期時の確認ダイアログを非表示（デフォルト: true）
   "git.confirmSync": false,
+  // コミット署名（GPG）を有効化（デフォルト: false）
   "git.enableCommitSigning": true,
+  // ステージ済み変更がない時に全変更を自動ステージしてコミット（デフォルト: false）
   "git.enableSmartCommit": true,
+  // Gitの実行ファイルパスを明示指定
   "git.path": "/usr/local/bin/git",
+  // リモートからの自動フェッチを有効化（デフォルト: false）
+  "git.autofetch": true,
+
+  // =============================================
+  // 拡張機能設定
+  // =============================================
+
+  // git-graph: 日付の表示形式
   "git-graph.date.format": "ISO Date & Time",
+  // Java: ランタイム設定
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-11",
-      "path": "~/.sdkman/candidates/java/11.0.26-amzn"
+      "path": "~/.sdkman/candidates/java/11.0.26-amzn",
     },
     {
       "name": "JavaSE-17",
-      "path": "~/.sdkman/candidates/java/17.0.14-amzn"
+      "path": "~/.sdkman/candidates/java/17.0.14-amzn",
     },
     {
       "name": "JavaSE-18",
       "path": "~/.sdkman/candidates/java/18.0.2-amzn",
-      "default": true
-    }
+      "default": true,
+    },
   ],
+  // Java: フォーマッター設定ファイルのURL
   "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/java/java-formatter-profile-nrhrhysd616-google-style.xml",
+  // Java: プロジェクトルートにメタデータファイルを生成
   "java.import.generatesMetadataFilesAtProjectRoot": true,
+  // Java: Gradleで使用するJavaホーム
   "java.import.gradle.java.home": "~/.sdkman/candidates/java/17.0.12-amzn",
+  // Java: Language ServerのJavaホーム
   "java.jdt.ls.java.home": "~/.sdkman/candidates/java/18.0.2-amzn",
+  // Java: 参照のCodeLensを表示
   "java.referencesCodeLens.enabled": true,
+  // todo-tree: 検出するタグ一覧
   "todo-tree.general.tags": ["BUG", "FIXME", "TODO", "[ ]", "[x]"],
+  // todo-tree: 検出用の正規表現パターン
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+  // protoc: Protocol Buffersコンパイラのパス
   "protoc": {
-    "path": "/usr/local/bin/protoc"
+    "path": "/usr/local/bin/protoc",
   },
+  // GitHub Copilot: 有効化する言語の設定
   "github.copilot.enable": {
     "*": true,
     "plaintext": true,
     "markdown": true,
     "scminput": false,
     "yaml": true,
-    "enableAutoCompletions": true
+    "enableAutoCompletions": true,
   },
+  // GitHub Copilot: エディタ内コードアクションを無効化
   "github.copilot.editor.enableCodeActions": false,
+  // GitHub Copilot: 次の編集候補を有効化
+  "github.copilot.nextEditSuggestions.enabled": true,
+  // Prettier: 行の最大幅
   "prettier.printWidth": 100,
-  "git.autofetch": true,
+  // Red Hat: テレメトリを無効化
+  "redhat.telemetry.enabled": false,
+  // intelephense (PHP): 波括弧のスタイルをK&Rに
+  "intelephense.format.braces": "k&r",
+  // GitLens: AIモデル設定
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.5",
+  // チャットビュー: セッション表示の向き
+  "chat.viewSessions.orientation": "stacked",
+  // Claude Code: パネルに表示
+  "claudeCode.preferredLocation": "panel",
+  // markdownlint: ルール設定
+  "markdownlint.config": {
+    "MD040": false,
+    "MD060": false,
+  },
+  // markdownlint: 保存時にリントを実行
+  "markdownlint.run": "onSave",
+
+  // =============================================
   // 言語別設定
+  // =============================================
+
   "[java]": {
-    "editor.defaultFormatter": "redhat.java"
+    "editor.defaultFormatter": "redhat.java",
   },
   "[php]": {
-    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
   },
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
+    "editor.defaultFormatter": "Prisma.prisma",
   },
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "vscode.json-language-features",
   },
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
-    "diffEditor.ignoreTrimWhitespace": false
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
   },
   "[xml]": {
     "files.trimFinalNewlines": true,
-    "editor.defaultFormatter": "redhat.vscode-xml"
+    "editor.defaultFormatter": "redhat.vscode-xml",
   },
-  // 拡張機能設定は以下に記述
-  "redhat.telemetry.enabled": false,
-  // bmewburn.vscode-intelephense-client
-  "intelephense.format.braces": "k&r",
-  // Prisma.prisma
-  "prisma.showPrismaDataPlatformNotification": false,
-  "github.copilot.nextEditSuggestions.enabled": true,
-  "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.5",
-  "chat.viewSessions.orientation": "stacked",
-  // Claude Code
-  "claudeCode.preferredLocation": "panel"
 }
