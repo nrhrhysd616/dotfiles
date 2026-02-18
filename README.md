@@ -9,7 +9,6 @@
     - [VSCode](https://code.visualstudio.com/download)
     - [VSCode Insiders](https://code.visualstudio.com/insiders/)
     - [Cursor](https://www.cursor.com/ja)
-    - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 2. 以下のZshコマンドを順番に実行
 
