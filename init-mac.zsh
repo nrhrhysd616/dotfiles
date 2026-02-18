@@ -163,6 +163,9 @@ install_command 'Python (latest)' 'python' 'mise which python' 'mise use -g pyth
 # Node.js install via mise
 install_command 'Node.js (latest LTS)' 'node' 'mise which node' 'mise use -g node@lts'
 
+# pnpm install via mise
+install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest'
+
 # Bun install via mise
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
@@ -234,7 +237,8 @@ print_success "VSCode Insiders configuration files created"
 print_section "Claude Code User Configuration"
 mkdir -p $HOME/.claude
 ln -nfs $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
-print_success "Claude Code user-level CLAUDE.md created"
+ln -nfs $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
+print_success "Claude Code user-level CLAUDE.md and skills created"
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"

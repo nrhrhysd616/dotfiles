@@ -354,5 +354,8 @@
   "prisma.showPrismaDataPlatformNotification": false,
   "github.copilot.nextEditSuggestions.enabled": true,
   "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.5"
+  "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.5",
+  "chat.viewSessions.orientation": "stacked",
+  // Claude Code
+  "claudeCode.preferredLocation": "panel"
 }
