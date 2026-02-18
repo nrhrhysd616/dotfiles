@@ -237,7 +237,8 @@ print_success "VSCode Insiders configuration files created"
 print_section "Claude Code User Configuration"
 mkdir -p $HOME/.claude
 ln -nfs $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
-print_success "Claude Code user-level CLAUDE.md created"
+ln -nfs $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
+print_success "Claude Code user-level CLAUDE.md and skills created"
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
