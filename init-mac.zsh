@@ -260,6 +260,31 @@ else
   print_warning "Extension ID: saoudrizwan.claude-dev"
 fi
 
+# sshd configuration
+# /etc/ssh/sshd_config is a system file, so sudo is required
+if [[ -e /etc/ssh/sshd_config && ! -L /etc/ssh/sshd_config ]]; then
+  local backup_path="/etc/ssh/sshd_config.bak.$(date +%Y%m%d%H%M%S)"
+  sudo cp /etc/ssh/sshd_config $backup_path
+  print_warning "Existing sshd_config backed up to $backup_path"
+fi
+sudo ln -nfs $SCRIPT_DIR/sshd/sshd_config /etc/ssh/sshd_config
+print_success "sshd configuration file created"
+print_info "To apply sshd configuration, restart sshd with the following commands:"
+print_info "  sudo launchctl stop com.openssh.sshd"
+print_info "  sudo launchctl start com.openssh.sshd"
+
+# SSH authorized_keys configuration
+mkdir -p $HOME/.ssh
+chmod 700 $HOME/.ssh
+if [[ -e $HOME/.ssh/authorized_keys && ! -L $HOME/.ssh/authorized_keys ]]; then
+  local backup_path="$HOME/.ssh/authorized_keys.bak.$(date +%Y%m%d%H%M%S)"
+  cp $HOME/.ssh/authorized_keys $backup_path
+  print_warning "Existing authorized_keys backed up to $backup_path"
+fi
+cp $SCRIPT_DIR/ssh/authorized_keys $HOME/.ssh/authorized_keys
+chmod 600 $HOME/.ssh/authorized_keys
+print_success "SSH authorized_keys configuration file copied"
+
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o $HOME/.iterm2_shell_integration.zsh
 print_success "iTerm2 shell integration installed"
