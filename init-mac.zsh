@@ -238,7 +238,8 @@ print_section "Claude Code User Configuration"
 mkdir -p $HOME/.claude
 ln -nfs $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
 ln -nfs $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
-print_success "Claude Code user-level CLAUDE.md and skills created"
+ln -nfs $SCRIPT_DIR/claude-code/settings.json $HOME/.claude/settings.json
+print_success "Claude Code user-level CLAUDE.md, skills and settings created"
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
