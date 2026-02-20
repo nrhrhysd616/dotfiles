@@ -1,3 +1,7 @@
 {
-  "language": "日本語"
+  "language": "日本語",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
 }
