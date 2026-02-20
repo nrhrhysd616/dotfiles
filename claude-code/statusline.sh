@@ -33,7 +33,7 @@ fi
 RED='\033[31m'
 RESET='\033[0m'
 
-if [ "$PCT" -ge 80 ]; then
+if [ "$PCT" -ge 70 ]; then
     CONTEXT_TEXT="${RED}Context: ${PCT}% (${USED}/${TOTAL} tokens)${RESET}"
 else
     CONTEXT_TEXT="Context: ${PCT}% (${USED}/${TOTAL} tokens)"
