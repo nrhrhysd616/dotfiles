@@ -1,8 +1,11 @@
 {
-  "enableAllProjectMcpServers": false,
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": false
 }
