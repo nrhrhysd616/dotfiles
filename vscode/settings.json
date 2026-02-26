@@ -311,6 +311,7 @@
   "claudeCode.preferredLocation": "panel",
   // markdownlint: ルール設定
   "markdownlint.config": {
+    "MD036": false,
     "MD040": false,
     "MD060": false,
   },
