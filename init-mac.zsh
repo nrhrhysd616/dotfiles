@@ -105,17 +105,30 @@ fi
 # @param command Command name (ex. 'git')
 # @param checkCommand Command to check if installed (ex. 'git --version')
 # @param installCommand Command to install (ex. 'brew install git')
+# @param updateCommand Command to update if already installed (ex. 'nix profile upgrade git') [optional]
 function install_command() {
   local name=$1
   local command=$2
   local checkCommand=$3
   local installCommand=$4
-  
+  local updateCommand=${5:-""}
+
   print_info "Checking ${name}... "
-  
+
   if eval "$checkCommand" &>/dev/null; then
-    print_success "Already installed"
-    return 0
+    if [[ -n "$updateCommand" ]]; then
+      print_info "Already installed. Updating... "
+      if eval "$updateCommand"; then
+        print_success "Updated successfully!"
+        return 0
+      else
+        print_error "Update failed"
+        return 1
+      fi
+    else
+      print_success "Already installed, skipping update"
+      return 0
+    fi
   else
     print_info "Installing... "
     if eval "$installCommand"; then
@@ -132,55 +145,55 @@ print_section "Installing Development Tools"
 
 
 # Git install
-install_command 'Git' 'git' 'which git' 'nix profile add nixpkgs#git'
+install_command 'Git' 'git' 'which git' 'nix profile add nixpkgs#git' 'nix profile upgrade git'
 
 # ghq install
-install_command 'ghq' 'ghq' 'ghq --version' 'nix profile add nixpkgs#ghq'
+install_command 'ghq' 'ghq' 'ghq --version' 'nix profile add nixpkgs#ghq' 'nix profile upgrade ghq'
 
 # GitHub CLI install
-install_command 'GitHub CLI' 'gh' 'gh --version' 'nix profile add nixpkgs#gh'
+install_command 'GitHub CLI' 'gh' 'gh --version' 'nix profile add nixpkgs#gh' 'nix profile upgrade gh'
 
 # curl install
-install_command 'curl' 'curl' 'which curl' 'nix profile add nixpkgs#curl'
+install_command 'curl' 'curl' 'which curl' 'nix profile add nixpkgs#curl' 'nix profile upgrade curl'
 
 # fzf install
-install_command 'fzf' 'fzf' 'fzf --version' 'nix profile add nixpkgs#fzf'
+install_command 'fzf' 'fzf' 'fzf --version' 'nix profile add nixpkgs#fzf' 'nix profile upgrade fzf'
 
 # mise install (multi-language version manager)
-install_command 'mise' 'mise' 'mise --version' 'nix profile add nixpkgs#mise'
+install_command 'mise' 'mise' 'mise --version' 'nix profile add nixpkgs#mise' 'nix profile upgrade mise'
 
 # Go install
-install_command 'Go' 'go' 'go version' 'nix profile add nixpkgs#go'
+install_command 'Go' 'go' 'go version' 'nix profile add nixpkgs#go' 'nix profile upgrade go'
 
 # SDKMAN install
-install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"'
+install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"' 'sdk selfupdate force'
 
 print_section "Installing mise-managed tools"
 
 # Python install via mise
-install_command 'Python (latest)' 'python' 'mise which python' 'mise use -g python@latest'
+install_command 'Python (latest)' 'python' 'mise which python' 'mise use -g python@latest' 'mise use -g python@latest'
 
 # Node.js install via mise
-install_command 'Node.js (latest LTS)' 'node' 'mise which node' 'mise use -g node@lts'
+install_command 'Node.js (latest LTS)' 'node' 'mise which node' 'mise use -g node@lts' 'mise use -g node@lts'
 
 # pnpm install via mise
-install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest'
+install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest' 'mise use -g pnpm@latest'
 
 # Bun install via mise
 # @see https://bun.sh/docs/installation
-install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest'
+install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest' 'mise use -g bun@latest'
 
 # Claude Code CLI install
-install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash'
+install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash' 'curl -fsSL https://claude.ai/install.sh | bash'
 
 # Codex CLI install
-install_command 'Codex CLI' 'codex' 'codex --version' 'brew install codex'
+install_command 'Codex CLI' 'codex' 'codex --version' 'brew install codex' 'brew upgrade codex'
 
 # AWS CLI install
-install_command 'AWS CLI' 'aws' 'aws --version' 'nix profile add nixpkgs#awscli2'
+install_command 'AWS CLI' 'aws' 'aws --version' 'nix profile add nixpkgs#awscli2' 'nix profile upgrade awscli2'
 
 # AWS SAM CLI install
-install_command 'AWS SAM CLI' 'sam' 'sam --version' 'nix profile add nixpkgs#aws-sam-cli'
+install_command 'AWS SAM CLI' 'sam' 'sam --version' 'nix profile add nixpkgs#aws-sam-cli' 'nix profile upgrade aws-sam-cli'
 
 # Font Fira Code install
 # Bug: Font installation path issue, manually move and remove from brew
@@ -188,15 +201,18 @@ install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Reg
 
 # ngrok install
 # @see https://ngrok.com/docs/getting-started/
-install_command 'ngrok' 'ngrok' 'ngrok version' 'brew install ngrok'
+install_command 'ngrok' 'ngrok' 'ngrok version' 'brew install ngrok' 'brew upgrade ngrok'
 
 # Stripe CLI install
 # @see https://docs.stripe.com/stripe-cli
-install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#stripe-cli'
+install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#stripe-cli' 'nix profile upgrade stripe-cli'
 
 # VHS install
 # @see https://github.com/charmbracelet/vhs
-install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs'
+install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix profile upgrade vhs'
+
+# tmux install
+install_command 'tmux' 'tmux' 'tmux -V' 'nix profile add nixpkgs#tmux' 'nix profile upgrade tmux'
 
 print_section "Installing Java"
 # After setting sdk command path in .zshrc, install Java
@@ -232,6 +248,10 @@ print_success "VSCode configuration files created"
 ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
 ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
 print_success "VSCode Insiders configuration files created"
+
+# tmux configuration
+ln -nfs $SCRIPT_DIR/tmux/.tmux.conf $HOME/
+print_success "tmux configuration file created"
 
 # Claude Code user-level configuration
 print_section "Claude Code User Configuration"
