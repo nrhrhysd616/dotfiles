@@ -12,7 +12,7 @@ else
 fi
 
 # Alias
-alias cdproject='cd ~/Documents/Project/github.com'
+alias cdproject='cd ~/Documents/Project'
 alias ..='cd ..'
 alias ls='ls -F'
 alias la='ls -A'
