@@ -55,6 +55,7 @@
 | `java/` | Javaコードフォーマッター設定（Google Styleベースのフォーマットプロファイル） |
 | `ssh/` | SSHクライアント設定（`authorized_keys`） |
 | `sshd/` | SSHサーバー設定（`sshd_config`） |
+| `tmux/` | Tmux設定（`.tmux.conf`） |
 | `vscode/` | VSCodeの設定（`settings.json`、`keybindings.json`、Cline拡張設定） |
 | `vscode-insiders/` | VSCode Insidersの設定（`settings.json`、`keybindings.json`） |
 | `zsh/` | Zshシェル設定（`.zshrc`） |
