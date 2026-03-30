@@ -57,19 +57,3 @@ local p_history="%F{yellow}%!%f"
 local p_endmark="%B%(?,%F{green}$,%F{red}!!\$!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
 
-# tmux auto-attach (interactive, non-tmux, non-vscode terminal)
-# $-はシェルオプションフラグの文字列。"i"が含まれていればインタラクティブシェル（手動操作用）
-# -z "$TMUX" はtmux内でなければtrue（二重起動を防ぐ）
-# "$TERM_PROGRAM" != "vscode" はVSCode統合ターミナルを除外
-if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-  # $SSH_CLIENT はSSH接続元のIPとポートが入る変数（SSH接続時のみセットされる）
-  # $SSH_TTY はSSH接続時に割り当てられた端末デバイスのパス（SSH接続時のみセットされる）
-  # どちらか一方でもセットされていればSSH接続と判定する
-  if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
-    # SSH接続時は専用セッション "remote" にアタッチ（なければ新規作成）
-    tmux new-session -A -s remote
-  else
-    # ローカル起動時はメインセッション "main" にアタッチ（なければ新規作成）
-    tmux new-session -A -s main
-  fi
-fi

@@ -211,9 +211,6 @@ install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#
 # @see https://github.com/charmbracelet/vhs
 install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix profile upgrade vhs'
 
-# tmux install
-install_command 'tmux' 'tmux' 'tmux -V' 'nix profile add nixpkgs#tmux' 'nix profile upgrade tmux'
-
 print_section "Installing Java"
 # After setting sdk command path in .zshrc, install Java
 install_command 'Java 11' 'java11' 'sdk home java 11.0.29-amzn' 'sdk install java 11.0.29-amzn'
@@ -248,10 +245,6 @@ print_success "VSCode configuration files created"
 ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
 ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
 print_success "VSCode Insiders configuration files created"
-
-# tmux configuration
-ln -nfs $SCRIPT_DIR/tmux/.tmux.conf $HOME/
-print_success "tmux configuration file created"
 
 # Claude Code user-level configuration
 print_section "Claude Code User Configuration"
