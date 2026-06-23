@@ -12,7 +12,7 @@ else
 fi
 
 # Alias
-alias cdproject='cd ~/Documents/Project/'
+alias cdproject='cd ~/Documents/Project'
 alias ..='cd ..'
 alias ls='ls -F'
 alias la='ls -A'
@@ -56,3 +56,4 @@ local p_current="%F{green}@%2d%f"
 local p_history="%F{yellow}%!%f"
 local p_endmark="%B%(?,%F{green}$,%F{red}!!\$!!)%f%b"
 PROMPT="$p_current $p_history$p_endmark"
+

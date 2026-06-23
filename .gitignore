@@ -28,3 +28,6 @@ id_ed25519
 *.tmp
 *.log
 *.bak
+
+# Claude Code
+.claude/plans/

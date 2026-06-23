@@ -1,7 +1,37 @@
 {
-  "language": "日本語",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)"
+    ],
+    "deny": [
+      "Read(*.env)",
+      "Read(*.env.*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(git push --force:*)",
+      "Read(./secrets/**)"
+    ],
+    "ask": [
+      "Bash(gh pr create:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(brew install:*)",
+      "Bash(brew uninstall:*)",
+      "Bash(curl:*)"
+    ],
+    "defaultMode": "default"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
-  }
+  },
+  "language": "japanese",
+  "effortLevel": "high",
+  "plansDirectory": "./.claude/plans",
+  "theme": "dark-daltonized",
+  "preferredNotifChannel": "iterm2_with_bell",
+  "tui": "fullscreen"
 }

@@ -303,12 +303,15 @@
   // GitLens: AIモデル設定
   "gitlens.ai.model": "vscode",
   "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.5",
+  // GitHub Pull Requests: 公開ブランチでのPR作成を無効化（デフォルト: "always"）誤操作防止
+  "githubPullRequests.createOnPublishBranch": "never",
   // チャットビュー: セッション表示の向き
   "chat.viewSessions.orientation": "stacked",
   // Claude Code: パネルに表示
   "claudeCode.preferredLocation": "panel",
   // markdownlint: ルール設定
   "markdownlint.config": {
+    "MD036": false,
     "MD040": false,
     "MD060": false,
   },
@@ -341,4 +344,5 @@
     "files.trimFinalNewlines": true,
     "editor.defaultFormatter": "redhat.vscode-xml",
   },
+  "docker.extension.enableComposeLanguageServer": false,
 }
