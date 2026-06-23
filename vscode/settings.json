@@ -344,4 +344,5 @@
     "files.trimFinalNewlines": true,
     "editor.defaultFormatter": "redhat.vscode-xml",
   },
+  "docker.extension.enableComposeLanguageServer": false,
 }

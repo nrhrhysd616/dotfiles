@@ -325,7 +325,7 @@
     "Alpha Component" : 1,
     "Green Component" : 0.69803921570000005
   },
-  "Window Type" : 7,
+  "Window Type" : 15,
   "Use Bright Bold" : true,
   "Cursor Text Color" : {
     "Red Component" : 0.72156862749999995,
@@ -351,7 +351,7 @@
   },
   "Name" : "Default",
   "Blinking Cursor" : false,
-  "Guid" : "E09A6999-29EB-4D13-B124-92D3FED5AC8E",
+  "Guid" : "38A830FE-FD4A-4A73-8777-268D6D4EB90C",
   "Badge Max Width" : 0.69999999999999996,
   "Match Background Color" : {
     "Red Component" : 1,
