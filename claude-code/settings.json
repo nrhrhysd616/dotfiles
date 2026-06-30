@@ -29,9 +29,9 @@
     "command": "~/.claude/statusline.sh"
   },
   "language": "japanese",
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "plansDirectory": "./.claude/plans",
+  "tui": "fullscreen",
   "theme": "dark-daltonized",
-  "preferredNotifChannel": "iterm2_with_bell",
-  "tui": "fullscreen"
+  "preferredNotifChannel": "iterm2_with_bell"
 }
