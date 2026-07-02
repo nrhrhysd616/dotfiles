@@ -3,12 +3,9 @@ if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
-# homebrew PATH
-if [ "$(uname -m)" = "arm64" ]; then
-  # For arm64
+# homebrew PATH (Apple Silicon)
+if [ -e /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-  # For x86_64
 fi
 
 # Alias
@@ -28,6 +25,9 @@ function historyexec() {
 
 # fetch gitignore
 function gitignore() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
+
+# 補完機能の初期化（git・ghなどのタブ補完に必要）
+autoload -Uz compinit && compinit
 
 # mise (multi-language version manager)
 eval "$(mise activate zsh)"
