@@ -30,14 +30,24 @@
     - name: アルファベットフルネーム
     - email: sshキーの設定と同一のGithubで利用しているメールアドレス
 
-5. sshdを再起動して設定を反映する
+5. コミット署名のローカル検証用に`~/.ssh/allowed_signers`ファイルを作成
+
+    `git log --show-signature`で署名を検証できるようにするための設定  
+    メールアドレスと公開鍵は`.gitconfig.user.local`に設定したものと同一にする
+
+    ```zsh
+    echo "<email> <signingkeyの公開鍵>" > ~/.ssh/allowed_signers
+    chmod 644 ~/.ssh/allowed_signers
+    ```
+
+6. sshdを再起動して設定を反映する
 
     ```zsh
     sudo launchctl stop com.openssh.sshd
     sudo launchctl start com.openssh.sshd
     ```
 
-6. VSCodeのClineのCustom Instructionsを手動で設定する
+7. VSCodeのClineのCustom Instructionsを手動で設定する
 
     現状設定のエクスポートなどができず、`settings.json`ファイルでの外出しも不可能なため手動
 

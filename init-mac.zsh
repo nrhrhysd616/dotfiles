@@ -28,6 +28,29 @@ function print_error() {
   echo "${RED}✗ $1${NC}"
 }
 
+# Create a symlink with validation
+# Skips when the destination's parent directory does not exist (ex. app not installed)
+# and reports failure instead of always printing success
+# @param src Source path in this repository (absolute path)
+# @param dest Destination path (absolute path)
+function link_config() {
+  local src=$1
+  local dest=$2
+  local dest_dir=$(dirname "$dest")
+
+  if [ ! -d "$dest_dir" ]; then
+    print_warning "Skipped linking $dest ($dest_dir not found)"
+    return 1
+  fi
+
+  if ln -nfs "$src" "$dest"; then
+    print_success "Linked $dest"
+  else
+    print_error "Failed to link $dest"
+    return 1
+  fi
+}
+
 # Check macOS
 print_section "Environment Check"
 if [ $(uname) != "Darwin" ] ; then
@@ -87,9 +110,8 @@ print_section "ZSH Configuration"
 # - mise (multi-language version manager)
 # - go
 # - sdkman
-ln -nfs $SCRIPT_DIR/zsh/.zshrc $HOME/
+link_config $SCRIPT_DIR/zsh/.zshrc $HOME/.zshrc
 source $HOME/.zshrc
-print_success ".zshrc file created"
 
 # Xcode Command Line Tools check and install
 if xcode-select -p &>/dev/null; then
@@ -212,48 +234,60 @@ install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#
 install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix profile upgrade vhs'
 
 print_section "Installing Java"
+
+# Resolve the latest available Amazon Corretto version for a major version
+# Falls back to a pinned version if SDKMAN resolution fails,
+# because pinned patch versions eventually disappear from SDKMAN
+# @param major Java major version (ex. '11')
+# @param fallback Pinned version identifier (ex. '11.0.29-amzn')
+function sdk_latest_java() {
+  local major=$1
+  local fallback=$2
+  local resolved=$(sdk list java 2>/dev/null | grep -oE "\b${major}(\.[0-9]+)+-amzn" | head -1)
+  echo ${resolved:-$fallback}
+}
+
 # After setting sdk command path in .zshrc, install Java
-install_command 'Java 11' 'java11' 'sdk home java 11.0.29-amzn' 'sdk install java 11.0.29-amzn'
-install_command 'Java 17' 'java17' 'sdk home java 17.0.17-amzn' 'sdk install java 17.0.17-amzn'
-install_command 'Java 18' 'java18' 'sdk home java 18.0.2-amzn' 'sdk install java 18.0.2-amzn'
+JAVA11_VERSION=$(sdk_latest_java 11 11.0.29-amzn)
+JAVA17_VERSION=$(sdk_latest_java 17 17.0.17-amzn)
+JAVA18_VERSION=$(sdk_latest_java 18 18.0.2-amzn)
+install_command 'Java 11' 'java11' "sdk home java $JAVA11_VERSION" "sdk install java $JAVA11_VERSION"
+install_command 'Java 17' 'java17' "sdk home java $JAVA17_VERSION" "sdk install java $JAVA17_VERSION"
+install_command 'Java 18' 'java18' "sdk home java $JAVA18_VERSION" "sdk install java $JAVA18_VERSION"
 
 print_section "Setting Up Configuration Files"
 
 # Git configuration
-ln -nfs $SCRIPT_DIR/git/.gitconfig $HOME/
-ln -nfs $SCRIPT_DIR/git/.gitignore_global $HOME/
+link_config $SCRIPT_DIR/git/.gitconfig $HOME/.gitconfig
+link_config $SCRIPT_DIR/git/.gitignore_global $HOME/.gitignore_global
 if [ ! -f $HOME/.gitconfig.user.local ]; then
   cp $SCRIPT_DIR/git/.gitconfig.user.local $HOME/
 fi
 print_success "Git configuration files created"
 
+# Editor user settings
+# settings.json is shared across VSCode / VSCode Insiders / Cursor (vscode/settings.json)
+# Requires each application to be installed and launched at least once
+
 # Cursor user settings
-# Requires Cursor application
-# Currently commented out as Cursor is not in use
-ln -nfs $SCRIPT_DIR/cursor/settings.json $HOME/Library/Application\ Support/Cursor/User/settings.json
-ln -nfs $SCRIPT_DIR/cursor/keybindings.json $HOME/Library/Application\ Support/Cursor/User/keybindings.json
-print_success "Cursor configuration files created"
+link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Cursor/User/settings.json"
+link_config $SCRIPT_DIR/cursor/keybindings.json "$HOME/Library/Application Support/Cursor/User/keybindings.json"
 
 # VSCode user settings
-# Requires VSCode application
-ln -nfs $SCRIPT_DIR/vscode/settings.json $HOME/Library/Application\ Support/Code/User/settings.json
-ln -nfs $SCRIPT_DIR/vscode/keybindings.json $HOME/Library/Application\ Support/Code/User/keybindings.json
-print_success "VSCode configuration files created"
+link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Code/User/settings.json"
+link_config $SCRIPT_DIR/vscode/keybindings.json "$HOME/Library/Application Support/Code/User/keybindings.json"
 
 # VSCode Insiders user settings
-# Requires VSCode Insiders application
-ln -nfs $SCRIPT_DIR/vscode-insiders/settings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
-ln -nfs $SCRIPT_DIR/vscode-insiders/keybindings.json $HOME/Library/Application\ Support/Code\ -\ Insiders/User/keybindings.json
-print_success "VSCode Insiders configuration files created"
+link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Code - Insiders/User/settings.json"
+link_config $SCRIPT_DIR/vscode-insiders/keybindings.json "$HOME/Library/Application Support/Code - Insiders/User/keybindings.json"
 
 # Claude Code user-level configuration
 print_section "Claude Code User Configuration"
 mkdir -p $HOME/.claude
-ln -nfs $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
-ln -nfs $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
-ln -nfs $SCRIPT_DIR/claude-code/settings.json $HOME/.claude/settings.json
-ln -nfs $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
-print_success "Claude Code user-level CLAUDE.md, skills, settings and statusline created"
+link_config $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
+link_config $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
+link_config $SCRIPT_DIR/claude-code/settings.json $HOME/.claude/settings.json
+link_config $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
@@ -277,13 +311,20 @@ fi
 
 # sshd configuration
 # /etc/ssh/sshd_config is a system file, so sudo is required
-if [[ -e /etc/ssh/sshd_config && ! -L /etc/ssh/sshd_config ]]; then
-  local backup_path="/etc/ssh/sshd_config.bak.$(date +%Y%m%d%H%M%S)"
+# Copy instead of symlink: a symlink into this repo would allow user-level
+# processes to rewrite the root-owned sshd config without sudo
+if [[ -L /etc/ssh/sshd_config ]]; then
+  sudo rm /etc/ssh/sshd_config
+  print_warning "Removed legacy sshd_config symlink"
+elif [[ -e /etc/ssh/sshd_config ]] && ! sudo cmp -s $SCRIPT_DIR/sshd/sshd_config /etc/ssh/sshd_config; then
+  backup_path="/etc/ssh/sshd_config.bak.$(date +%Y%m%d%H%M%S)"
   sudo cp /etc/ssh/sshd_config $backup_path
   print_warning "Existing sshd_config backed up to $backup_path"
 fi
-sudo ln -nfs $SCRIPT_DIR/sshd/sshd_config /etc/ssh/sshd_config
-print_success "sshd configuration file created"
+sudo cp $SCRIPT_DIR/sshd/sshd_config /etc/ssh/sshd_config
+sudo chown root:wheel /etc/ssh/sshd_config
+sudo chmod 644 /etc/ssh/sshd_config
+print_success "sshd configuration file copied"
 print_info "To apply sshd configuration, restart sshd with the following commands:"
 print_info "  sudo launchctl stop com.openssh.sshd"
 print_info "  sudo launchctl start com.openssh.sshd"
@@ -292,7 +333,7 @@ print_info "  sudo launchctl start com.openssh.sshd"
 mkdir -p $HOME/.ssh
 chmod 700 $HOME/.ssh
 if [[ -e $HOME/.ssh/authorized_keys && ! -L $HOME/.ssh/authorized_keys ]]; then
-  local backup_path="$HOME/.ssh/authorized_keys.bak.$(date +%Y%m%d%H%M%S)"
+  backup_path="$HOME/.ssh/authorized_keys.bak.$(date +%Y%m%d%H%M%S)"
   cp $HOME/.ssh/authorized_keys $backup_path
   print_warning "Existing authorized_keys backed up to $backup_path"
 fi
