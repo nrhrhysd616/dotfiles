@@ -8,6 +8,8 @@
   format = ssh
 [gpg "ssh"]
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  # git log --show-signature でローカル検証するための署名者リスト（README参照）
+  allowedSignersFile = ~/.ssh/allowed_signers
 [filter "lfs"]
   required = true
   clean = git-lfs clean -- %f
@@ -16,12 +18,23 @@
 [pull]
   rebase = false
   ff = only
+[push]
+  # 初回pushで -u 指定不要にする
+  autoSetupRemote = true
+[fetch]
+  # リモートで削除されたブランチの追跡参照を自動削除
+  prune = true
+[rebase]
+  # rebase時に未コミットの変更を自動でstash/復元
+  autostash = true
 [commit]
   gpgsign = true
 [tag]
   gpgsign = true
 [merge]
   ff = false
+[diff]
+  algorithm = histogram
 [diff "lockb"]
   textconv = bun
   binary = true
