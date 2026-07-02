@@ -47,14 +47,14 @@
 
 | ディレクトリ | 説明 |
 | --- | --- |
-| `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`、planファイル） |
+| `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
 | `claude-code/` | ユーザーレベルのClaude Code設定 |
-| `cursor/` | Cursorエディタの設定（`settings.json`、`keybindings.json`） |
+| `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
 | `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`） |
 | `iterm2/` | iTerm2の設定・プロファイル・カラースキーム（Monokaiテーマ各種） |
 | `java/` | Javaコードフォーマッター設定（Google Styleベースのフォーマットプロファイル） |
 | `ssh/` | SSHクライアント設定（`authorized_keys`） |
-| `sshd/` | SSHサーバー設定（`sshd_config`） |
-| `vscode/` | VSCodeの設定（`settings.json`、`keybindings.json`、Cline拡張設定） |
-| `vscode-insiders/` | VSCode Insidersの設定（`settings.json`、`keybindings.json`） |
+| `sshd/` | SSHサーバー設定（`sshd_config`。symlinkではなくコピーで配置される） |
+| `vscode/` | VSCodeの設定（`settings.json`※VSCode Insiders・Cursorと共有、`keybindings.json`、Cline拡張設定） |
+| `vscode-insiders/` | VSCode Insidersの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
 | `zsh/` | Zshシェル設定（`.zshrc`） |

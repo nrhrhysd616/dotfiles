@@ -20,6 +20,10 @@ TOTAL=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
 CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 
+# スクリプトはセッション開始時のディレクトリで実行されるため、
+# セッション中のディレクトリ移動に追従するよう workspace.current_dir へ移動する
+cd "$CURRENT_DIR" 2>/dev/null
+
 # Gitリポジトリの場合にブランチ名を取得
 GIT_BRANCH=""
 if git rev-parse --git-dir > /dev/null 2>&1; then
@@ -29,7 +33,7 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
     fi
 fi
 
-# コンテキスト使用率が80%以上の場合は赤色にする
+# コンテキスト使用率が70%以上の場合は赤色にする
 RED='\033[31m'
 RESET='\033[0m'
 

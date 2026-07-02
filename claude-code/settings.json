@@ -7,6 +7,9 @@
     "deny": [
       "Read(*.env)",
       "Read(*.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/id_rsa*)",
+      "Read(**/id_ed25519*)",
       "Bash(rm:*)",
       "Bash(rmdir:*)",
       "Bash(git push --force:*)",
