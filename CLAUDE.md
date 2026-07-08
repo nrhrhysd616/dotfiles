@@ -43,7 +43,7 @@
    - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS
-5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18（Amazon Corretto）
+5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
 6. **設定ファイルのシンボリックリンク作成**: Git・Cursor・VSCode・VSCode Insiders・Claude Code
 7. **Cline拡張設定のコピー**（VSCode Cline拡張が存在する場合のみ）
 8. **SSH設定**: `sshd_config` を `/etc/ssh/` へシンボリックリンク（要sudo）、`authorized_keys` をコピー
