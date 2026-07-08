@@ -13,11 +13,18 @@
 
 **重要:** エディタやシェル設定を変更する際は、リンク先ではなくこのリポジトリ内のソースファイルを編集すること
 
-### バージョン管理
+### パッケージマネージャーの優先順位
 
-**mise**で管理できるものはすべてmiseで管理する
+複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
 
-**SDKMAN**がJavaバージョンを管理する
+1. **Nix**（第一候補）: 基盤的なCLIツール全般。宣言的でバージョン管理不要、再現性が高い
+   例: Git、ghq、GitHub CLI、curl、fzf、mise、Go、AWS CLI、AWS SAM CLI、Stripe CLI、VHS
+2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
+   例: Python、Node.js、pnpm、Bun、Terraform
+3. **Homebrew**（最終手段）: GUIアプリ・フォントなど、Nix/miseでカバーできない、またはNixで問題が起きるもの
+   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok
+
+**SDKMAN**がJavaバージョンを管理する（上記の優先順位とは独立した専用ツール）
 
 ## 初期化スクリプト
 
@@ -33,7 +40,7 @@
    - Git、ghq、GitHub CLI、curl、fzf（Nixで管理）
    - mise（マルチ言語バージョンマネージャー）、Go（Nixで管理）
    - SDKMAN（Java用バージョンマネージャー）
-   - Python、Node.js（LTS）、pnpm、Bun（miseで管理）
+   - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18（Amazon Corretto）
