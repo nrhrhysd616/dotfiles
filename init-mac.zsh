@@ -205,6 +205,9 @@ install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest' 'mise 
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest' 'mise use -g bun@latest'
 
+# Terraform install via mise
+install_command 'Terraform' 'terraform' 'mise which terraform' 'mise use -g terraform@latest' 'mise use -g terraform@latest'
+
 # Claude Code CLI install
 install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash' 'curl -fsSL https://claude.ai/install.sh | bash'
 
