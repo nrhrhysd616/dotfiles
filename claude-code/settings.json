@@ -27,6 +27,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "sonnet",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -36,5 +37,7 @@
   "plansDirectory": "./.claude/plans",
   "tui": "fullscreen",
   "theme": "dark-daltonized",
-  "preferredNotifChannel": "iterm2_with_bell"
+  "preferredNotifChannel": "iterm2_with_bell",
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
 }

@@ -205,6 +205,9 @@ install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest' 'mise 
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest' 'mise use -g bun@latest'
 
+# Terraform install via mise
+install_command 'Terraform' 'terraform' 'mise which terraform' 'mise use -g terraform@latest' 'mise use -g terraform@latest'
+
 # Claude Code CLI install
 install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash' 'curl -fsSL https://claude.ai/install.sh | bash'
 
@@ -251,9 +254,11 @@ function sdk_latest_java() {
 JAVA11_VERSION=$(sdk_latest_java 11 11.0.29-amzn)
 JAVA17_VERSION=$(sdk_latest_java 17 17.0.17-amzn)
 JAVA18_VERSION=$(sdk_latest_java 18 18.0.2-amzn)
+JAVA21_VERSION=$(sdk_latest_java 21 21.0.11-amzn)
 install_command 'Java 11' 'java11' "sdk home java $JAVA11_VERSION" "sdk install java $JAVA11_VERSION"
 install_command 'Java 17' 'java17' "sdk home java $JAVA17_VERSION" "sdk install java $JAVA17_VERSION"
 install_command 'Java 18' 'java18' "sdk home java $JAVA18_VERSION" "sdk install java $JAVA18_VERSION"
+install_command 'Java 21' 'java21' "sdk home java $JAVA21_VERSION" "sdk install java $JAVA21_VERSION"
 
 print_section "Setting Up Configuration Files"
 
