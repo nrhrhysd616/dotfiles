@@ -31,3 +31,6 @@ id_ed25519
 
 # Claude Code
 .claude/plans/
+
+# RunCat Neo Custom Metrics（statusline.sh等が生成する実行時ファイル）
+runcat-metrics.json
