@@ -29,10 +29,13 @@ CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 # セッションの累計コスト（USD）を取得
 COST_USD=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 
-# レート制限の使用率（%）。Pro/Maxプランかつ初回API応答後のみ存在するため、
+# レート制限の使用率（%）とリセット時刻（resets_at: Unix epoch秒）。
+# Pro/Maxプランかつ初回API応答後のみ存在し、各ウィンドウは独立して欠落しうるため、
 # 値が無い場合は空文字のままにしておき、後段で存在チェックする
 FIVE_HOUR_PCT=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+FIVE_HOUR_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 SEVEN_DAY_PCT=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+SEVEN_DAY_RESET=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
 # スクリプトはセッション開始時のディレクトリで実行されるため、
 # セッション中のディレクトリ移動に追従するよう workspace.current_dir へ移動する
@@ -66,12 +69,33 @@ echo -e "${CONTEXT_TEXT}  [$MODEL_DISPLAY] 📁 ${CURRENT_DIR##*github.com/}$GIT
     NORMALIZED_PCT=$(awk -v p="$PCT" 'BEGIN { v = p / 100; if (v < 0) v = 0; if (v > 1) v = 1; printf "%.4f", v }')
     COST_FORMATTED=$(awk -v c="$COST_USD" 'BEGIN { printf "$%.2f", c }')
     NOW_ISO=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    NOW_EPOCH=$(date +%s)
 
-    # 5時間/7日のレート制限は値が存在する場合のみformattedValue/normalizedValueを組み立てる
+    # resets_at（Unix epoch秒）と現在時刻の差から「あと何分/時間/日でリセットか」を組み立てる。
+    # 例: 45m / 2h30m / 4d21h。RunCat NeoはJSONをポーリング表示するため、
+    # statuslineが再実行されるまで相対時間は固定される（時間経過で実態とズレる）点に留意
+    format_reset() {
+        awk -v r="$1" -v n="$2" 'BEGIN {
+            diff = r - n
+            if (diff < 0) diff = 0
+            d = int(diff / 86400)
+            h = int((diff % 86400) / 3600)
+            m = int((diff % 3600) / 60)
+            if (d > 0) printf "%dd%dh", d, h
+            else if (h > 0) printf "%dh%dm", h, m
+            else printf "%dm", m
+        }'
+    }
+
+    # 5時間/7日のレート制限は値が存在する場合のみformattedValue/normalizedValueを組み立てる。
+    # resets_atがあれば「 (resets in ...)」を併記する
     FIVE_HOUR_FORMATTED=""
     FIVE_HOUR_NORM="0"
     if [ -n "$FIVE_HOUR_PCT" ]; then
         FIVE_HOUR_FORMATTED="$(awk -v p="$FIVE_HOUR_PCT" 'BEGIN { printf "%.0f%%", p }')"
+        if [ -n "$FIVE_HOUR_RESET" ]; then
+            FIVE_HOUR_FORMATTED="$FIVE_HOUR_FORMATTED (resets in $(format_reset "$FIVE_HOUR_RESET" "$NOW_EPOCH"))"
+        fi
         FIVE_HOUR_NORM=$(awk -v p="$FIVE_HOUR_PCT" 'BEGIN { v = p / 100; if (v < 0) v = 0; if (v > 1) v = 1; printf "%.4f", v }')
     fi
 
@@ -79,6 +103,9 @@ echo -e "${CONTEXT_TEXT}  [$MODEL_DISPLAY] 📁 ${CURRENT_DIR##*github.com/}$GIT
     SEVEN_DAY_NORM="0"
     if [ -n "$SEVEN_DAY_PCT" ]; then
         SEVEN_DAY_FORMATTED="$(awk -v p="$SEVEN_DAY_PCT" 'BEGIN { printf "%.0f%%", p }')"
+        if [ -n "$SEVEN_DAY_RESET" ]; then
+            SEVEN_DAY_FORMATTED="$SEVEN_DAY_FORMATTED (resets in $(format_reset "$SEVEN_DAY_RESET" "$NOW_EPOCH"))"
+        fi
         SEVEN_DAY_NORM=$(awk -v p="$SEVEN_DAY_PCT" 'BEGIN { v = p / 100; if (v < 0) v = 0; if (v > 1) v = 1; printf "%.4f", v }')
     fi
 
