@@ -236,6 +236,10 @@ install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#
 # @see https://github.com/charmbracelet/vhs
 install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix profile upgrade vhs'
 
+# Poppler install (PDF utilities: pdftotext, pdftoppm, pdfimages, etc.)
+# @see https://poppler.freedesktop.org/
+install_command 'Poppler' 'pdftotext' 'which pdftotext' 'nix profile add nixpkgs#poppler-utils' 'nix profile upgrade poppler-utils'
+
 print_section "Installing Java"
 
 # Resolve the latest available Amazon Corretto version for a major version

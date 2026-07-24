@@ -18,7 +18,7 @@
 複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
 
 1. **Nix**（第一候補）: 基盤的なCLIツール全般。宣言的でバージョン管理不要、再現性が高い
-   例: Git、ghq、GitHub CLI、curl、fzf、mise、Go、AWS CLI、AWS SAM CLI、Stripe CLI、VHS
+   例: Git、ghq、GitHub CLI、curl、fzf、mise、Go、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
    例: Python、Node.js、pnpm、Bun、Terraform
 3. **Homebrew**（最終手段）: GUIアプリ・フォントなど、Nix/miseでカバーできない、またはNixで問題が起きるもの
@@ -42,7 +42,7 @@
    - SDKMAN（Java用バージョンマネージャー）
    - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
-   - フォント（Fira Code）、ngrok、Stripe CLI、VHS
+   - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
 6. **設定ファイルのシンボリックリンク作成**: Git・Cursor・VSCode・VSCode Insiders・Claude Code
 7. **Cline拡張設定のコピー**（VSCode Cline拡張が存在する場合のみ）
