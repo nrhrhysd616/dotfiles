@@ -27,7 +27,7 @@
     ],
     "defaultMode": "default"
   },
-  "model": "sonnet",
+  "model": "opus[1m]",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -38,6 +38,6 @@
   "tui": "fullscreen",
   "theme": "dark-daltonized",
   "preferredNotifChannel": "iterm2_with_bell",
-  "agentPushNotifEnabled": true,
-  "inputNeededNotifEnabled": true
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }
