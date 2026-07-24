@@ -17,13 +17,11 @@
     ],
     "ask": [
       "Bash(gh pr create:*)",
-      "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
       "Bash(brew install:*)",
-      "Bash(brew uninstall:*)",
-      "Bash(curl:*)"
+      "Bash(brew uninstall:*)"
     ],
     "defaultMode": "default"
   },
