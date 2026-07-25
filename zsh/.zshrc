@@ -9,7 +9,7 @@ if [ -e /opt/homebrew/bin/brew ]; then
 fi
 
 # Alias
-alias cdproject='cd ~/Documents/Project'
+alias cdproject='cd ~/Documents/Project/github.com'
 alias ..='cd ..'
 alias ls='ls -F'
 alias la='ls -A'
