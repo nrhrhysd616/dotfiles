@@ -1,0 +1,1258 @@
+#!/usr/bin/env zsh
+#
+# csctl - code-serverインスタンスをTailscale経由で起動・公開・停止するコマンド
+#
+# 各インスタンスはこのマシンのTailscale IPに直接バインドし、`tailscale cert`が
+# 発行した証明書で自らTLSを終端する。そのためプロジェクトディレクトリは
+# https://<MagicDNS名>:<ポート>/ という形でtailnet内の任意の端末
+# （iPad、iPhone、他のMac）から到達でき、インターネットには一切露出しない。
+# ポートを分ければ複数のディレクトリを同時に公開できる。
+#
+# サブコマンドの一覧は `csctl help` を参照。
+
+# ユーザーの環境設定に影響されないよう、zshの既定オプション状態にリセットする
+emulate -R zsh
+# pipe_fail: パイプ中のどれかが失敗したら全体を失敗扱いにする
+# no_unset : 未定義変数を参照したらエラーにする（タイポ対策）
+setopt pipe_fail no_unset
+
+readonly CSCTL_VERSION="1.0.0"
+
+# 設定・状態・データの置き場所（XDG Base Directoryの規約に従う）
+readonly CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/csctl"
+readonly STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/csctl"
+readonly DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/csctl"
+
+readonly INSTANCE_DIR="$STATE_DIR/instances"
+readonly LOG_DIR="$STATE_DIR/logs"
+readonly CERT_DIR="$DATA_DIR/cert"
+readonly USER_DATA_ROOT="$DATA_DIR/user-data"
+readonly PASSWORD_FILE="$CONFIG_DIR/password"
+
+# 拡張機能の置き場所。--user-data-dirを指定するとcode-serverは既定で
+# その配下に拡張機能を入れてしまい、インスタンスごとにインストールし直しに
+# なるため、全インスタンス共通のディレクトリを明示的に指定する
+readonly EXTENSIONS_DIR="$DATA_DIR/extensions"
+
+# csctl本体はこのリポジトリ内にあり、$HOME/.local/bin からシンボリックリンク
+# されている。${0:A}でリンクを解決した実体のパスが得られるので、そこから
+# リポジトリのルートと、共有するVS Codeユーザー設定の位置を割り出す
+readonly REPO_ROOT="${0:A:h:h}"
+readonly REPO_SETTINGS="$REPO_ROOT/code-server/settings.json"
+
+# Tailscaleを接続したのがユーザーではなくcsctlであることを記録する目印。
+# 最後のインスタンスが止まったときに切断してよいかの判断に使う
+readonly TAILSCALE_MARKER="$STATE_DIR/connected-by-csctl"
+
+# 自動`tailscale up`を諦めるまでの待ち時間（秒）
+readonly TAILSCALE_UP_TIMEOUT=30
+
+# --port省略時に最初に試すポートと、そこから何個スキャンするか。
+# 18080は開発サーバが慣習的に使うポート（3000・8000・8080・9000など）を避けつつ、
+# macOSがエフェメラルポートとして使う49152以降からも十分離れている
+readonly PORT_START="${CSCTL_PORT_START:-18080}"
+readonly PORT_SCAN_COUNT=20
+
+# 証明書の残り有効期間がこの値を切っていたらTailscaleに更新させる
+readonly CERT_MIN_VALIDITY="720h"
+
+# 起動したインスタンスがポートで応答し始めるまで待つ上限（秒）
+readonly START_TIMEOUT=60
+
+# 停止要求したインスタンスにSIGKILLを送るまで待つ時間（秒）
+readonly STOP_TIMEOUT=10
+
+# Tailscaleの状態。read_tailscale_state()が書き込む
+TS_STATE=""
+TS_HOST=""
+TS_IP=""
+
+# 証明書のパス。ensure_cert()が書き込む
+CERT_FILE=""
+CERT_KEY_FILE=""
+
+# インスタンス情報。load_instance()が書き込む
+I_NAME="" I_DIR="" I_PORT="" I_PID="" I_HOST="" I_IP="" I_AUTH="" I_STARTED_AT=""
+
+# ---------------------------------------------------------------------------
+# 出力ヘルパー
+# ---------------------------------------------------------------------------
+
+# 端末に出力するときだけ色を付ける（パイプやリダイレクト時は制御文字を混ぜない）
+if [[ -t 1 ]]; then
+  RED=$'\033[0;31m'
+  GREEN=$'\033[0;32m'
+  YELLOW=$'\033[0;33m'
+  BLUE=$'\033[0;34m'
+  DIM=$'\033[2m'
+  BOLD=$'\033[1m'
+  NC=$'\033[0m'
+else
+  RED="" GREEN="" YELLOW="" BLUE="" DIM="" BOLD="" NC=""
+fi
+
+function print_info() {
+  echo "${BLUE}ℹ $1${NC}"
+}
+
+function print_success() {
+  echo "${GREEN}✓ $1${NC}"
+}
+
+# 警告・エラーは標準エラー出力へ。`csctl url`などの出力をパイプで使えるようにするため
+function print_warning() {
+  echo "${YELLOW}⚠ $1${NC}" >&2
+}
+
+function print_error() {
+  echo "${RED}✗ $1${NC}" >&2
+}
+
+# エラーを表示して終了する
+# @param message エラーメッセージ
+function die() {
+  print_error "$*"
+  exit 1
+}
+
+# ---------------------------------------------------------------------------
+# 実行環境の解決
+# ---------------------------------------------------------------------------
+
+# Tailscale CLIの場所を探す。macOSのGUI版は$PATHの外に実体を置くため候補を順に見る
+function tailscale_bin() {
+  local candidate
+  for candidate in \
+    "${CSCTL_TAILSCALE_BIN:-}" \
+    "$(command -v tailscale 2>/dev/null || true)" \
+    /usr/local/bin/tailscale \
+    /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+    /Applications/Tailscale.app/Contents/MacOS/tailscale
+  do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# code-serverの実行ファイルを探す
+function code_server_bin() {
+  local candidate
+  for candidate in \
+    "${CSCTL_CODE_SERVER_BIN:-}" \
+    "$(command -v code-server 2>/dev/null || true)" \
+    /opt/homebrew/bin/code-server \
+    /usr/local/bin/code-server \
+    "$HOME/.local/bin/code-server"
+  do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# 依存コマンドが揃っていなければ中断する
+function require_dependencies() {
+  local -a missing
+  missing=()
+  tailscale_bin >/dev/null || missing+=("tailscale")
+  code_server_bin >/dev/null || missing+=("code-server")
+  command -v jq >/dev/null 2>&1 || missing+=("jq")
+  command -v curl >/dev/null 2>&1 || missing+=("curl")
+  command -v lsof >/dev/null 2>&1 || missing+=("lsof")
+
+  # ${#missing}は配列の要素数
+  if (( ${#missing} > 0 )); then
+    print_error "Missing dependencies: ${missing[*]}"
+    print_info "Run init-mac.zsh to install them, or run: csctl doctor"
+    exit 1
+  fi
+}
+
+# csctlが書き込むディレクトリをすべて用意する
+function ensure_dirs() {
+  mkdir -p "$CONFIG_DIR" "$INSTANCE_DIR" "$LOG_DIR" "$CERT_DIR" \
+    "$USER_DATA_ROOT" "$EXTENSIONS_DIR"
+  # パスワードと秘密鍵を置くディレクトリは本人以外読めないようにする
+  chmod 700 "$CONFIG_DIR" "$CERT_DIR"
+}
+
+# リポジトリのsettings.jsonを、インスタンスのUser配下へシンボリックリンクする。
+# これで全インスタンスがテーマなどの設定を共有し、変更はリポジトリ側に残る
+# @param user_data インスタンスのuser-data-dir
+function link_user_settings() {
+  local user_data="$1"
+  local target="$user_data/User/settings.json"
+
+  [[ -f "$REPO_SETTINGS" ]] || return 0
+
+  mkdir -p "$user_data/User"
+
+  # 既に目的のリンクになっていれば触らない
+  if [[ -L "$target" && "${target:A}" == "${REPO_SETTINGS:A}" ]]; then
+    return 0
+  fi
+
+  # 実ファイルとして存在する場合（code-server上で編集した場合など）は退避する
+  if [[ -e "$target" && ! -L "$target" ]]; then
+    local backup="$target.bak.$(date +%Y%m%d%H%M%S)"
+    mv "$target" "$backup"
+    print_warning "Existing settings.json backed up to $backup"
+  fi
+
+  ln -nfs "$REPO_SETTINGS" "$target"
+}
+
+# このノードのTailscale状態をTS_STATE / TS_HOST / TS_IPに読み込む
+# @return Tailscaleが接続済みでMagicDNS名を持つなら0、そうでなければ1
+function read_tailscale_state() {
+  TS_STATE="Unavailable" TS_HOST="" TS_IP=""
+
+  local ts json
+  ts="$(tailscale_bin)" || return 1
+  json="$("$ts" status --json --peers=false 2>/dev/null)" || return 1
+
+  TS_STATE="$(jq -r '.BackendState // "Unknown"' <<<"$json")"
+  # APIが返すDNSNameは末尾にドットが付くので削る
+  TS_HOST="$(jq -r '.Self.DNSName // ""' <<<"$json" | sed 's/\.$//')"
+  # TailscaleIPsにはIPv4とIPv6が入っている。数字で始まる方＝IPv4を採用する
+  TS_IP="$(jq -r '.Self.TailscaleIPs[]? | select(test("^[0-9]+\\."))' <<<"$json" | head -1)"
+
+  # 関数の戻り値は最後に評価した式の結果になる
+  [[ "$TS_STATE" == "Running" && -n "$TS_HOST" && -n "$TS_IP" ]]
+}
+
+# 時間制限付きで`tailscale up`を実行する。
+# tailscale upはフラグを1つでも渡すと「設定変更」とみなされ、非デフォルトの
+# フラグをすべて再指定するまで実行を拒否する（--timeoutを渡しても同じ）。
+# さらにmacOSにはtimeout(1)がないため、バックグラウンドジョブを
+# ポーリングして自前で上限を設けている。
+# @param ts tailscale実行ファイルのパス
+# @param limit 待つ秒数
+# @param errfile 診断用に標準エラー出力を溜めるファイル
+function tailscale_up_bounded() {
+  local ts="$1" limit="$2" errfile="$3"
+
+  "$ts" up >/dev/null 2>"$errfile" &
+  local pid=$!   # $!は直前にバックグラウンド起動したプロセスのPID
+
+  local waited=0
+  while (( waited < limit )); do
+    # kill -0はシグナルを送らずに生存確認だけ行う
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 1
+    (( waited += 1 ))
+  done
+
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -TERM "$pid" 2>/dev/null
+    echo "timed out after ${limit}s" >>"$errfile"
+    return 1
+  fi
+
+  # waitで終了ステータスを回収し、それをこの関数の戻り値にする
+  wait "$pid" 2>/dev/null
+}
+
+# Tailscaleが接続済みであることを保証する。単に停止しているだけなら接続する。
+# これによりtailnetへの接続を「使うときだけ」に留められる。
+# サインインが必要な状態（NeedsLogin）はブラウザ操作が必要でコマンドが
+# 止まってしまうため、自動接続の対象にしない。
+function require_tailscale() {
+  read_tailscale_state && return 0
+
+  if [[ "$TS_STATE" == "Stopped" && "${CSCTL_AUTO_UP:-1}" != "0" ]]; then
+    local ts errfile
+    ts="$(tailscale_bin)"
+    errfile="$(mktemp)"
+    print_info "Tailscale is stopped; connecting ..."
+    if tailscale_up_bounded "$ts" "$TAILSCALE_UP_TIMEOUT" "$errfile" && read_tailscale_state; then
+      # csctlが接続したことを記録する。stop時に切断してよいかの判断材料になる
+      mkdir -p "$STATE_DIR"
+      : >"$TAILSCALE_MARKER"   # 空ファイルを作るイディオム（:は何もしない組み込みコマンド）
+      rm -f "$errfile"
+      print_success "Tailscale connected as $TS_HOST"
+      return 0
+    fi
+    print_error "Failed to connect Tailscale automatically (state: $TS_STATE)"
+    # 原因が分かるようtailscale自身のエラーをインデントして見せる
+    [[ -s "$errfile" ]] && sed 's/^/    /' "$errfile" >&2
+    rm -f "$errfile"
+    print_info "Connect it manually: tailscale up"
+    exit 1
+  fi
+
+  print_error "Tailscale is not ready (state: $TS_STATE)"
+  case "$TS_STATE" in
+    Stopped)
+      print_info "Automatic connect is disabled; connect it with: tailscale up"
+      ;;
+    NeedsLogin)
+      print_info "Sign in first (this opens a browser): tailscale up"
+      ;;
+    Unavailable)
+      print_info "The Tailscale CLI could not be reached. Is the Tailscale app running?"
+      ;;
+    *)
+      print_info "Open the Tailscale app and make sure this machine is connected"
+      ;;
+  esac
+  exit 1
+}
+
+# 最後のインスタンスが無くなった時点でTailscaleを切断する。
+# ただしcsctlが接続した場合に限る。ユーザー自身が張った接続には手を出さない
+function maybe_tailscale_down() {
+  [[ "${CSCTL_AUTO_DOWN:-1}" != "0" ]] || return 0
+  [[ -f "$TAILSCALE_MARKER" ]] || return 0
+
+  # まだ動いているインスタンスが1つでもあれば接続を維持する
+  local -a names
+  names=($(instance_names))
+  (( ${#names} == 0 )) || return 0
+
+  local ts
+  ts="$(tailscale_bin)" || return 0
+  if "$ts" down >/dev/null 2>&1; then
+    print_info "Tailscale disconnected again (csctl had connected it)"
+  else
+    print_warning "Could not disconnect Tailscale; leaving it connected"
+  fi
+  rm -f "$TAILSCALE_MARKER"
+}
+
+# ---------------------------------------------------------------------------
+# インスタンスの管理
+# ---------------------------------------------------------------------------
+
+# インスタンスの情報を書き出すファイル（key=value形式）
+function instance_file() {
+  echo "$INSTANCE_DIR/$1.env"
+}
+
+# code-serverに渡す設定ファイル
+function instance_config() {
+  echo "$INSTANCE_DIR/$1.yaml"
+}
+
+# インスタンスのログファイル
+function instance_log() {
+  echo "$LOG_DIR/$1.log"
+}
+
+# 任意の文字列を、ファイル名やCookie名として安全なインスタンス名に変換する
+# @param raw 元の文字列（通常はディレクトリ名）
+function slugify() {
+  local slug="${1:l}"                    # :l は小文字化
+  slug="${slug//[^a-z0-9._-]/-}"         # 使えない文字はハイフンに置換
+  # 先頭と末尾に残ったハイフンを削る
+  while [[ "$slug" == -* ]]; do slug="${slug#-}"; done
+  while [[ "$slug" == *- ]]; do slug="${slug%-}"; done
+  echo "${slug:-instance}"               # 全部消えてしまった場合の保険
+}
+
+# 登録済みインスタンス名を名前順に列挙する
+function instance_names() {
+  local file
+  # (N)はnullglob指定。1件もマッチしないときパターン文字列のまま残さず空になる
+  for file in "$INSTANCE_DIR"/*.env(N); do
+    echo "${${file:t}%.env}"   # :t でファイル名だけ取り出し、%.env で拡張子を落とす
+  done
+}
+
+# インスタンス情報をI_*変数へ読み込む
+# @param name インスタンス名
+# @return 情報ファイルが存在して読み込めたら0
+function load_instance() {
+  local name="$1"
+  local file
+  file="$(instance_file "$name")"
+  [[ -f "$file" ]] || return 1
+
+  # 前回の値が残らないよう毎回クリアしてから読み込む
+  I_NAME="" I_DIR="" I_PORT="" I_PID="" I_HOST="" I_IP="" I_AUTH="" I_STARTED_AT=""
+  source "$file"
+  [[ -n "$I_NAME" ]]
+}
+
+# 現在のI_*変数をファイルへ保存する
+function save_instance() {
+  local file
+  file="$(instance_file "$I_NAME")"
+  # ${(qq)var} は値をシングルクォートで囲んだ形に整える。
+  # スペースを含むパスなどをsourceで安全に読み戻すために必要
+  cat >"$file" <<EOF
+# Generated by csctl - do not edit while the instance is running
+I_NAME=${(qq)I_NAME}
+I_DIR=${(qq)I_DIR}
+I_PORT=${(qq)I_PORT}
+I_PID=${(qq)I_PID}
+I_HOST=${(qq)I_HOST}
+I_IP=${(qq)I_IP}
+I_AUTH=${(qq)I_AUTH}
+I_STARTED_AT=${(qq)I_STARTED_AT}
+EOF
+}
+
+# インスタンスに紐づく管理ファイルを削除する
+# @param name インスタンス名
+function forget_instance() {
+  local name="$1"
+  rm -f "$(instance_file "$name")" "$(instance_config "$name")"
+}
+
+# PIDが生きていて、かつ中身がcode-serverであることを確認する。
+# コマンド名まで見るのは、異常終了後にPIDが別プロセスへ再利用された場合に
+# 無関係なプロセスを「動作中」と誤認しないため
+# @param pid プロセスID
+function process_alive() {
+  local pid="${1:-}"
+  [[ -n "$pid" ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  ps -p "$pid" -o command= 2>/dev/null | grep -q "code-server"
+}
+
+# プロセスとその子孫すべてにシグナルを送る。
+# code-serverは監視役と実処理役の2プロセス構成なので、親だけに送ると
+# 子がポートを掴んだまま残ることがある
+# @param pid 起点のプロセスID
+# @param signal シグナル名（例: 'TERM'）
+function kill_tree() {
+  local pid="$1" signal="$2" child
+  # ${(f)"..."} は文字列を改行で分割して配列にする
+  for child in ${(f)"$(pgrep -P "$pid" 2>/dev/null || true)"}; do
+    [[ -n "$child" ]] && kill_tree "$child" "$signal"   # 再帰的に子孫をたどる
+  done
+  kill "-$signal" "$pid" 2>/dev/null || true
+}
+
+# 指定ポートで何かがLISTENしているかを調べる
+# @param port ポート番号
+function port_in_use() {
+  lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+}
+
+# $PORT_STARTから上に向かって探し、最初に空いているポートを出力する
+function find_free_port() {
+  local port=$PORT_START
+  local limit=$(( PORT_START + PORT_SCAN_COUNT ))
+  while (( port < limit )); do
+    if ! port_in_use "$port"; then
+      echo "$port"
+      return 0
+    fi
+    (( port += 1 ))
+  done
+  return 1
+}
+
+# ユーザーが指定した文字列からインスタンス名を割り出す。
+# インスタンス名そのものと、そのインスタンスが使っているポート番号を受け付ける
+# @param target インスタンス名またはポート番号
+function resolve_instance() {
+  local target="$1" name
+  if [[ -f "$(instance_file "$target")" ]]; then
+    echo "$target"
+    return 0
+  fi
+  # 数字だけならポート番号とみなして総当たりで探す
+  if [[ "$target" =~ '^[0-9]+$' ]]; then
+    for name in $(instance_names); do
+      if load_instance "$name" && [[ "$I_PORT" == "$target" ]]; then
+        echo "$name"
+        return 0
+      fi
+    done
+  fi
+  return 1
+}
+
+# ---------------------------------------------------------------------------
+# パスワードと証明書
+# ---------------------------------------------------------------------------
+
+# 全インスタンス共通のパスワードを出力する。初回呼び出し時に自動生成する
+function get_password() {
+  if [[ ! -s "$PASSWORD_FILE" ]]; then
+    # 16進24文字。iPadでの手入力を考えて記号を含めていない
+    openssl rand -hex 12 >"$PASSWORD_FILE" || die "Failed to generate a password"
+    chmod 600 "$PASSWORD_FILE"
+  fi
+  cat "$PASSWORD_FILE"
+}
+
+# このノードのMagicDNS名に対するTLS証明書を発行または更新する。
+# 成功するとCERT_FILE / CERT_KEY_FILEを設定する
+# @param host MagicDNS名（例: 'my-mac.tailnet.ts.net'）
+function ensure_cert() {
+  local host="$1"
+  local ts errfile
+  ts="$(tailscale_bin)"
+
+  CERT_FILE="$CERT_DIR/$host.crt"
+  CERT_KEY_FILE="$CERT_DIR/$host.key"
+  errfile="$(mktemp)"
+
+  # `tailscale cert`は--min-validityより長く有効な証明書が手元にあれば
+  # それを使い回すので、起動のたびに呼んでも負荷にならない
+  if "$ts" cert --min-validity "$CERT_MIN_VALIDITY" \
+      --cert-file "$CERT_FILE" --key-file "$CERT_KEY_FILE" "$host" >/dev/null 2>"$errfile"; then
+    chmod 600 "$CERT_KEY_FILE"
+    rm -f "$errfile"
+    return 0
+  fi
+
+  # 認証局によっては「何日前から更新してよいか」に上限がある。
+  # --min-validityが原因で失敗した可能性があるので、外して一度だけ再試行する
+  if "$ts" cert --cert-file "$CERT_FILE" --key-file "$CERT_KEY_FILE" "$host" \
+      >/dev/null 2>"$errfile"; then
+    chmod 600 "$CERT_KEY_FILE"
+    rm -f "$errfile"
+    return 0
+  fi
+
+  print_error "Failed to obtain a TLS certificate for $host"
+  sed 's/^/    /' "$errfile" >&2
+  rm -f "$errfile"
+  print_info "HTTPS certificates have to be enabled for the tailnet:"
+  print_info "  https://login.tailscale.com/admin/dns  ->  Enable HTTPS"
+  return 1
+}
+
+# ---------------------------------------------------------------------------
+# Webフォント（Fira Code）
+#
+# ブラウザは閲覧している端末のフォントしか使えないため、iPadのように
+# Fira Codeが入っていない端末では editor.fontFamily を指定しても効かない。
+# code-server自身にフォントを同梱して@font-faceで配信すれば、どの端末でも
+# 適用できる。ただしcode-server本体のファイルを書き換えるため、
+# `csctl font install` で明示的に有効にしたときだけ行う。
+# ---------------------------------------------------------------------------
+
+# workbench.cssと同じ階層に作るフォント置き場の名前
+readonly FONT_DIR_NAME="csctl-fonts"
+# 有効化されていることを覚えておくファイル（更新で剥がれた際の貼り直しに使う）
+readonly FONT_MARKER="$CONFIG_DIR/font-enabled"
+# 追記したCSSを後から特定して取り除くための目印
+readonly FONT_CSS_BEGIN="/* csctl:fira-code:begin */"
+readonly FONT_CSS_END="/* csctl:fira-code:end */"
+# 埋め込むウェイト（ファイル名の一部:CSSのfont-weight）
+readonly -a FONT_WEIGHTS=(Regular:400 Medium:500 Bold:700)
+
+# システムにインストールされたFira Codeのディレクトリを出力する
+function fira_code_dir() {
+  local dir
+  for dir in "$HOME/Library/Fonts" /Library/Fonts; do
+    if [[ -f "$dir/FiraCode-Regular.ttf" ]]; then
+      echo "$dir"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# code-serverが配信するworkbench.cssの場所を探す。
+# Homebrew版とスタンドアロン版で階層が違うため候補を順に試す
+function workbench_css_path() {
+  local cs real candidate
+  cs="$(code_server_bin)" || return 1
+  real="${cs:A}"   # シンボリックリンクを解決した実体
+  for candidate in \
+    "${real:h:h:h}/lib/vscode/out/vs/code/browser/workbench/workbench.css" \
+    "${real:h:h}/lib/vscode/out/vs/code/browser/workbench/workbench.css"
+  do
+    if [[ -f "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# CSSにパッチが当たっているか
+function font_patch_applied() {
+  local css
+  css="$(workbench_css_path)" || return 1
+  grep -q "csctl:fira-code:begin" "$css" 2>/dev/null
+}
+
+# 追記したCSSを取り除く（BEGIN行からEND行までを削除）
+# @param css workbench.cssのパス
+function font_patch_strip() {
+  local css="$1"
+  grep -q "csctl:fira-code:begin" "$css" 2>/dev/null || return 0
+  # macOSのsedは-iに空の拡張子引数を要求する
+  sed -i '' "/csctl:fira-code:begin/,/csctl:fira-code:end/d" "$css"
+}
+
+# フォントを配置し、@font-faceをCSSへ追記する
+function font_patch_apply() {
+  local css fonts_src fonts_dst
+
+  css="$(workbench_css_path)" || {
+    print_error "Could not locate code-server's workbench.css"
+    return 1
+  }
+  fonts_src="$(fira_code_dir)" || {
+    print_error "Fira Code not found in ~/Library/Fonts or /Library/Fonts"
+    print_info "Install it first (init-mac.zsh does this)"
+    return 1
+  }
+  [[ -w "$css" ]] || {
+    print_error "No write permission for $css"
+    return 1
+  }
+
+  fonts_dst="${css:h}/$FONT_DIR_NAME"
+  mkdir -p "$fonts_dst" || return 1
+
+  local entry file
+  for entry in $FONT_WEIGHTS; do
+    file="FiraCode-${entry%%:*}.ttf"      # %%:* は最初の:以降を削る
+    [[ -f "$fonts_src/$file" ]] || continue
+    cp -f "$fonts_src/$file" "$fonts_dst/$file" || return 1
+  done
+
+  # 二重に追記しないよう、古いパッチがあれば先に剥がす
+  font_patch_strip "$css"
+
+  # CSS内の相対URLはCSSファイルの位置が基準になるので ./ で参照できる
+  {
+    echo ""
+    echo "$FONT_CSS_BEGIN"
+    for entry in $FONT_WEIGHTS; do
+      file="FiraCode-${entry%%:*}.ttf"
+      [[ -f "$fonts_dst/$file" ]] || continue
+      echo "@font-face{font-family:'Fira Code';font-style:normal;font-weight:${entry##*:};src:url('./$FONT_DIR_NAME/$file') format('truetype');}"
+    done
+    echo "$FONT_CSS_END"
+  } >>"$css"
+}
+
+# 有効化されているのにパッチが消えている場合に貼り直す。
+# code-serverを更新すると本体ファイルごと差し替わるため、起動時に確認する
+function ensure_font_patch() {
+  [[ -f "$FONT_MARKER" ]] || return 0
+  font_patch_applied && return 0
+
+  print_info "Re-applying the Fira Code web font (code-server was updated)"
+  font_patch_apply || print_warning "Could not re-apply the font patch"
+}
+
+# ---------------------------------------------------------------------------
+# サブコマンド
+# ---------------------------------------------------------------------------
+
+function cmd_start() {
+  local dir="" name="" port="" auth="password"
+
+  # オプション解析。shiftで引数を消費しながら先頭から順に見ていく
+  while (( $# > 0 )); do
+    case "$1" in
+      -p|--port)
+        (( $# >= 2 )) || die "--port requires a value"
+        port="$2"
+        shift 2
+        ;;
+      -n|--name)
+        (( $# >= 2 )) || die "--name requires a value"
+        name="$2"
+        shift 2
+        ;;
+      --no-auth)
+        auth="none"
+        shift
+        ;;
+      -h|--help)
+        usage
+        return 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      -*)
+        die "Unknown option: $1"
+        ;;
+      *)
+        [[ -z "$dir" ]] || die "Only one directory can be given"
+        dir="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # `--`で解析を打ち切った場合、残りの先頭がディレクトリ
+  if [[ -z "$dir" && -n "${1:-}" ]]; then
+    dir="$1"
+  fi
+  dir="${dir:-$PWD}"                     # 省略時はカレントディレクトリ
+  [[ -d "$dir" ]] || die "Not a directory: $dir"
+  dir="${dir:A}"                         # :A はシンボリックリンクも解決した絶対パス
+
+  require_dependencies
+  ensure_dirs
+  require_tailscale
+
+  # --name省略時は末尾のディレクトリ名（:t）を名前にする
+  name="${name:-$(slugify "${dir:t}")}"
+
+  # 動作中の同名インスタンスは上書きしない。死んでいる情報だけ黙って回収する
+  if load_instance "$name"; then
+    if process_alive "$I_PID"; then
+      print_warning "Instance '$name' is already running"
+      print_info "  https://$I_HOST:$I_PORT/"
+      return 1
+    fi
+    forget_instance "$name"
+  fi
+
+  if [[ -n "$port" ]]; then
+    [[ "$port" =~ '^[0-9]+$' ]] || die "Invalid port: $port"
+    port_in_use "$port" && die "Port $port is already in use"
+  else
+    port="$(find_free_port)" \
+      || die "No free port in ${PORT_START}-$(( PORT_START + PORT_SCAN_COUNT - 1 ))"
+  fi
+
+  ensure_cert "$TS_HOST" || exit 1
+
+  local cs conf log user_data
+  cs="$(code_server_bin)"
+  conf="$(instance_config "$name")"
+  log="$(instance_log "$name")"
+  user_data="$USER_DATA_ROOT/$name"
+  mkdir -p "$user_data"
+  link_user_settings "$user_data"
+  ensure_font_patch
+
+  # 設定はすべて設定ファイル経由で渡す。コマンドライン引数にすると
+  # パスワードが`ps`の出力に見えてしまうため。
+  # user-data-dirはインスタンスごとに分ける（VS Codeは同じuser-data-dirを
+  # 複数のサーバーで同時に使えない）が、extensions-dirは明示的に共通の
+  # 場所を指してテーマや拡張機能を全インスタンスで共有する
+  {
+    echo "# Generated by csctl for '$name' - do not edit while running"
+    echo "bind-addr: $TS_IP:$port"
+    echo "auth: $auth"
+    if [[ "$auth" == "password" ]]; then
+      echo "password: \"$(get_password)\""
+    fi
+    echo "cert: \"$CERT_FILE\""
+    echo "cert-key: \"$CERT_KEY_FILE\""
+    echo "user-data-dir: \"$user_data\""
+    echo "extensions-dir: \"$EXTENSIONS_DIR\""
+    # Cookieはポート番号を区別しない。同じホスト名で複数動かすと
+    # セッションが混ざるため、インスタンスごとに接尾辞を変える
+    echo "cookie-suffix: \"$name\""
+    echo "app-name: \"$name\""
+    echo "disable-telemetry: true"
+    echo "disable-update-check: true"
+    echo "disable-workspace-trust: true"
+  } >"$conf"
+  chmod 600 "$conf"
+
+  print_info "Starting '$name' on port $port ..."
+  echo "=== csctl start $(date +%Y-%m-%dT%H:%M:%S%z) ===" >>"$log"
+  # nohupでターミナルを閉じても生き残るようにする
+  nohup "$cs" --config "$conf" "$dir" >>"$log" 2>&1 &
+  local pid=$!
+  disown 2>/dev/null || true
+
+  # 起動待ち。プロセスが落ちた場合はログを見せて後始末する
+  local waited=0 ready=0
+  while (( waited < START_TIMEOUT )); do
+    if ! process_alive "$pid"; then
+      print_error "code-server exited during startup"
+      echo "${DIM}--- last 20 log lines ---${NC}" >&2
+      tail -20 "$log" >&2
+      forget_instance "$name"
+      return 1
+    fi
+    # HTTPステータスは問わない。接続さえできればcurlは成功するので
+    # 「ポートで待ち受け始めたか」の判定にそのまま使える
+    if curl -sk -o /dev/null --max-time 2 "https://$TS_IP:$port/" 2>/dev/null; then
+      ready=1
+      break
+    fi
+    sleep 1
+    (( waited += 1 ))
+  done
+
+  if (( ready == 0 )); then
+    print_error "Timed out after ${START_TIMEOUT}s waiting for '$name' to accept connections"
+    echo "${DIM}--- last 20 log lines ---${NC}" >&2
+    tail -20 "$log" >&2
+    kill_tree "$pid" TERM
+    forget_instance "$name"
+    return 1
+  fi
+
+  # ここまで来て初めて情報を保存する（起動に失敗した記録を残さないため）
+  I_NAME="$name"
+  I_DIR="$dir"
+  I_PORT="$port"
+  I_PID="$pid"
+  I_HOST="$TS_HOST"
+  I_IP="$TS_IP"
+  I_AUTH="$auth"
+  I_STARTED_AT="$(date +%Y-%m-%dT%H:%M:%S%z)"
+  save_instance
+
+  print_success "'$name' is serving $dir"
+  echo ""
+  echo "  ${BOLD}https://$TS_HOST:$port/${NC}"
+  if [[ "$auth" == "password" ]]; then
+    echo "  ${DIM}password:${NC} $(get_password)"
+  else
+    echo "  ${DIM}auth:${NC} none (any device in the tailnet can open it)"
+  fi
+  echo ""
+  print_info "Reachable from every device signed into this tailnet"
+}
+
+function cmd_stop() {
+  local target="${1:-}"
+  [[ -n "$target" ]] || die "Usage: csctl stop <name|port|all>"
+
+  ensure_dirs
+
+  if [[ "$target" == "all" ]]; then
+    local -a names
+    names=($(instance_names))
+    if (( ${#names} == 0 )); then
+      print_info "No instances to stop"
+      return 0
+    fi
+    local name
+    for name in $names; do
+      stop_one "$name"
+    done
+    maybe_tailscale_down
+    return 0
+  fi
+
+  local name
+  name="$(resolve_instance "$target")" || die "No such instance: $target"
+  stop_one "$name"
+  maybe_tailscale_down
+}
+
+# インスタンスを1つ停止して管理ファイルを消す
+# @param name インスタンス名
+function stop_one() {
+  local name="$1"
+  if ! load_instance "$name"; then
+    print_error "No such instance: $name"
+    return 1
+  fi
+
+  # 既に死んでいるなら管理ファイルの掃除だけして終わる
+  if ! process_alive "$I_PID"; then
+    print_warning "'$name' was not running; cleaning up"
+    forget_instance "$name"
+    return 0
+  fi
+
+  # forget_instanceでI_*が使えなくなる前に控えておく
+  local port="$I_PORT" pid="$I_PID"
+  kill_tree "$pid" TERM
+
+  # まずは行儀よく終わるのを待つ
+  local waited=0
+  while (( waited < STOP_TIMEOUT )) && process_alive "$pid"; do
+    sleep 1
+    (( waited += 1 ))
+  done
+
+  # 待っても終わらなければ強制終了する
+  if process_alive "$pid"; then
+    print_warning "'$name' ignored SIGTERM; sending SIGKILL"
+    kill_tree "$pid" KILL
+    sleep 1
+  fi
+
+  forget_instance "$name"
+  print_success "Stopped '$name' (port $port)"
+}
+
+function cmd_restart() {
+  local target="${1:-}"
+  [[ -n "$target" ]] || die "Usage: csctl restart <name|port>"
+  ensure_dirs
+
+  local name
+  name="$(resolve_instance "$target")" || die "No such instance: $target"
+  load_instance "$name" || die "No such instance: $name"
+
+  # 停止すると情報が消えるので、再起動に必要な値を先に退避する
+  local dir="$I_DIR" port="$I_PORT" auth="$I_AUTH"
+  stop_one "$name" || return 1
+  # カーネルがLISTENソケットを解放するまでの猶予
+  sleep 1
+
+  local -a opts
+  opts=(--name "$name" --port "$port")
+  [[ "$auth" == "none" ]] && opts+=(--no-auth)
+  cmd_start "${opts[@]}" "$dir"
+}
+
+function cmd_list() {
+  ensure_dirs
+  local -a names
+  names=($(instance_names))
+
+  if (( ${#names} == 0 )); then
+    print_info "No instances. Start one with: csctl start <directory>"
+    return 0
+  fi
+
+  printf "%-18s %-6s %-8s %-8s %s\n" "NAME" "PORT" "PID" "STATUS" "DIRECTORY"
+
+  # zshでは`status`が`?`の別名として予約されていて代入できないためinst_statusとする
+  local name inst_status color host=""
+  for name in $names; do
+    load_instance "$name" || continue
+    if process_alive "$I_PID"; then
+      inst_status="running"
+      color="$GREEN"
+    else
+      inst_status="stopped"
+      color="$RED"
+    fi
+    host="$I_HOST"
+    # 色指定はprintfの書式の外側に置く。書式の中に入れると
+    # 制御文字も文字数に数えられて桁が揃わなくなる
+    printf "%-18s %-6s %-8s ${color}%-8s${NC} %s\n" \
+      "$I_NAME" "$I_PORT" "$I_PID" "$inst_status" "${I_DIR/#$HOME/~}"   # /# は先頭一致の置換
+  done
+
+  # ホスト名は全インスタンス共通なので表の外にまとめて出す
+  if [[ -n "$host" ]]; then
+    echo ""
+    print_info "URLs: https://$host:<port>/"
+  fi
+}
+
+function cmd_status() {
+  ensure_dirs
+  local target="${1:-}"
+
+  # 対象を省略したときは一覧表示に委ねる
+  if [[ -z "$target" ]]; then
+    cmd_list
+    return 0
+  fi
+
+  local name
+  name="$(resolve_instance "$target")" || die "No such instance: $target"
+  load_instance "$name" || die "No such instance: $name"
+
+  # zshでは`status`が`?`の別名として予約されているためinst_statusとする
+  local inst_status
+  if process_alive "$I_PID"; then
+    inst_status="${GREEN}running${NC}"
+  else
+    inst_status="${RED}stopped${NC}"
+  fi
+
+  echo "${BOLD}$I_NAME${NC}"
+  echo "  status:     $inst_status"
+  echo "  directory:  $I_DIR"
+  echo "  url:        https://$I_HOST:$I_PORT/"
+  echo "  bind:       $I_IP:$I_PORT"
+  echo "  pid:        $I_PID"
+  echo "  auth:       $I_AUTH"
+  echo "  started:    $I_STARTED_AT"
+  echo "  log:        $(instance_log "$I_NAME")"
+}
+
+function cmd_logs() {
+  ensure_dirs
+  local follow=0 target=""
+
+  while (( $# > 0 )); do
+    case "$1" in
+      -f|--follow) follow=1; shift ;;
+      -*) die "Unknown option: $1" ;;
+      *) target="$1"; shift ;;
+    esac
+  done
+
+  [[ -n "$target" ]] || die "Usage: csctl logs [-f] <name|port>"
+
+  local name log
+  name="$(resolve_instance "$target")" || die "No such instance: $target"
+  log="$(instance_log "$name")"
+  [[ -f "$log" ]] || die "No log file for '$name'"
+
+  if (( follow )); then
+    tail -f -n 100 "$log"
+  else
+    tail -n 200 "$log"
+  fi
+}
+
+function cmd_url() {
+  ensure_dirs
+  local target="${1:-}"
+  [[ -n "$target" ]] || die "Usage: csctl url <name|port>"
+
+  local name
+  name="$(resolve_instance "$target")" || die "No such instance: $target"
+  load_instance "$name" || die "No such instance: $name"
+  echo "https://$I_HOST:$I_PORT/"
+}
+
+function cmd_open() {
+  local target="${1:-}"
+  [[ -n "$target" ]] || die "Usage: csctl open <name|port>"
+  local url
+  # cmd_urlはサブシェルで動くのでdieしても親は止まらない。明示的に中断する
+  url="$(cmd_url "$target")" || exit 1
+  open "$url"
+}
+
+function cmd_password() {
+  ensure_dirs
+  if [[ "${1:-}" == "--reset" ]]; then
+    rm -f "$PASSWORD_FILE"
+    get_password >/dev/null   # 生成だけ先に済ませる
+    print_success "Password regenerated"
+    print_warning "Running instances keep the old password until restarted"
+    print_info "Restart them with: csctl restart <name>"
+  fi
+  get_password
+}
+
+function cmd_cert() {
+  require_dependencies
+  ensure_dirs
+  require_tailscale
+
+  ensure_cert "$TS_HOST" || exit 1
+  print_success "Certificate ready for $TS_HOST"
+  echo "  cert: $CERT_FILE"
+  echo "  key:  $CERT_KEY_FILE"
+  if command -v openssl >/dev/null 2>&1; then
+    echo "  ${DIM}$(openssl x509 -enddate -noout -in "$CERT_FILE" 2>/dev/null)${NC}"
+  fi
+}
+
+function cmd_font() {
+  local action="${1:-status}"
+  ensure_dirs
+
+  case "$action" in
+    install|enable)
+      font_patch_apply || exit 1
+      : >"$FONT_MARKER"
+      print_success "Fira Code is now served by code-server itself"
+      print_info "Every device can use it, including ones without the font installed"
+      print_warning "This edits code-server's own files and is lost when it is upgraded"
+      print_info "csctl re-applies it automatically on the next start"
+      print_info "Restart running instances to pick it up: csctl restart <name>"
+      ;;
+    remove|disable)
+      local css
+      if css="$(workbench_css_path)"; then
+        font_patch_strip "$css"
+        rm -rf "${css:h}/$FONT_DIR_NAME"
+      fi
+      rm -f "$FONT_MARKER"
+      print_success "Fira Code web font removed"
+      print_info "Restart running instances to apply: csctl restart <name>"
+      ;;
+    status)
+      local css
+      if [[ -f "$FONT_MARKER" ]]; then
+        if font_patch_applied; then
+          print_success "enabled"
+        else
+          print_warning "enabled, but the patch is missing (it will be restored on next start)"
+        fi
+      else
+        print_info "disabled - enable it with: csctl font install"
+      fi
+      if css="$(workbench_css_path)"; then
+        echo "  stylesheet: $css"
+        echo "  fonts:      ${css:h}/$FONT_DIR_NAME"
+      else
+        print_warning "code-server's workbench.css could not be located"
+      fi
+      ;;
+    *)
+      die "Usage: csctl font <install|remove|status>"
+      ;;
+  esac
+}
+
+function cmd_doctor() {
+  ensure_dirs
+  local ok=1 bin tool
+
+  echo "${BOLD}Dependencies${NC}"
+  if bin="$(code_server_bin)"; then
+    print_success "code-server: $bin ($("$bin" --version 2>/dev/null | tail -1))"
+  else
+    print_error "code-server not found - install it with: brew install code-server"
+    ok=0
+  fi
+
+  if bin="$(tailscale_bin)"; then
+    print_success "tailscale: $bin ($("$bin" version 2>/dev/null | head -1))"
+  else
+    print_error "tailscale not found - install the Tailscale app: https://tailscale.com/download"
+    ok=0
+  fi
+
+  for tool in jq curl lsof openssl; do
+    if command -v "$tool" >/dev/null 2>&1; then
+      print_success "$tool: $(command -v "$tool")"
+    else
+      print_error "$tool not found"
+      ok=0
+    fi
+  done
+
+  echo ""
+  echo "${BOLD}Tailscale${NC}"
+  if read_tailscale_state; then
+    print_success "connected as $TS_HOST ($TS_IP)"
+  elif [[ "$TS_STATE" == "Stopped" && "${CSCTL_AUTO_UP:-1}" != "0" ]]; then
+    # 停止中でも起動時に自動接続されるので問題として扱わない
+    print_warning "stopped - csctl will connect it when an instance starts"
+  else
+    print_error "not ready (state: $TS_STATE)"
+    print_info "Connect it with: tailscale up"
+    ok=0
+  fi
+
+  echo ""
+  echo "${BOLD}Certificate${NC}"
+  if [[ -n "$TS_HOST" && -f "$CERT_DIR/$TS_HOST.crt" ]]; then
+    print_success "cached: $CERT_DIR/$TS_HOST.crt"
+    if command -v openssl >/dev/null 2>&1; then
+      echo "  ${DIM}$(openssl x509 -enddate -noout -in "$CERT_DIR/$TS_HOST.crt" 2>/dev/null)${NC}"
+    fi
+  else
+    print_warning "not issued yet - run: csctl cert"
+  fi
+
+  echo ""
+  echo "${BOLD}Paths${NC}"
+  echo "  config:    $CONFIG_DIR"
+  echo "  state:     $STATE_DIR"
+  echo "  data:      $DATA_DIR"
+  echo "  ports:     ${PORT_START}-$(( PORT_START + PORT_SCAN_COUNT - 1 ))"
+
+  echo ""
+  if (( ok )); then
+    print_success "Ready to serve"
+  else
+    print_error "Fix the problems above first"
+  fi
+  (( ok ))   # 診断結果をそのまま終了ステータスにする
+}
+
+function usage() {
+  # <<'EOF' とクォートすることで、中の$や`をそのまま出力する
+  cat <<'EOF'
+csctl - publish project directories as code-server instances over Tailscale
+
+USAGE
+  csctl <command> [arguments]
+
+COMMANDS
+  start [dir] [options]   Start code-server for a directory and publish it.
+                          Defaults to the current directory.
+    -p, --port <port>     Listen on a specific port (default: first free from 18080)
+    -n, --name <name>     Instance name (default: the directory's own name,
+                          lowercased, with anything but [a-z0-9._-] turned into -)
+        --no-auth         Skip the password prompt (still tailnet-only)
+
+  stop <name|port|all>    Stop an instance, or every instance
+  restart <name|port>     Restart an instance with the same directory and port
+  list                    List all instances
+  status [name|port]      Show details for one instance, or list them all
+  logs [-f] <name|port>   Show an instance log (-f to follow)
+  url <name|port>         Print the URL of an instance
+  open <name|port>        Open an instance in the local browser
+  password [--reset]      Show the shared password, or generate a new one
+  cert                    Issue or renew the TLS certificate
+  font <install|remove|status>
+                          Serve Fira Code from code-server itself, so devices
+                          without the font installed (iPad ...) can use it
+  doctor                  Check dependencies and Tailscale readiness
+  help                    Show this help
+  version                 Show the csctl version
+
+EXAMPLES
+  csctl start ~/Documents/Project/github.com/me/my-app
+  csctl start . --port 18090
+  csctl list
+  csctl stop my-app
+  csctl stop all
+
+HOW IT WORKS
+  Each instance binds to this machine's Tailscale IP and terminates TLS with a
+  certificate issued by `tailscale cert`, so it is reachable at
+  https://<magicdns-name>:<port>/ from any device in the tailnet and from
+  nowhere else. Nothing is exposed to the public internet.
+
+  Tailscale does not have to stay connected. `start` runs `tailscale up` when it
+  finds the backend stopped, and `stop` runs `tailscale down` again once the last
+  instance is gone - but only if csctl was the one that connected it. A
+  connection you established yourself is never taken down.
+
+  Editor settings are shared: every instance links its User/settings.json to
+  code-server/settings.json in the dotfiles repository, and all instances share
+  one extensions directory, so a theme only has to be installed once.
+
+ENVIRONMENT
+  CSCTL_PORT_START        First port scanned when --port is omitted (default 18080)
+  CSCTL_CODE_SERVER_BIN   Path to the code-server executable
+  CSCTL_TAILSCALE_BIN     Path to the tailscale executable
+  CSCTL_AUTO_UP           Set to 0 to never run `tailscale up` automatically
+  CSCTL_AUTO_DOWN         Set to 0 to stay connected after the last instance stops
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# サブコマンドの振り分け
+# ---------------------------------------------------------------------------
+
+function main() {
+  local subcommand="${1:-help}"
+  # 引数があればサブコマンド名を取り除き、残りを各関数へそのまま渡す
+  (( $# > 0 )) && shift
+
+  case "$subcommand" in
+    start)                cmd_start "$@" ;;
+    stop)                 cmd_stop "$@" ;;
+    restart)              cmd_restart "$@" ;;
+    list|ls)              cmd_list "$@" ;;
+    status)               cmd_status "$@" ;;
+    logs|log)             cmd_logs "$@" ;;
+    url)                  cmd_url "$@" ;;
+    open)                 cmd_open "$@" ;;
+    password|passwd)      cmd_password "$@" ;;
+    cert)                 cmd_cert "$@" ;;
+    font)                 cmd_font "$@" ;;
+    doctor)               cmd_doctor "$@" ;;
+    help|-h|--help)       usage ;;
+    version|-v|--version) echo "csctl $CSCTL_VERSION" ;;
+    *)
+      print_error "Unknown command: $subcommand"
+      echo ""
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

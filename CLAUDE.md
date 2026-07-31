@@ -22,7 +22,7 @@
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
    例: Python、Node.js、pnpm、Bun、Terraform
 3. **Homebrew**（最終手段）: GUIアプリ・フォントなど、Nix/miseでカバーできない、またはNixで問題が起きるもの
-   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok
+   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok、code-server（nixpkgsがaarch64-darwin非対応、npm版はNode 22固定のため）
 
 **SDKMAN**がJavaバージョンを管理する（上記の優先順位とは独立した専用ツール）
 
@@ -43,8 +43,9 @@
    - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
+   - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
-6. **設定ファイルのシンボリックリンク作成**: Git・Cursor・VSCode・VSCode Insiders・Claude Code
+6. **設定ファイルのシンボリックリンク作成**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・`csctl`コマンド
 7. **Cline拡張設定のコピー**（VSCode Cline拡張が存在する場合のみ）
 8. **SSH設定**: `sshd_config` を `/etc/ssh/` へシンボリックリンク（要sudo）、`authorized_keys` をコピー
 9. **iTerm2シェルインテグレーションのインストール**
@@ -55,7 +56,9 @@
 | ディレクトリ | 説明 |
 | --- | --- |
 | `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
+| `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する） |
 | `claude-code/` | ユーザーレベルのClaude Code設定 |
+| `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
 | `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`） |
 | `iterm2/` | iTerm2の設定・プロファイル・カラースキーム（Monokaiテーマ各種） |
