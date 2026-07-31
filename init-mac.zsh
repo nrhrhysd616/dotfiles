@@ -240,6 +240,14 @@ install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix p
 # @see https://poppler.freedesktop.org/
 install_command 'Poppler' 'pdftotext' 'which pdftotext' 'nix profile add nixpkgs#poppler-utils' 'nix profile upgrade poppler-utils'
 
+# code-server install (VS Code in the browser, driven by the csctl command)
+# Homebrew instead of Nix/mise: nixpkgs has no aarch64-darwin build and the npm
+# package pins Node 22 while mise tracks the current LTS. The formula bundles
+# node@22 itself. It is marked deprecated upstream (disabled 2027-04-11), so
+# revisit the install method before then.
+# @see https://coder.com/docs/code-server
+install_command 'code-server' 'code-server' 'code-server --version' 'brew install code-server' 'brew upgrade code-server'
+
 print_section "Installing Java"
 
 # Resolve the latest available Amazon Corretto version for a major version
@@ -297,6 +305,12 @@ link_config $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
 link_config $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
 link_config $SCRIPT_DIR/claude-code/settings.json $HOME/.claude/settings.json
 link_config $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
+
+# Custom commands
+# $HOME/.local/bin is already on $PATH via zsh/.zshrc
+print_section "Custom Commands"
+mkdir -p $HOME/.local/bin
+link_config $SCRIPT_DIR/bin/csctl $HOME/.local/bin/csctl
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
