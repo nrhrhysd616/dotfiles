@@ -1,265 +1,3116 @@
 {
-  // code-server（ブラウザ版VS Code）用のユーザー設定
+  // =============================================================================
+  // code-server（ブラウザ版 VS Code）ユーザー設定
+  // =============================================================================
+  // csctl が各インスタンスの User/settings.json からこのファイルへ
+  // シンボリックリンクを張るため、全インスタンスで共有される（bin/csctl の 184-204 行目）。
   //
-  // csctlが各インスタンスの User/settings.json からこのファイルへ
-  // シンボリックリンクを張るため、全インスタンスで共有される。
-  //
-  // vscode/settings.json との違い:
+  // 【vscode/settings.json との違い】
   //   - 拡張機能に依存する設定を含めない（標準機能だけで完結させる）
   //   - テーマは組み込みの Monokai / Seti を使う
   //   - 外部アプリ連携（iTerm起動など）はブラウザから機能しないため除外
+  //   - ベースが VS Code 1.112 のため、それ以降に追加された設定は含めない
+  //
+  // 【コメントの表記】
+  //   （デフォルト: X）        既定値から変更している項目。X が VS Code 側の既定値
+  //   （既定値）               既定値のまま明示している項目
+  //   （実験的機能・既定値）   実験的・プレビュー設定。将来のバージョンで削除されることがある
+  //
+  // 共通設定を変更する場合は vscode/settings.json と両方を更新すること。
+  // 末尾カンマは付けないこと（リポジトリ内で開いた時に警告になる）。
+  // =============================================================================
 
   // =============================================
   // Text Editor - テキストエディタ
   // =============================================
 
-  // スクリーンリーダーのサポートを無効化（デフォルト: "auto"）パフォーマンス向上のため
+  // スクリーンリーダー向け最適化モード（デフォルト: "auto"）パフォーマンス向上のため無効化
   "editor.accessibilitySupport": "off",
+  // スクリーンリーダーが一度に読み上げる行数（既定値）
+  "editor.accessibilityPageSize": 500,
+  // AI挿入文字比率のゲージ表示（既定値）
+  "editor.aiStats.enabled": false,
+  // 可変フォント（バリアブルフォント）の使用を許可（既定値）
+  "editor.allowVariableFonts": true,
+  // アクセシビリティモード時の可変フォント使用（既定値）
+  "editor.allowVariableFontsInAccessibilityMode": false,
+  // 行ごとに異なる行高を許可（既定値）
+  "editor.allowVariableLineHeights": true,
   // 空白文字の前でのみ括弧を自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingBrackets": "beforeWhitespace",
   // 空白文字の前でのみコメントを自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingComments": "beforeWhitespace",
+  // 削除時に対になる閉じ括弧・引用符も削除する（既定値）
+  "editor.autoClosingDelete": "auto",
+  // 閉じ括弧・引用符の上から入力した際に上書きする（既定値）
+  "editor.autoClosingOvertype": "auto",
   // 空白文字の前でのみ引用符を自動閉じ（デフォルト: "languageDefined"）
   "editor.autoClosingQuotes": "beforeWhitespace",
+  // 入力・貼り付け・行移動時のインデント自動調整（既定値）
+  "editor.autoIndent": "full",
+  // 貼り付けた内容を自動インデントする（既定値）
+  "editor.autoIndentOnPaste": false,
+  // 文字列リテラル内に貼り付けた場合の自動インデント（既定値）autoIndentOnPasteが有効な時のみ作用
+  "editor.autoIndentOnPasteWithinString": true,
+  // 選択範囲がある状態で引用符・括弧を入力した際に囲む（既定値）
+  "editor.autoSurround": "languageDefined",
+  // 括弧ペアの色分けを有効化（既定値）
+  "editor.bracketPairColorization.enabled": true,
   // 括弧の種類（(), [], {}）ごとに独立した色プールを使用（デフォルト: false）
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
-  // CodeLensのフォントファミリーを明示指定
+  // 診断のない行でも近傍のクイックフィックスを表示（既定値）
+  "editor.codeActionWidget.includeNearbyQuickFixes": true,
+  // コードアクションメニューにグループ見出しを表示（既定値）
+  "editor.codeActionWidget.showHeaders": true,
+  // フォーカス変更時に codeActionsOnSave を実行（既定値）
+  "editor.codeActions.triggerOnFocusChange": false,
+  // 保存時に実行するコードアクション（既定値）※プロジェクト側の設定で指定する運用
+  "editor.codeActionsOnSave": {},
+  // CodeLens（関数上部の参照数など）を表示（既定値）
+  "editor.codeLens": true,
+  // CodeLensのフォントファミリー（デフォルト: ""=エディタのフォントを継承）明示指定
   "editor.codeLensFontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  // カラーデコレーターをクリック時のみアクティブ化（デフォルト: "clickAndHover"）
+  // CodeLensのフォントサイズ（既定値）0はeditor.fontSizeの90%
+  "editor.codeLensFontSize": 0,
+  // 色リテラルにカラーデコレーター（色見本）を表示（既定値）
+  "editor.colorDecorators": true,
+  // カラーピッカーをクリック時のみ開く（デフォルト: "clickAndHover"）ホバーで誤って開かないように
   "editor.colorDecoratorsActivatedOn": "click",
-  // カラーデコレーターの最大表示数を制限（デフォルト: 500）
+  // カラーデコレーターの最大表示数（デフォルト: 500）描画負荷を抑えるため制限
   "editor.colorDecoratorsLimit": 30,
+  // マウス+キーでの選択を矩形選択にする（既定値）
+  "editor.columnSelection": false,
   // 空行もコメントトグルの対象にする（デフォルト: true=空行を無視）
   "editor.comments.ignoreEmptyLines": false,
-  // コピー時にシンタックスハイライトを含めない（デフォルト: true）
+  // コメント記号の後に空白を挿入（既定値）
+  "editor.comments.insertSpace": true,
+  // コピー時にシンタックスハイライトを含めない（デフォルト: true）プレーンテキストとして貼り付けたいため
   "editor.copyWithSyntaxHighlighting": false,
-  // 定義リンクをPeekビューで開く（デフォルト: false=別タブで開く）
+  // 既定のドキュメントカラープロバイダーで色装飾を表示（既定値）
+  "editor.defaultColorDecorators": "auto",
+  // 既定の折りたたみ範囲プロバイダー（既定値）
+  "editor.defaultFoldingRangeProvider": null,
+  // 定義ジャンプのマウス操作を常にPeekビューで開く（デフォルト: false）
   "editor.definitionLinkOpensInPeek": true,
-  // インデントの自動検出を無効化（デフォルト: true）tabSize設定を常に適用
+  // インデントの自動検出（デフォルト: true）tabSize/insertSpacesを常に適用するため無効化
   "editor.detectIndentation": false,
-  // テキストのドラッグ＆ドロップを無効化（デフォルト: true）誤操作防止
+  // 括弧・引用符の隣でダブルクリックした際に中身を選択（既定値）
+  "editor.doubleClickSelectsBlock": true,
+  // 選択テキストのドラッグ＆ドロップ移動（デフォルト: true）誤操作防止のため無効化
   "editor.dragAndDrop": false,
-  // エディタへのファイルドロップを無効化（デフォルト: true）
+  // Shift+ドラッグでのエディタへのファイルドロップ（デフォルト: true）誤操作防止のため無効化
   "editor.dropIntoEditor.enabled": false,
-  // 選択範囲がない時のクリップボードコピーを無効化（デフォルト: true=行全体をコピー）
+  // ドロップ時に優先する編集種別の順序（既定値）
+  "editor.dropIntoEditor.preferences": [],
+  // ドロップ後に挿入方法の選択ウィジェットを表示（既定値）
+  "editor.dropIntoEditor.showDropSelector": "afterDrop",
+  // 入力処理にEditContext APIを使用（既定値）
+  "editor.editContext": true,
+  // 選択範囲がない時のコピーで行全体をコピー（デフォルト: true）意図しない行コピーを防ぐため無効化
   "editor.emptySelectionClipboard": false,
-  // Alt+スクロール時の高速スクロール感度（デフォルト: 5）
+  // トークン化をWeb Workerで非同期実行（実験的機能・既定値）
+  "editor.experimental.asyncTokenization": true,
+  // 非同期トークン化のログ出力（実験的機能・既定値）デバッグ用
+  "editor.experimental.asyncTokenizationLogging": false,
+  // 非同期トークン化を旧実装と突き合わせて検証（実験的機能・既定値）デバッグ用
+  "editor.experimental.asyncTokenizationVerification": false,
+  // CSSのTree-sitterパース（実験的機能・既定値）
+  "editor.experimental.preferTreeSitter.css": false,
+  // INIのTree-sitterパース（実験的機能・既定値）
+  "editor.experimental.preferTreeSitter.ini": false,
+  // 正規表現のTree-sitterパース（実験的機能・既定値）
+  "editor.experimental.preferTreeSitter.regex": false,
+  // TypeScriptのTree-sitterパース（実験的機能・既定値）
+  "editor.experimental.preferTreeSitter.typescript": false,
+  // Tree-sitterパースの有効化とテレメトリ収集（実験的機能・既定値）
+  "editor.experimental.treeSitterTelemetry": false,
+  // GPUアクセラレーションによる描画（実験的機能・既定値）
+  "editor.experimentalGpuAcceleration": "off",
+  // 空白文字の新描画方式（実験的機能・既定値）
+  "editor.experimentalWhitespaceRendering": "svg",
+  // Alt+スクロール時の高速スクロール倍率（デフォルト: 5）速すぎるため抑制
   "editor.fastScrollSensitivity": 3,
-  // 折りたたみ可能な最大リージョン数（デフォルト: 5000）
+  // コードの折りたたみを有効化（既定値）
+  "editor.folding": true,
+  // 折りたたまれた範囲をハイライト（既定値）
+  "editor.foldingHighlight": true,
+  // import文を既定で折りたたむ（既定値）
+  "editor.foldingImportsByDefault": false,
+  // 折りたたみ可能な最大リージョン数（デフォルト: 5000）描画負荷を抑えるため制限
   "editor.foldingMaximumRegions": 3000,
-  // 各種定義ジャンプで結果が見つからない時の代替コマンドを参照一覧に統一
+  // 折りたたみ範囲の計算方法（既定値）
+  "editor.foldingStrategy": "auto",
+  // 行番号左のグリフマージン（ブレークポイント表示領域）を表示（既定値）
+  "editor.glyphMargin": true,
+  // 「宣言へ移動」の結果が現在位置しかない場合の代替コマンド（既定値）参照一覧を開く
   "editor.gotoLocation.alternativeDeclarationCommand": "editor.action.goToReferences",
+  // 「定義へ移動」の結果が現在位置しかない場合の代替コマンド（既定値）参照一覧を開く
   "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.goToReferences",
+  // 「実装へ移動」の結果が現在位置しかない場合の代替コマンド（デフォルト: ""）他と揃えて参照一覧を開く
   "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
+  // 「参照へ移動」の結果が現在位置しかない場合の代替コマンド（デフォルト: ""）他と揃えて参照一覧を開く
   "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences",
+  // 「型定義へ移動」の結果が現在位置しかない場合の代替コマンド（既定値）参照一覧を開く
   "editor.gotoLocation.alternativeTypeDefinitionCommand": "editor.action.goToReferences",
-  // 括弧ペアのガイド線を表示（デフォルト: false）
+  // 宣言が複数ある場合の挙動（既定値）
+  "editor.gotoLocation.multipleDeclarations": "peek",
+  // 定義が複数ある場合の挙動（既定値）
+  "editor.gotoLocation.multipleDefinitions": "peek",
+  // 実装が複数ある場合の挙動（既定値）
+  "editor.gotoLocation.multipleImplementations": "peek",
+  // 参照が複数ある場合の挙動（既定値）
+  "editor.gotoLocation.multipleReferences": "peek",
+  // 型定義が複数ある場合の挙動（既定値）
+  "editor.gotoLocation.multipleTypeDefinitions": "peek",
+  // 括弧ペアのガイド線を表示（デフォルト: false）ネストの把握のため有効化
   "editor.guides.bracketPairs": true,
-  // ホバー表示までの遅延時間（デフォルト: 300ms）
+  // 括弧ペアの水平ガイド線（既定値）
+  "editor.guides.bracketPairsHorizontal": "active",
+  // アクティブな括弧ペアをハイライト（既定値）
+  "editor.guides.highlightActiveBracketPair": true,
+  // アクティブなインデントガイドをハイライト（既定値）
+  "editor.guides.highlightActiveIndentation": true,
+  // インデントガイドを表示（既定値）
+  "editor.guides.indentation": true,
+  // 概要ルーラー（右端のミニ地図帯）でカーソル位置を隠す（既定値）
+  "editor.hideCursorInOverviewRuler": false,
+  // ホバーを行の上側に優先表示（既定値）
+  "editor.hover.above": true,
+  // ホバー表示までの遅延（デフォルト: 300ms）意図しないホバーを減らすため延長
   "editor.hover.delay": 500,
-  // インレイヒントのフォントファミリーを明示指定
+  // ホバー表示を有効化（既定値）
+  "editor.hover.enabled": "on",
+  // ホバーが消えるまでの遅延（既定値）hover.stickyが有効な時のみ作用
+  "editor.hover.hidingDelay": 300,
+  // 長い行の警告ホバー（トークン化スキップ時など）を表示（既定値）
+  "editor.hover.showLongLineWarning": true,
+  // ホバーにマウスを乗せている間は表示を維持（既定値）
+  "editor.hover.sticky": true,
+  // インデント幅（既定値）"tabSize"はeditor.tabSizeの値を使う
+  "editor.indentSize": "tabSize",
+  // 慣性スクロール（既定値）主にLinuxのタッチパッド向け
+  "editor.inertialScroll": false,
+  // インレイヒント（型注釈などの補助表示）を有効化（既定値）
+  "editor.inlayHints.enabled": "on",
+  // インレイヒントのフォントファミリー（デフォルト: ""=エディタのフォントを継承）明示指定
   "editor.inlayHints.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
-  // リンク編集を有効化（デフォルト: false）HTMLタグの開始/終了タグを連動編集
+  // インレイヒントのフォントサイズ（既定値）0はeditor.fontSizeを使う
+  "editor.inlayHints.fontSize": 0,
+  // インレイヒント1行あたりの最大長（既定値）0で無制限
+  "editor.inlayHints.maximumLength": 43,
+  // インレイヒントの前後に余白を入れる（既定値）
+  "editor.inlayHints.padding": false,
+  // Tabキーでスペースを挿入（既定値）detectIndentationを無効にしているため常に適用される
+  "editor.insertSpaces": true,
+  // インデント増減を判定する括弧記号の定義（既定値）言語別に指定する用途
+  "editor.language.brackets": null,
+  // 色分け対象の括弧ペアの定義（既定値）言語別に指定する用途
+  "editor.language.colorizedBracketPairs": null,
+  // 巨大ファイルで重い機能を自動的に無効化（既定値）
+  "editor.largeFileOptimizations": true,
+  // コードアクションの電球アイコンを表示（既定値）
+  "editor.lightbulb.enabled": "onCode",
+  // 行番号の表示（既定値）
+  "editor.lineNumbers": "on",
+  // リンク編集（HTMLの開始/終了タグを連動編集）（デフォルト: false）
   "editor.linkedEditing": true,
-  // トークン化する最大行長（デフォルト: 20000）
+  // URLなどを検出してクリック可能にする（既定値）
+  "editor.links": true,
+  // 対応する括弧をハイライト（既定値）
+  "editor.matchBrackets": "always",
+  // トークン化する最大行長（デフォルト: 20000）長大な1行での描画停止を避けるため抑制
   "editor.maxTokenizationLineLength": 15000,
-  // マルチカーソルの最大数（デフォルト: 10000）
+  // 中クリック時の動作（既定値）
+  "editor.mouseMiddleClickAction": "default",
+  // マウスホイールのスクロール量倍率（既定値）
+  "editor.mouseWheelScrollSensitivity": 1,
+  // Cmd+ホイールでフォントサイズを変更（既定値）
+  "editor.mouseWheelZoom": false,
+  // マルチカーソルの最大数（デフォルト: 10000）暴発時の負荷を抑えるため制限
   "editor.multiCursorLimit": 3000,
-  // 出現箇所ハイライトの表示遅延（デフォルト: 0ms）
+  // 重なったマルチカーソルを統合（既定値）
+  "editor.multiCursorMergeOverlapping": true,
+  // マルチカーソル追加時の修飾キー（既定値）
+  "editor.multiCursorModifier": "alt",
+  // 貼り付ける行数とカーソル数が一致する場合の貼り付け方（既定値）
+  "editor.multiCursorPaste": "spread",
+  // 同一シンボルの出現箇所をハイライトする範囲（既定値）
+  "editor.occurrencesHighlight": "singleFile",
+  // 出現箇所ハイライトの表示遅延（デフォルト: 0ms）カーソル移動中のちらつきを防ぐため
   "editor.occurrencesHighlightDelay": 200,
-  // エディタ上部のパディング（デフォルト: 0px）
+  // 上書き入力モード時のカーソル形状（既定値）
+  "editor.overtypeCursorStyle": "block",
+  // 上書き入力モードで貼り付けた場合に上書きする（既定値）
+  "editor.overtypeOnPaste": true,
+  // 概要ルーラーに枠線を描画（既定値）
+  "editor.overviewRulerBorder": true,
+  // エディタ下端と最終行の間の余白（既定値）
+  "editor.padding.bottom": 0,
+  // エディタ上端と先頭行の間の余白（デフォルト: 0px）先頭行が詰まって見えないように
   "editor.padding.top": 5,
-  // パラメータヒントの循環表示を有効化（最後の後に最初に戻る）
-  "editor.parameterHints.cycle": true,
-  // 制御文字（見えない文字）を可視化
+  // 貼り付け方法を選べるようにする（既定値）
+  "editor.pasteAs.enabled": true,
+  // 貼り付け時に優先する編集種別の順序（既定値）
+  "editor.pasteAs.preferences": [],
+  // 貼り付け後に挿入方法の選択ウィジェットを表示（既定値）
+  "editor.pasteAs.showPasteSelector": "afterPaste",
+  // Peekビューを開いた際のフォーカス先（既定値）
+  "editor.peekWidgetDefaultFocus": "tree",
+  // リネーム前に変更内容をプレビューできるようにする（既定値）
+  "editor.rename.enablePreview": true,
+  // 制御文字（見えない文字）を可視化（既定値）
   "editor.renderControlCharacters": true,
-  // すべての空白文字を常に表示（デフォルト: "selection"=選択時のみ）
+  // ファイル末尾が改行の場合に最終行番号を表示（既定値）
+  "editor.renderFinalNewline": "on",
+  // 現在行のハイライト方法（既定値）
+  "editor.renderLineHighlight": "line",
+  // エディタにフォーカスがある時のみ現在行をハイライト（既定値）
+  "editor.renderLineHighlightOnlyWhenFocus": false,
+  // スクリーンリーダー向けリッチコンテンツの描画（既定値）editContextが有効な時のみ作用
+  "editor.renderRichScreenReaderContent": false,
+  // すべての空白文字を常に表示（デフォルト: "selection"=選択時のみ）全角スペース等の混入検知のため
   "editor.renderWhitespace": "all",
-  // ルーラーを80, 100, 150文字目に表示（コード幅の目安）
+  // 選択範囲の角を丸める（既定値）
+  "editor.roundedSelection": true,
+  // 縦ルーラーを80/100/150桁に表示（デフォルト: []）コード幅の目安として
   "editor.rulers": [80, 100, 150],
+  // インライン補完をスクリーンリーダーで読み上げる（既定値）
+  "editor.screenReaderAnnounceInlineSuggestion": true,
+  // 最終列以降に水平スクロールできる余白（既定値）
+  "editor.scrollBeyondLastColumn": 4,
+  // 最終行以降に垂直スクロールできるようにする（既定値）
+  "editor.scrollBeyondLastLine": true,
+  // 中ボタン押下でスクロールモードに入る（既定値）
+  "editor.scrollOnMiddleClick": false,
+  // 縦横同時スクロール時に主要な軸のみスクロール（既定値）トラックパッドの横滑り防止
+  "editor.scrollPredominantAxis": true,
+  // 水平スクロールバーの表示（既定値）
+  "editor.scrollbar.horizontal": "auto",
   // 水平スクロールバーの高さ（デフォルト: 12px）
   "editor.scrollbar.horizontalScrollbarSize": 10,
-  // 垂直スクロールバーの幅（デフォルト: 14px）
+  // 水平スクロールバーの分だけコンテンツ高を増やさない（既定値）
+  "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": false,
+  // スクロールバークリック時にページ単位でスクロール（既定値）falseはクリック位置へジャンプ
+  "editor.scrollbar.scrollByPage": false,
+  // 垂直スクロールバーの表示（既定値）
+  "editor.scrollbar.vertical": "auto",
+  // 垂直スクロールバーの幅（デフォルト: 14px）掴みやすくするため拡大
   "editor.scrollbar.verticalScrollbarSize": 15,
-  // 最終列以降のスクロール余白（デフォルト: 5文字分）
-  "editor.scrollBeyondLastColumn": 4,
-  // スムーズスクロールを有効化（デフォルト: false）アニメーション付きスクロール
+  // 選択文字列と同じ箇所をハイライト（既定値）
+  "editor.selectionHighlight": true,
+  // 類似箇所ハイライトを行う選択文字数の上限（既定値）0で無制限
+  "editor.selectionHighlightMaxLength": 200,
+  // 複数行にまたがる選択でも類似箇所をハイライト（既定値）
+  "editor.selectionHighlightMultiline": false,
+  // セマンティックハイライトの有効化（既定値）テーマの指定に従う
+  "editor.semanticHighlighting.enabled": "configuredByTheme",
+  // セマンティックトークンの色・スタイルの上書き（既定値）
+  "editor.semanticTokenColorCustomizations": {},
+  // 折りたたみコントロールの表示タイミング（既定値）
+  "editor.showFoldingControls": "mouseover",
+  // 未使用コードを淡色表示（既定値）
+  "editor.showUnused": true,
+  // 選択範囲の拡張で前後の空白を含める（既定値）
+  "editor.smartSelect.selectLeadingAndTrailingWhitespace": true,
+  // 選択範囲の拡張でサブワード（fooBarのfoo等）を対象にする（既定値）
+  "editor.smartSelect.selectSubwords": true,
+  // アニメーション付きスクロール（デフォルト: false）スクロール位置を見失わないように
   "editor.smoothScrolling": true,
-  // スニペットのコードアクションを無効化
+  // 囲みスニペット・ファイルテンプレートをコードアクションに出す（デフォルト: true）候補が増えすぎるため無効化
   "editor.snippets.codeActions.enabled": false,
-  // スティッキースクロールの最大表示行数（デフォルト: 5）
+  // ダブルクリックやEscでもPeekエディタを開いたままにする（既定値）
+  "editor.stablePeek": false,
+  // スティッキースクロールで固定する行の判定モデル（既定値）
+  "editor.stickyScroll.defaultModel": "outlineModel",
+  // スティッキースクロール（上部に親スコープを固定表示）（既定値）
+  "editor.stickyScroll.enabled": true,
+  // スティッキースクロールの最大表示行数（デフォルト: 5）ネストの深いコードでも追えるように
   "editor.stickyScroll.maxLineCount": 10,
-  // Tabキーで補完候補を確定（デフォルト: "off"）
-  "editor.tabCompletion": "on",
-  // タブサイズを2スペースに（デフォルト: 4）
+  // スティッキースクロールを水平スクロールに追従させる（既定値）
+  "editor.stickyScroll.scrollWithEditor": true,
+  // スペースインデントでもタブストップ単位で選択を吸着（既定値）
+  "editor.stickyTabStops": false,
+  // Tabキーをフォーカス移動に使う（既定値）
+  "editor.tabFocusMode": false,
+  // タブ幅（デフォルト: 4）2スペース統一
   "editor.tabSize": 2,
-  // トークンカラーのカスタマイズ（ライト/ダークテーマでの検索マッチテキスト色）
+  // トークンカラーのカスタマイズ（デフォルト: {}）ライト/ダークテーマでの検索マッチテキスト色
   "editor.tokenColorCustomizations": {
     "[*Light*]": {
       "textMateRules": [
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#000",
-          },
-        },
-      ],
+            "foreground": "#000"
+          }
+        }
+      ]
     },
     "[*Dark*]": {
       "textMateRules": [
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#fff",
-          },
-        },
-      ],
-    },
+            "foreground": "#fff"
+          }
+        }
+      ]
+    }
   },
-  // 自動挿入された末尾空白のトリムを無効化（デフォルト: true）
+  // 自動挿入された末尾空白のトリム（デフォルト: true）意図しない差分を避けるため無効化
   "editor.trimAutoWhitespace": false,
-  // 単語分割に日本語ロケールを使用（日本語の単語境界を正しく認識）
+  // 改行削除時に次行のインデント空白も削除（既定値）
+  "editor.trimWhitespaceOnDelete": false,
+  // 折りたたまれた行の行末より後ろをクリックして展開（既定値）
+  "editor.unfoldOnClickAfterEndOfLine": false,
+  // Unicode強調表示から除外する文字（既定値）
+  "editor.unicodeHighlight.allowedCharacters": {},
+  // Unicode強調表示から除外するロケール（既定値）
+  "editor.unicodeHighlight.allowedLocales": {
+    "_os": true,
+    "_vscode": true
+  },
+  // ASCIIと紛らわしい文字を強調（既定値）
+  "editor.unicodeHighlight.ambiguousCharacters": true,
+  // コメント内もUnicode強調の対象にする（既定値）
+  "editor.unicodeHighlight.includeComments": "inUntrustedWorkspace",
+  // 文字列内もUnicode強調の対象にする（既定値）
+  "editor.unicodeHighlight.includeStrings": true,
+  // 幅を持たない不可視文字を強調（既定値）
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  // 非ASCII文字をすべて強調（既定値）
+  "editor.unicodeHighlight.nonBasicASCII": "inUntrustedWorkspace",
+  // 特殊な改行文字の除去を確認する（既定値）
+  "editor.unusualLineTerminators": "prompt",
+  // タブストップに合わせてスペースを挿入・削除（既定値）
+  "editor.useTabStops": true,
+  // 日本語・中国語・韓国語（CJK）の改行規則（既定値）
+  "editor.wordBreak": "normal",
+  // 単語分割に使うロケール（デフォルト: []）日本語の単語境界を正しく認識させる
   "editor.wordSegmenterLocales": ["ja"],
-  // ワードラップの列数（デフォルト: 80）
+  // 単語区切りとして扱う文字（既定値）
+  "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?",
+  // 行の折り返し（既定値）
+  "editor.wordWrap": "off",
+  // 折り返す桁数（デフォルト: 80）wordWrapが"wordWrapColumn"/"bounded"の時に作用
   "editor.wordWrapColumn": 100,
+  // 文字列中の \n で折り返す（既定値）
+  "editor.wrapOnEscapedLineFeeds": false,
+  // 折り返し行のインデント（既定値）
+  "editor.wrappingIndent": "same",
+  // 折り返し位置の計算アルゴリズム（既定値）
+  "editor.wrappingStrategy": "simple",
 
   // =============================================
   // Text Editor > Cursor - カーソル
   // =============================================
 
-  // カーソルの点滅スタイルをスムーズアニメーションに（デフォルト: "blink"）
+  // カーソルの点滅スタイル（デフォルト: "blink"）滑らかなアニメーションにする
   "editor.cursorBlinking": "smooth",
-  // カーソル周辺に常に20行の表示を確保（デフォルト: 0）スクロール位置が安定する
+  // カーソルの高さ（既定値）cursorStyleが"line"の時に作用。0で行高に合わせる
+  "editor.cursorHeight": 0,
+  // カーソル移動時のスムーズアニメーション（既定値）
+  "editor.cursorSmoothCaretAnimation": "off",
+  // 挿入モード時のカーソル形状（既定値）
+  "editor.cursorStyle": "line",
+  // カーソル周辺に確保する表示行数（デフォルト: 0）スクロール位置を安定させるため
   "editor.cursorSurroundingLines": 20,
-  // カーソルの幅を2pxに設定
+  // cursorSurroundingLinesを適用する条件（既定値）
+  "editor.cursorSurroundingLinesStyle": "default",
+  // カーソルの幅（デフォルト: 0=自動）視認性のため2pxに固定
   "editor.cursorWidth": 2,
+
+  // =============================================
+  // Text Editor > Find - 検索
+  // =============================================
+
+  // 検索ウィジェット表示時にエディタ上部へ余白を追加（既定値）
+  "editor.find.addExtraSpaceOnTop": true,
+  // 選択範囲内検索を自動で有効にする条件（既定値）
+  "editor.find.autoFindInSelection": "never",
+  // 検索結果に到達したら検索ウィジェットを閉じる（既定値）
+  "editor.find.closeOnResult": false,
+  // 入力中にカーソルを一致箇所へ移動（既定値）
+  "editor.find.cursorMoveOnType": true,
+  // 入力しながら逐次検索（既定値）
+  "editor.find.findOnType": true,
+  // macOSの共有検索クリップボードを使用（デフォルト: false）他アプリと検索文字列を共有するため
+  "editor.find.globalFindClipboard": true,
+  // 検索履歴の保存単位（既定値）
+  "editor.find.history": "workspace",
+  // 末尾まで到達したら先頭から検索し直す（既定値）
+  "editor.find.loop": true,
+  // 置換履歴の保存単位（既定値）
+  "editor.find.replaceHistory": "workspace",
+  // 選択中のテキストを検索文字列の初期値にする（既定値）
+  "editor.find.seedSearchStringFromSelection": "always",
 
   // =============================================
   // Text Editor > Font - フォント
   // =============================================
 
-  // フォントファミリー（Fira Codeを優先使用）
+  // フォントファミリー（デフォルト: "Menlo, Monaco, 'Courier New', monospace"）
   // ブラウザ側にFira Codeが無い場合は後続のフォントにフォールバックする。
-  // `csctl font install` を実行するとcode-server自身がWebフォントとして
-  // 配信するようになり、iPadなどフォント未導入の端末でも適用される
+  // `csctl font install` を実行するとcode-server自身がWebフォントとして配信するため、
+  // iPadなどフォント未導入の端末でも適用される
   "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
   // フォント合字を有効化（デフォルト: false）=> → ≠ などの合字表示
   "editor.fontLigatures": true,
   // フォントサイズ（デフォルト: 12px）
   "editor.fontSize": 11.5,
+  // バリアブルフォントの font-variation-settings（既定値）
+  "editor.fontVariations": false,
+  // フォントの太さ（既定値）
+  "editor.fontWeight": "normal",
+  // 文字間隔（既定値）
+  "editor.letterSpacing": 0,
+  // 行の高さ（既定値）0はフォントサイズから自動計算
+  "editor.lineHeight": 0,
 
   // =============================================
   // Text Editor > Formatting - 書式設定
   // =============================================
-  // 既定のフォーマッターは指定しない（拡張機能に依存するため）。
-  // JSON・HTML・CSS・JS/TSは組み込みのフォーマッターが動作する
 
   // ペースト時に自動フォーマット（デフォルト: false）
   "editor.formatOnPaste": true,
   // 保存時に自動フォーマット（デフォルト: false）
   "editor.formatOnSave": true,
+  // 保存時フォーマットの対象範囲（既定値）ファイル全体をフォーマットする
+  "editor.formatOnSaveMode": "file",
   // 入力時に自動フォーマット（デフォルト: false）
   "editor.formatOnType": true,
+
+  // =============================================
+  // Text Editor > Diff Editor - 差分エディタ
+  // =============================================
+
+  // 差分エディタでCodeLensを表示（デフォルト: false）
+  "diffEditor.codeLens": true,
+  // 差分計算アルゴリズム（既定値）
+  "diffEditor.diffAlgorithm": "advanced",
+  // 挿入・削除位置を示す空の装飾を表示（実験的機能・既定値）
+  "diffEditor.experimental.showEmptyDecorations": true,
+  // 検出したコードの移動を表示（実験的機能・既定値）
+  "diffEditor.experimental.showMoves": false,
+  // インライン表示時に単語単位の変更をインライン描画（実験的機能・既定値）
+  "diffEditor.experimental.useTrueInlineView": false,
+  // 変更なし領域を折りたたむ際に残す前後の行数（既定値）
+  "diffEditor.hideUnchangedRegions.contextLineCount": 3,
+  // 変更のない領域を折りたたんで非表示にする（デフォルト: false）差分に集中するため
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  // 折りたたむ最小行数（デフォルト: 3）細切れの折りたたみを避けるため
+  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
+  // 折りたたみを展開する際に一度に表示する行数（既定値）
+  "diffEditor.hideUnchangedRegions.revealLineCount": 20,
+  // 前後の空白のみの差分を無視する（デフォルト: true）空白の変更も検知したいため無効化
+  "diffEditor.ignoreTrimWhitespace": false,
+  // 差分計算のタイムアウト（既定値）0で無制限
+  "diffEditor.maxComputationTime": 5000,
+  // 差分を計算する最大ファイルサイズ（デフォルト: 50MB）大きめのファイルも比較できるように
+  "diffEditor.maxFileSize": 100,
+  // 取り消し・ステージ操作用のガター（余白領域）を表示（既定値）
+  "diffEditor.renderGutterMenu": true,
+  // 追加・削除の +/- インジケーターを表示（既定値）
+  "diffEditor.renderIndicators": true,
+  // グリフマージンに変更を戻す矢印を表示（既定値）
+  "diffEditor.renderMarginRevertIcon": true,
+  // 差分をサイドバイサイドで表示（既定値）
+  "diffEditor.renderSideBySide": true,
+  // サイドバイサイドからインライン表示に切り替える幅（デフォルト: 900px）
+  "diffEditor.renderSideBySideInlineBreakpoint": 1000,
+  // 幅が狭い場合にインライン表示へ切り替える（既定値）
+  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
+  // 差分エディタの折り返し（既定値）エディタ本体の設定を継承する
+  "diffEditor.wordWrap": "inherit",
 
   // =============================================
   // Text Editor > Minimap - ミニマップ（右側のファイル全体プレビュー）
   // =============================================
 
-  // ミニマップの最大列数（デフォルト: 120）
+  // ミニマップの自動非表示（既定値）
+  "editor.minimap.autohide": "none",
+  // ミニマップを表示（既定値）
+  "editor.minimap.enabled": true,
+  // セクションヘッダーとして扱うコメントの正規表現（既定値）
+  "editor.minimap.markSectionHeaderRegex": "\\bMARK:\\s*(?<separator>-?)\\s*(?<label>.*)$",
+  // ミニマップの最大列数（デフォルト: 120）横幅を取りすぎないよう制限
   "editor.minimap.maxColumn": 80,
-  // セクションヘッダーの文字間隔（デフォルト: 1）
+  // 色ブロックではなく実際の文字を描画（既定値）
+  "editor.minimap.renderCharacters": true,
+  // ミニマップの描画倍率（既定値）
+  "editor.minimap.scale": 1,
+  // セクションヘッダーのフォントサイズ（既定値）
+  "editor.minimap.sectionHeaderFontSize": 9,
+  // セクションヘッダーの文字間隔（デフォルト: 1）小さい文字でも読めるように広げる
   "editor.minimap.sectionHeaderLetterSpacing": 2,
-  // ミニマップのスライダーを常に表示（デフォルト: "mouseover"）
+  // MARK: コメントをセクションヘッダーとして表示（既定値）
+  "editor.minimap.showMarkSectionHeaders": true,
+  // #region をセクションヘッダーとして表示（既定値）
+  "editor.minimap.showRegionSectionHeaders": true,
+  // ミニマップのスライダーを常に表示（デフォルト: "mouseover"）現在位置を常に把握するため
   "editor.minimap.showSlider": "always",
+  // ミニマップを表示する側（既定値）
+  "editor.minimap.side": "right",
+  // ミニマップのサイズ調整方法（既定値）
+  "editor.minimap.size": "proportional",
 
   // =============================================
   // Text Editor > Suggestions - 補完候補
   // =============================================
 
-  // 補完候補の選択方法：最近使用かつプレフィックス一致を優先（デフォルト: "first"）
+  // コミット文字（JSの`;`など）で補完を確定（既定値）
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  // Enterキーでも補完を確定（既定値）
+  "editor.acceptSuggestionOnEnter": "on",
+  // インライン補完時にスクリーンリーダー向けヒントを出す（既定値）
+  "editor.inlineCompletionsAccessibilityVerbose": false,
+  // インライン補完の表示時にコードをずらして領域を確保（既定値）
+  "editor.inlineSuggest.edits.allowCodeShifting": "always",
+  // 大きなインライン補完をサイドバイサイド表示（既定値）
+  "editor.inlineSuggest.edits.renderSideBySide": "auto",
+  // ジャンプするまでインライン補完を折りたたんで表示（既定値）
+  "editor.inlineSuggest.edits.showCollapsed": false,
+  // 離れた位置へのインライン補完を表示（既定値）
+  "editor.inlineSuggest.edits.showLongDistanceHint": true,
+  // インライン補完（ゴーストテキスト）を自動表示（既定値）
+  "editor.inlineSuggest.enabled": true,
+  // インライン補完プロバイダーへリクエスト情報を送信（実験的機能・既定値）
+  "editor.inlineSuggest.experimental.emptyResponseInformation": true,
+  // 補完ウィジェットと競合する場合もインライン補完を表示（実験的機能・既定値）
+  "editor.inlineSuggest.experimental.showOnSuggestConflict": "never",
+  // インライン補完を抑制する拡張機能ID（実験的機能・既定値）カンマ区切り
+  "editor.inlineSuggest.experimental.suppressInlineSuggestions": "",
+  // インライン補完のフォントファミリー（既定値）
+  "editor.inlineSuggest.fontFamily": "default",
+  // 入力後にインライン補完を表示するまでの最小遅延（既定値）
+  "editor.inlineSuggest.minShowDelay": 0,
+  // インライン補完のツールバーを表示するタイミング（既定値）
+  "editor.inlineSuggest.showToolbar": "onHover",
+  // スニペット編集中はインライン補完を抑制（既定値）
+  "editor.inlineSuggest.suppressInSnippetMode": true,
+  // インライン補完がある時は補完ウィジェットを自動表示しない（既定値）
+  "editor.inlineSuggest.suppressSuggestions": false,
+  // インライン補完にシンタックスハイライトを適用（既定値）
+  "editor.inlineSuggest.syntaxHighlightingEnabled": true,
+  // インライン補完プロバイダーの切り替え時にコマンドを実行（既定値）
+  "editor.inlineSuggest.triggerCommandOnProviderChange": false,
+  // パラメータヒントを末尾で先頭に戻す循環表示にする（既定値）
+  "editor.parameterHints.cycle": true,
+  // 入力中に引数の説明・型情報をポップアップ表示（既定値）
+  "editor.parameterHints.enabled": true,
+  // 入力中に補完候補を自動表示する範囲（既定値）コメント・文字列内では出さない
+  "editor.quickSuggestions": {
+    "other": "offWhenInlineCompletions",
+    "comments": "off",
+    "strings": "off"
+  },
+  // 補完候補の自動表示までの遅延（既定値）
+  "editor.quickSuggestionsDelay": 10,
+  // スニペットを他の候補と一緒に表示する方法（既定値）
+  "editor.snippetSuggestions": "inline",
+  // 軽微なタイプミスを許容して候補を絞り込む（既定値）
+  "editor.suggest.filterGraceful": true,
+  // 補完確定時に後続の単語を上書きするか（既定値）"insert"は上書きしない
+  "editor.suggest.insertMode": "insert",
+  // カーソル近くに現れる単語を優先して並べる（既定値）
+  "editor.suggest.localityBonus": false,
+  // 先頭文字が単語の先頭に一致する候補のみ表示（既定値）
+  "editor.suggest.matchOnWordStartOnly": true,
+  // 補完結果をエディタ内にプレビュー表示（既定値）
+  "editor.suggest.preview": false,
+  // 補完ウィジェット表示時に候補を選択状態にする（既定値）
+  "editor.suggest.selectionMode": "always",
+  // 補完候補の選択履歴を複数ワークスペース間で共有（既定値）
+  "editor.suggest.shareSuggestSelections": false,
+  // クラスの候補を表示（既定値）
+  "editor.suggest.showClasses": true,
+  // 色の候補を表示（既定値）
+  "editor.suggest.showColors": true,
+  // 定数の候補を表示（既定値）
+  "editor.suggest.showConstants": true,
+  // コンストラクタの候補を表示（既定値）
+  "editor.suggest.showConstructors": true,
+  // カスタムカラーの候補を表示（既定値）
+  "editor.suggest.showCustomcolors": true,
+  // 列挙型メンバーの候補を表示（既定値）
+  "editor.suggest.showEnumMembers": true,
+  // 列挙型の候補を表示（既定値）
+  "editor.suggest.showEnums": true,
+  // イベントの候補を表示（既定値）
+  "editor.suggest.showEvents": true,
+  // フィールドの候補を表示（既定値）
+  "editor.suggest.showFields": true,
+  // ファイルの候補を表示（既定値）
+  "editor.suggest.showFiles": true,
+  // フォルダの候補を表示（既定値）
+  "editor.suggest.showFolders": true,
+  // 関数の候補を表示（既定値）
+  "editor.suggest.showFunctions": true,
+  // 補完候補にアイコンを表示（既定値）
+  "editor.suggest.showIcons": true,
+  // 候補の詳細をラベル横にインライン表示（既定値）
+  "editor.suggest.showInlineDetails": true,
+  // インターフェースの候補を表示（既定値）
+  "editor.suggest.showInterfaces": true,
+  // 課題（issue）の候補を表示（既定値）
+  "editor.suggest.showIssues": true,
+  // キーワードの候補を表示（既定値）
+  "editor.suggest.showKeywords": true,
+  // メソッドの候補を表示（既定値）
+  "editor.suggest.showMethods": true,
+  // モジュールの候補を表示（既定値）
+  "editor.suggest.showModules": true,
+  // 演算子の候補を表示（既定値）
+  "editor.suggest.showOperators": true,
+  // プロパティの候補を表示（既定値）
+  "editor.suggest.showProperties": true,
+  // 参照の候補を表示（既定値）
+  "editor.suggest.showReferences": true,
+  // スニペットの候補を表示（既定値）
+  "editor.suggest.showSnippets": true,
+  // 補完ウィジェット下部のステータスバーを表示（既定値）
+  "editor.suggest.showStatusBar": false,
+  // 構造体の候補を表示（既定値）
+  "editor.suggest.showStructs": true,
+  // 型パラメータの候補を表示（既定値）
+  "editor.suggest.showTypeParameters": true,
+  // 単位の候補を表示（既定値）
+  "editor.suggest.showUnits": true,
+  // ユーザーの候補を表示（既定値）
+  "editor.suggest.showUsers": true,
+  // 値の候補を表示（既定値）
+  "editor.suggest.showValues": true,
+  // 変数の候補を表示（既定値）
+  "editor.suggest.showVariables": true,
+  // ドキュメント内の単語（テキスト）候補を表示（既定値）
+  "editor.suggest.showWords": true,
+  // スニペット編集中に補完候補の自動表示を抑制（既定値）
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  // 補完ウィジェットのフォントサイズ（既定値）0はeditor.fontSizeを使う
+  "editor.suggestFontSize": 0,
+  // 補完ウィジェットの行の高さ（既定値）0はeditor.lineHeightを使う
+  "editor.suggestLineHeight": 0,
+  // トリガー文字（`.`など）の入力で補完を自動表示（既定値）
+  "editor.suggestOnTriggerCharacters": true,
+  // 補完候補の初期選択（デフォルト: "first"）入力したプレフィックスで最近使ったものを優先
   "editor.suggestSelection": "recentlyUsedByPrefix",
+  // Tabキーで補完候補を確定（デフォルト: "off"）
+  "editor.tabCompletion": "on",
+  // ドキュメント内の単語を元にした補完（既定値）インライン補完がある時は無効
+  "editor.wordBasedSuggestions": "offWithInlineSuggestions",
 
   // =============================================
-  // Diff Editor - 差分エディタ
+  // Text Editor > Files - ファイル
   // =============================================
 
-  // 差分エディタでCodeLensを表示（デフォルト: false）
-  "diffEditor.codeLens": true,
-  // 変更のない領域を折りたたんで非表示にする（デフォルト: false）
-  "diffEditor.hideUnchangedRegions.enabled": true,
-  // 折りたたむ最小行数（デフォルト: 3）
-  "diffEditor.hideUnchangedRegions.minimumLineCount": 10,
-  // 末尾空白の差分を無視しない（デフォルト: true=無視する）
-  "diffEditor.ignoreTrimWhitespace": false,
-  // 差分計算の最大ファイルサイズ（デフォルト: 50MB）
-  "diffEditor.maxFileSize": 100,
-  // サイドバイサイド表示からインライン表示に切り替える幅（デフォルト: 900px）
-  "diffEditor.renderSideBySideInlineBreakpoint": 1000,
-
-  // =============================================
-  // Files - ファイル
-  // =============================================
-
+  // 拡張子と言語の関連付け（既定値）プロジェクト側で指定する運用
+  "files.associations": {},
+  // ファイルを開く際に文字コードを推測する（既定値）
+  "files.autoGuessEncoding": false,
   // フォーカスが外れた時にファイルを自動保存（デフォルト: "off"）
   "files.autoSave": "onFocusChange",
+  // 自動保存までの遅延（既定値）autoSaveが"afterDelay"の時のみ作用
+  "files.autoSaveDelay": 1000,
+  // エラーがない時だけ自動保存する（既定値）
+  "files.autoSaveWhenNoErrors": false,
+  // ワークスペース内のファイルのみ自動保存する（既定値）
+  "files.autoSaveWorkspaceFilesOnly": false,
+  // 文字コード推測時に候補とするエンコーディング（既定値）
+  "files.candidateGuessEncodings": [],
+  // 新規ファイルに割り当てる言語（既定値）
+  "files.defaultLanguage": "",
+  // ファイルダイアログの既定パス（既定値）
+  "files.dialog.defaultPath": "",
+  // 削除時にゴミ箱へ移動する（既定値）falseにすると完全削除になるため変更しない
+  "files.enableTrash": true,
+  // 読み書き時の既定文字コード（既定値）
+  "files.encoding": "utf8",
+  // 既定の改行コード（既定値）"auto"はOS依存（macOSではLF）
+  "files.eol": "auto",
+  // エクスプローラー等で非表示にするファイル（既定値）
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  // 未保存ファイルをセッション間で保持する（既定値）
+  "files.hotExit": "onExit",
+  // 保存時にファイル末尾へ改行を挿入（既定値）※Prettierに任せるため有効化しない
+  "files.insertFinalNewline": false,
+  // ファイル作成・リネーム・削除の参加者処理のタイムアウト（既定値）
+  "files.participants.timeout": 60000,
+  // 読み取り専用マークから除外するパス（既定値）
+  "files.readonlyExclude": {},
+  // ファイルのパーミッションに従って読み取り専用にする（既定値）
+  "files.readonlyFromPermissions": false,
+  // 読み取り専用としてマークするパス（既定値）
+  "files.readonlyInclude": {},
+  // リファクタリングで変更されたファイルを自動保存（既定値）
+  "files.refactoring.autoSave": true,
+  // ファイルを再度開いた時にundo履歴を復元（既定値）
+  "files.restoreUndoStack": true,
+  // 保存の競合が起きた時の挙動（既定値）データ損失を防ぐため確認する
+  "files.saveConflictResolution": "askUser",
+  // OS標準ではなく簡易ファイルダイアログを使う（既定値）
+  "files.simpleDialog.enable": false,
+  // 保存時に末尾の余分な改行を削除（既定値）※Prettierに任せるため有効化しない
+  "files.trimFinalNewlines": false,
+  // 保存時に行末の空白を削除（既定値）※Prettierに任せるため有効化しない
+  "files.trimTrailingWhitespace": false,
+  // 複数行文字列・正規表現内の行末空白も削除対象にする（既定値）
+  "files.trimTrailingWhitespaceInRegexAndStrings": true,
+  // ファイル監視から除外するパス（既定値）
+  "files.watcherExclude": {
+    ".git/objects/**": true,
+    ".git/subtree-cache/**": true,
+    ".hg/store/**": true,
+    "*/.git/objects/**": true,
+    "*/.git/subtree-cache/**": true,
+    "*/.hg/store/**": true
+  },
+  // ファイル監視に追加するパス（既定値）シンボリックリンク先を監視したい場合に指定
+  "files.watcherInclude": [],
 
   // =============================================
-  // Workbench - ワークベンチ
+  // Workbench > Appearance - 外観
   // =============================================
 
-  // カラーテーマ（VS Code組み込みのMonokai。拡張機能不要）
+  // 表示するビューが1つだけの時にアクティビティバーを自動的に隠す（既定値）
+  "workbench.activityBar.autoHide": false,
+  // アクティビティバーをコンパクト表示にする（既定値）
+  "workbench.activityBar.compact": false,
+  // アクティビティバーのアイコンをクリックした時の挙動（既定値）
+  "workbench.activityBar.iconClickBehavior": "toggle",
+  // アクティビティバーの表示位置（既定値）
+  "workbench.activityBar.location": "default",
+  // クラウドに保存した作業中の変更を自動復元（既定値）
+  "workbench.cloudChanges.autoResume": "onReload",
+  // 「別の場所で続行」時にクラウド保存を確認する（既定値）
+  "workbench.cloudChanges.continueOn": "prompt",
+  // カラーテーマの色の上書き（既定値）テーマ側の配色をそのまま使う
+  "workbench.colorCustomizations": {},
+  // カラーテーマ（デフォルト: "Dark 2026"）VS Code組み込みのMonokai。拡張機能不要
   "workbench.colorTheme": "Monokai",
-  // アイコンテーマ（組み込みのSeti）
+  // コマンドパレットからチャットに質問する際の表示先（実験的機能・既定値）
+  "workbench.commandPalette.experimental.askChatLocation": "chatView",
+  // コマンドパレットの自然言語検索（実験的機能・既定値）
+  "workbench.commandPalette.experimental.enableNaturalLanguageSearch": true,
+  // コマンドパレットによく使うコマンドを提示（実験的機能・既定値）
+  "workbench.commandPalette.experimental.suggestCommands": false,
+  // コマンドパレットの履歴保持件数（既定値）0で履歴無効
+  "workbench.commandPalette.history": 50,
+  // コマンドパレットの入力内容を次回に復元（既定値）
+  "workbench.commandPalette.preserveInput": false,
+  // コマンドパレット下部に「チャットで質問」を表示（既定値）
+  "workbench.commandPalette.showAskInChat": true,
+  // Microsoftのオンラインサービスから実験的機能の設定を取得（既定値）
+  "workbench.enableExperiments": true,
+  // 作業中の変更をクラウドへ自動保存（実験的機能・既定値）
+  "workbench.experimental.cloudChanges.autoStore": "off",
+  // 部分一致するクラウド上の変更も提示（実験的機能・既定値）
+  "workbench.experimental.cloudChanges.partialMatches.enabled": false,
+  // コマンドセンター横に共有アクションを表示（実験的機能・既定値）
+  "workbench.experimental.share.enabled": false,
+  // 外部URI（http/https）を開くアプリの指定（既定値）
+  "workbench.externalUriOpeners": {},
+  // ワークベンチのフォントアンチエイリアス方式（既定値）
+  "workbench.fontAliasing": "default",
+  // ワークベンチ項目のホバー表示までの遅延（既定値）
+  "workbench.hover.delay": 1500,
+  // 素早い反応が望ましい場面でのホバー遅延（既定値）
+  "workbench.hover.reducedDelay": 500,
+  // アイコンテーマ（既定値）組み込みのSeti
   "workbench.iconTheme": "vs-seti",
-  // タブのプレビューモードを無効化（デフォルト: true）シングルクリックでもタブを確定的に開く
+  // タイトルバーにレイアウト切り替えコントロールを表示（既定値）
+  "workbench.layoutControl.enabled": true,
+  // レイアウトコントロールの表示形式（既定値）
+  "workbench.layoutControl.type": "both",
+  // リスト・ツリー検索時の一致方式（既定値）
+  "workbench.list.defaultFindMatchType": "fuzzy",
+  // リスト・ツリーの既定の検索モード（既定値）
+  "workbench.list.defaultFindMode": "highlight",
+  // リスト・ツリーでAlt+スクロール時の高速スクロール倍率（既定値）
+  "workbench.list.fastScrollSensitivity": 5,
+  // リスト・ツリーの水平スクロール（既定値）有効にすると描画負荷が増える
+  "workbench.list.horizontalScrolling": false,
+  // リスト・ツリーのマウスホイールのスクロール量倍率（既定値）
+  "workbench.list.mouseWheelScrollSensitivity": 1,
+  // リスト・ツリーで複数選択する際の修飾キー（既定値）
+  "workbench.list.multiSelectModifier": "ctrlCmd",
+  // リスト・ツリーの項目を開く操作（既定値）
+  "workbench.list.openMode": "singleClick",
+  // スクロールバークリック時にページ単位でスクロール（既定値）
+  "workbench.list.scrollByPage": false,
+  // リスト・ツリーのスムーズスクロール（既定値）
+  "workbench.list.smoothScrolling": false,
+  // リスト・ツリーで文字入力による移動の動作（既定値）
+  "workbench.list.typeNavigationMode": "automatic",
+  // ローカル履歴（保存のたびに内容をバックアップ）を有効化（既定値）
+  "workbench.localHistory.enabled": true,
+  // ローカル履歴から除外するパス（既定値）
+  "workbench.localHistory.exclude": {},
+  // ファイルあたりのローカル履歴の最大保持数（既定値）
+  "workbench.localHistory.maxFileEntries": 50,
+  // ローカル履歴の対象とする最大ファイルサイズ（既定値・KB単位）
+  "workbench.localHistory.maxFileSize": 256,
+  // この秒数以内の連続保存はローカル履歴を上書きする（既定値）自動保存で履歴が増えすぎるのを防ぐ
+  "workbench.localHistory.mergeWindow": 10,
+  // タイトルバーにナビゲーションコントロールを表示（既定値）
+  "workbench.navigationControl.enabled": true,
+  // 通知トースト・通知センターの表示位置（既定値）
+  "workbench.notifications.position": "bottom-right",
+  // タイトルバーに通知ボタンを表示（既定値）通知が右上配置の時のみ作用
+  "workbench.notifications.showInTitleBar": true,
+  // パネル（ターミナル・出力・問題）の既定位置（既定値）
+  "workbench.panel.defaultLocation": "bottom",
+  // パネルを最大化した状態で開く（既定値）
+  "workbench.panel.opensMaximized": "preserve",
+  // パネルのタイトルをアイコンではなくラベルで表示（既定値）
+  "workbench.panel.showLabels": true,
+  // OSがダークモードの時のテーマ（既定値）window.autoDetectColorSchemeが有効な時のみ作用
+  "workbench.preferredDarkColorTheme": "Dark 2026",
+  // ハイコントラスト（ダーク）時のテーマ（既定値）
+  "workbench.preferredHighContrastColorTheme": "Default High Contrast",
+  // ハイコントラスト（ライト）時のテーマ（既定値）
+  "workbench.preferredHighContrastLightColorTheme": "Default High Contrast Light",
+  // OSがライトモードの時のテーマ（既定値）window.autoDetectColorSchemeが有効な時のみ作用
+  "workbench.preferredLightColorTheme": "Light 2026",
+  // プロダクトアイコンテーマ（UIアイコンのテーマ）（既定値）
+  "workbench.productIconTheme": "Default",
+  // クイックオープンをフォーカスが外れた時に閉じる（既定値）
+  "workbench.quickOpen.closeOnFocusLost": true,
+  // クイックオープンの入力内容を次回に復元（既定値）
+  "workbench.quickOpen.preserveInput": false,
+  // アニメーションを減らす（既定値）"auto"はOSの設定に従う
+  "workbench.reduceMotion": "auto",
+  // 透明・ぼかし効果を減らす（既定値）
+  "workbench.reduceTransparency": "off",
+  // リモートインジケーターに拡張機能の推奨を表示（既定値）
+  "workbench.remoteIndicator.showExtensionRecommendations": true,
+  // ビュー間のドラッグ領域のホバー反応遅延（既定値）
+  "workbench.sash.hoverDelay": 300,
+  // ビュー間のドラッグ領域の幅（既定値）掴みにくい場合は大きくする
+  "workbench.sash.size": 4,
+  // セカンダリサイドバーの初回表示状態（既定値）
+  "workbench.secondarySideBar.defaultVisibility": "visibleInWorkspace",
+  // セカンダリサイドバーを常に最大化して表示（既定値）
+  "workbench.secondarySideBar.forceMaximized": false,
+  // セカンダリサイドバーのタイトルをラベル表示（既定値）
+  "workbench.secondarySideBar.showLabels": true,
+  // プライマリサイドバーとアクティビティバーの表示位置（既定値）
+  "workbench.sideBar.location": "left",
+  // 起動時に開くエディタ（既定値）
+  "workbench.startupEditor": "welcomePage",
+  // 画面下部のステータスバーを表示（既定値）
+  "workbench.statusBar.visible": true,
+  // エディタ未表示時にキーバインドのヒントを表示（既定値）
+  "workbench.tips.enabled": true,
+  // ツリーのスティッキースクロール（親階層の固定表示）（既定値）
+  "workbench.tree.enableStickyScroll": true,
+  // ツリーのフォルダ名クリック時の展開動作（既定値）
+  "workbench.tree.expandMode": "singleClick",
+  // ツリーのインデント幅（既定値）
+  "workbench.tree.indent": 8,
+  // ツリーのインデントガイドの表示（既定値）
+  "workbench.tree.renderIndentGuides": "onHover",
+  // ツリーのスティッキースクロールで固定する最大要素数（既定値）
+  "workbench.tree.stickyScrollMaxItemCount": 7,
+  // 信頼済みワークスペースでもリンクを開く際に確認する（既定値）
+  "workbench.trustedDomains.promptInTrustedWorkspace": false,
+  // ビューのヘッダーアクションを常に表示（既定値）
+  "workbench.view.alwaysShowHeaderActions": false,
+  // 拡張機能がビュー表示を要求した際にステータスバー通知に留める対象（既定値）
+  "workbench.view.showQuietly": {},
+  // 拡張機能のインストール時にウォークスルーを開く（既定値）
+  "workbench.welcomePage.walkthroughs.openOnInstall": true,
+
+  // =============================================
+  // Workbench > Breadcrumbs - パンくずリスト
+  // =============================================
+
+  // パンくずリストを有効化（既定値）
+  "breadcrumbs.enabled": true,
+  // パンくずリストにファイルパスを表示（既定値）
+  "breadcrumbs.filePath": "on",
+  // パンくずリストの項目にアイコンを表示（既定値）
+  "breadcrumbs.icons": true,
+  // 配列シンボルを表示（既定値）
+  "breadcrumbs.showArrays": true,
+  // 真偽値シンボルを表示（既定値）
+  "breadcrumbs.showBooleans": true,
+  // クラスシンボルを表示（既定値）
+  "breadcrumbs.showClasses": true,
+  // 定数シンボルを表示（既定値）
+  "breadcrumbs.showConstants": true,
+  // コンストラクタシンボルを表示（既定値）
+  "breadcrumbs.showConstructors": true,
+  // 列挙型メンバーシンボルを表示（既定値）
+  "breadcrumbs.showEnumMembers": true,
+  // 列挙型シンボルを表示（既定値）
+  "breadcrumbs.showEnums": true,
+  // イベントシンボルを表示（既定値）
+  "breadcrumbs.showEvents": true,
+  // フィールドシンボルを表示（既定値）
+  "breadcrumbs.showFields": true,
+  // ファイルシンボルを表示（既定値）
+  "breadcrumbs.showFiles": true,
+  // 関数シンボルを表示（既定値）
+  "breadcrumbs.showFunctions": true,
+  // インターフェースシンボルを表示（既定値）
+  "breadcrumbs.showInterfaces": true,
+  // キーシンボルを表示（既定値）
+  "breadcrumbs.showKeys": true,
+  // メソッドシンボルを表示（既定値）
+  "breadcrumbs.showMethods": true,
+  // モジュールシンボルを表示（既定値）
+  "breadcrumbs.showModules": true,
+  // 名前空間シンボルを表示（既定値）
+  "breadcrumbs.showNamespaces": true,
+  // nullシンボルを表示（既定値）
+  "breadcrumbs.showNull": true,
+  // 数値シンボルを表示（既定値）
+  "breadcrumbs.showNumbers": true,
+  // オブジェクトシンボルを表示（既定値）
+  "breadcrumbs.showObjects": true,
+  // 演算子シンボルを表示（既定値）
+  "breadcrumbs.showOperators": true,
+  // パッケージシンボルを表示（既定値）
+  "breadcrumbs.showPackages": true,
+  // プロパティシンボルを表示（既定値）
+  "breadcrumbs.showProperties": true,
+  // 文字列シンボルを表示（既定値）
+  "breadcrumbs.showStrings": true,
+  // 構造体シンボルを表示（既定値）
+  "breadcrumbs.showStructs": true,
+  // 型パラメータシンボルを表示（既定値）
+  "breadcrumbs.showTypeParameters": true,
+  // 変数シンボルを表示（既定値）
+  "breadcrumbs.showVariables": true,
+  // パンくずリストにシンボルのパスを表示（既定値）
+  "breadcrumbs.symbolPath": "on",
+  // シンボルパスをコピーする際の区切り文字（既定値）
+  "breadcrumbs.symbolPathSeparator": ".",
+  // パンくずリスト内のシンボルの並び順（既定値）出現位置順
+  "breadcrumbs.symbolSortOrder": "position",
+
+  // =============================================
+  // Workbench > Editor Management - エディタ管理
+  // =============================================
+
+  // エディタグループが非アクティブでもエディタアクションを常に表示（既定値）
+  "workbench.editor.alwaysShowEditorActions": false,
+  // 中央寄せレイアウトで複数グループを開いた際に自動で最大幅にする（既定値）
+  "workbench.editor.centeredLayoutAutoResize": true,
+  // 中央寄せレイアウトでウィンドウのリサイズ時も幅を保つ（既定値）
+  "workbench.editor.centeredLayoutFixedWidth": false,
+  // 最後のタブを閉じた際に空のエディタグループを自動的に閉じる（既定値）
+  "workbench.editor.closeEmptyGroups": true,
+  // 外部プロセスでファイルが削除・リネームされた際にエディタを閉じる（既定値）
+  "workbench.editor.closeOnFileDelete": false,
+  // カスタムのエディタラベルを適用する（既定値）
+  "workbench.editor.customLabels.enabled": true,
+  // エディタラベルのカスタムパターン（既定値）
+  "workbench.editor.customLabels.patterns": {},
+  // エディタのファイル装飾にバッジを使う（既定値）
+  "workbench.editor.decorations.badges": true,
+  // エディタのファイル装飾に色を使う（既定値）
+  "workbench.editor.decorations.colors": true,
+  // バイナリと判定されたファイルの既定エディタ（既定値）空は選択ダイアログを出す
+  "workbench.editor.defaultBinaryEditor": "",
+  // タブをダブルクリックした際のエディタグループのサイズ変更（既定値）
+  "workbench.editor.doubleClickTabToToggleEditorGroupSizes": "expand",
+  // エディタをウィンドウ外へドラッグして新規ウィンドウで開く（既定値）
+  "workbench.editor.dragToOpenWindow": true,
+  // エディタアクションの表示位置（既定値）
+  "workbench.editor.editorActionsLocation": "default",
+  // 空のエディタに操作ヒントを表示（既定値）
+  "workbench.editor.empty.hint": "text",
+  // タブのプレビューモード（デフォルト: true）シングルクリックでもタブを確定的に開くため無効化
   "workbench.editor.enablePreview": false,
+  // コードジャンプ元のエディタをプレビューのままにする（既定値）
+  "workbench.editor.enablePreviewFromCodeNavigation": false,
+  // クイックオープンから開いたエディタをプレビューにする（既定値）
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  // エディタを閉じた後に直近使用したエディタへフォーカスする（既定値）
+  "workbench.editor.focusRecentEditorAfterClose": true,
+  // 未保存の変更があるタブに上線を表示（既定値）
+  "workbench.editor.highlightModifiedTabs": false,
+  // 言語自動判定にエディタの履歴を利用する（既定値）
+  "workbench.editor.historyBasedLanguageDetection": true,
+  // エディタのラベル書式（既定値）
+  "workbench.editor.labelFormat": "default",
+  // 内容からエディタの言語を自動判定する（既定値）
+  "workbench.editor.languageDetection": true,
+  // 判定言語と設定言語が異なる場合にステータスバーへ修正候補を出す（既定値）
+  "workbench.editor.languageDetectionHints": {
+    "untitledEditors": true,
+    "notebookEditors": true
+  },
+  // 同時に開けるエディタ数を制限する（既定値）
+  "workbench.editor.limit.enabled": false,
+  // エディタ数の制限から未保存のエディタを除外する（既定値）
+  "workbench.editor.limit.excludeDirty": false,
+  // エディタ数の制限をグループ単位で適用する（既定値）
+  "workbench.editor.limit.perEditorGroup": false,
+  // 同時に開けるエディタ数の上限（既定値）limit.enabledが有効な時のみ作用
+  "workbench.editor.limit.value": 10,
+  // マウスの第4・第5ボタンで「戻る／進む」を実行（既定値）
+  "workbench.editor.mouseBackForwardToNavigate": true,
+  // 「戻る／進む」の履歴ナビゲーションの範囲（既定値）
+  "workbench.editor.navigationScope": "default",
+  // 新しいエディタを開く位置（既定値）アクティブなエディタの右隣
+  "workbench.editor.openPositioning": "right",
+  // 横に並べて開く際の方向（既定値）
+  "workbench.editor.openSideBySideDirection": "right",
+  // ピン留めタブのサイズ（既定値）
+  "workbench.editor.pinnedTabSizing": "normal",
+  // ピン留めタブを別の行に表示（既定値）
+  "workbench.editor.pinnedTabsOnSeparateRow": false,
+  // 履歴を考慮した言語判定モデルを優先する（既定値）
+  "workbench.editor.preferHistoryBasedLanguageDetection": false,
+  // ピン留めしたエディタをキーボード・中クリックで閉じさせない（既定値）
+  "workbench.editor.preventPinnedEditorClose": "keyboardAndMouse",
+  // 起動時に前回のエディタを復元（既定値）
+  "workbench.editor.restoreEditors": true,
+  // エディタを開き直した際にスクロール位置などを復元（既定値）
+  "workbench.editor.restoreViewState": true,
+  // 既に開いているエディタがあれば、そのグループを表示する（既定値）
+  "workbench.editor.revealIfOpen": false,
+  // タブ上のスクロールでエディタを切り替える（既定値）
+  "workbench.editor.scrollToSwitchTabs": false,
+  // 全エディタグループでスクロール位置などの状態を共有（既定値）
+  "workbench.editor.sharedViewState": false,
+  // エディタタブにアイコンを表示（既定値）アイコンテーマの有効化が必要
+  "workbench.editor.showIcons": true,
+  // タブに通し番号を表示（既定値）
+  "workbench.editor.showTabIndex": false,
+  // エディタタブの表示方法（既定値）
+  "workbench.editor.showTabs": "multiple",
+  // グループ内でエディタを分割する際のレイアウト（既定値）
+  "workbench.editor.splitInGroupLayout": "horizontal",
+  // 端へのドラッグ＆ドロップでエディタグループを分割（既定値）
+  "workbench.editor.splitOnDragAndDrop": true,
+  // 分割時のエディタグループのサイズ配分（既定値）
+  "workbench.editor.splitSizing": "auto",
+  // タブの閉じるボタンを表示（既定値）
+  "workbench.editor.tabActionCloseVisibility": true,
+  // タブの操作ボタン（閉じる・ピン解除）の位置（既定値）
+  "workbench.editor.tabActionLocation": "right",
+  // タブのピン解除ボタンを表示（既定値）
+  "workbench.editor.tabActionUnpinVisibility": true,
+  // エディタタブのサイズ調整方法（既定値）
+  "workbench.editor.tabSizing": "fit",
+  // tabSizingが"fixed"の時のタブ最大幅（既定値）
+  "workbench.editor.tabSizingFixedMaxWidth": 160,
+  // tabSizingが"fixed"の時のタブ最小幅（既定値）
+  "workbench.editor.tabSizingFixedMinWidth": 50,
+  // タイトル領域のスクロールバーの高さ（既定値）
+  "workbench.editor.titleScrollbarSizing": "default",
+  // タイトル領域のスクロールバーの表示（既定値）
+  "workbench.editor.titleScrollbarVisibility": "auto",
+  // 無題エディタのラベル書式（既定値）先頭行の内容を使う
+  "workbench.editor.untitled.labelFormat": "content",
+  // エディタをモーダルオーバーレイで開く（既定値）
+  "workbench.editor.useModal": "some",
+  // タブが収まらない時に折り返して複数行表示する（既定値）falseはスクロールバー表示
+  "workbench.editor.wrapTabs": false,
+  // ファイルパターンとエディタの関連付け（既定値）
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor"
+  },
+  // エディタで開く際に確認を出すファイルサイズの下限（既定値・MB単位）
+  "workbench.editorLargeFileConfirmation": 1024,
+
+  // =============================================
+  // Workbench > Outline - アウトライン
+  // =============================================
+
+  // アウトラインの項目を展開した状態にする（既定値）
+  "outline.collapseItems": "alwaysExpand",
+  // アウトラインの項目にアイコンを表示（既定値）
+  "outline.icons": true,
+  // アウトラインのエラー・警告をバッジで表示（既定値）
+  "outline.problems.badges": true,
+  // アウトラインのエラー・警告を色で表示（既定値）
+  "outline.problems.colors": true,
+  // アウトラインにエラー・警告を表示（既定値）
+  "outline.problems.enabled": true,
+  // 配列シンボルを表示（既定値）
+  "outline.showArrays": true,
+  // 真偽値シンボルを表示（既定値）
+  "outline.showBooleans": true,
+  // クラスシンボルを表示（既定値）
+  "outline.showClasses": true,
+  // 定数シンボルを表示（既定値）
+  "outline.showConstants": true,
+  // コンストラクタシンボルを表示（既定値）
+  "outline.showConstructors": true,
+  // 列挙型メンバーシンボルを表示（既定値）
+  "outline.showEnumMembers": true,
+  // 列挙型シンボルを表示（既定値）
+  "outline.showEnums": true,
+  // イベントシンボルを表示（既定値）
+  "outline.showEvents": true,
+  // フィールドシンボルを表示（既定値）
+  "outline.showFields": true,
+  // ファイルシンボルを表示（既定値）
+  "outline.showFiles": true,
+  // 関数シンボルを表示（既定値）
+  "outline.showFunctions": true,
+  // インターフェースシンボルを表示（既定値）
+  "outline.showInterfaces": true,
+  // キーシンボルを表示（既定値）
+  "outline.showKeys": true,
+  // メソッドシンボルを表示（既定値）
+  "outline.showMethods": true,
+  // モジュールシンボルを表示（既定値）
+  "outline.showModules": true,
+  // 名前空間シンボルを表示（既定値）
+  "outline.showNamespaces": true,
+  // nullシンボルを表示（既定値）
+  "outline.showNull": true,
+  // 数値シンボルを表示（既定値）
+  "outline.showNumbers": true,
+  // オブジェクトシンボルを表示（既定値）
+  "outline.showObjects": true,
+  // 演算子シンボルを表示（既定値）
+  "outline.showOperators": true,
+  // パッケージシンボルを表示（既定値）
+  "outline.showPackages": true,
+  // プロパティシンボルを表示（既定値）
+  "outline.showProperties": true,
+  // 文字列シンボルを表示（既定値）
+  "outline.showStrings": true,
+  // 構造体シンボルを表示（既定値）
+  "outline.showStructs": true,
+  // 型パラメータシンボルを表示（既定値）
+  "outline.showTypeParameters": true,
+  // 変数シンボルを表示（既定値）
+  "outline.showVariables": true,
+
+  // =============================================
+  // Workbench > Settings Editor - 設定エディタ
+  // =============================================
+
+  // @tag:advanced フィルタなしで詳細設定を常に表示（既定値）
+  "workbench.settings.alwaysShowAdvancedSettings": false,
+  // すべてのプロファイルに適用する設定（既定値）
+  "workbench.settings.applyToAllProfiles": [],
+  // 既定で使う設定エディタ（既定値）"ui"はGUI版
+  "workbench.settings.editor": "ui",
+  // 設定検索の自然言語モード（既定値）Microsoftのオンラインサービスを利用する
+  "workbench.settings.enableNaturalLanguageSearch": true,
+  // キーバインド設定を開く際に既定のキーバインド一覧も開く（既定値）
+  "workbench.settings.openDefaultKeybindings": false,
+  // 設定を開く際に既定の設定一覧も開く（既定値）
+  "workbench.settings.openDefaultSettings": false,
+  // 設定検索時の目次の挙動（既定値）
+  "workbench.settings.settingsSearchTocBehavior": "filter",
+  // 設定エディタの検索バーにAI検索の切り替えを表示（既定値）
+  "workbench.settings.showAISearchToggle": true,
+  // 設定をJSONで編集する際に分割エディタを使う（既定値）
+  "workbench.settings.useSplitJSON": false,
+
+  // =============================================
+  // Workbench > Zen Mode - 禅モード
+  // =============================================
+
+  // 禅モードでレイアウトを中央寄せにする（既定値）
+  "zenMode.centerLayout": true,
+  // 禅モードでフルスクリーンにする（既定値）
+  "zenMode.fullScreen": true,
+  // 禅モードでアクティビティバーを隠す（既定値）
+  "zenMode.hideActivityBar": true,
+  // 禅モードで行番号を隠す（既定値）
+  "zenMode.hideLineNumbers": true,
+  // 禅モードでステータスバーを隠す（既定値）
+  "zenMode.hideStatusBar": true,
+  // 禅モードのまま終了した場合、次回も禅モードで復元する（既定値）
+  "zenMode.restore": true,
+  // 禅モードでのエディタタブの表示（既定値）
+  "zenMode.showTabs": "multiple",
+  // 禅モード中は通知を抑制する（既定値）エラー通知のみ表示される
+  "zenMode.silentNotifications": true,
+
+  // =============================================
+  // Workbench > Screencast Mode - スクリーンキャストモード
+  // =============================================
+
+  // スクリーンキャストモードのキー表示のフォントサイズ（既定値）
+  "screencastMode.fontSize": 56,
+  // キーボードオーバーレイの表示項目（既定値）
+  "screencastMode.keyboardOptions": {
+    "showKeys": true,
+    "showKeybindings": true,
+    "showCommands": true,
+    "showCommandGroups": false,
+    "showSingleEditorCursorMoves": true
+  },
+  // キーボードオーバーレイの表示時間（既定値）
+  "screencastMode.keyboardOverlayTimeout": 800,
+  // マウスインジケーターの色（既定値）
+  "screencastMode.mouseIndicatorColor": "#FF0000",
+  // マウスインジケーターのサイズ（既定値）
+  "screencastMode.mouseIndicatorSize": 20,
+  // オーバーレイの下端からの縦位置（既定値・ワークベンチ高さに対する%）
+  "screencastMode.verticalOffset": 20,
+
+  // =============================================
+  // Window - ウィンドウ
+  // =============================================
+
+  // OSのカラーモードに応じてテーマを自動切り替え（既定値）
+  "window.autoDetectColorScheme": false,
+  // OSがハイコントラストの時にテーマを自動切り替え（既定値）
+  "window.autoDetectHighContrast": true,
+  // タイトルバーにコマンドセンター（検索窓）を表示（既定値）
+  "window.commandCenter": true,
+  // ウィンドウを閉じる・アプリ終了時に確認ダイアログを出す（既定値）
+  "window.confirmBeforeClose": "never",
+  // エディタタブの高さ（既定値）
+  "window.density.editorTabHeight": "default",
+  // 新規ウィンドウで使うプロファイル（既定値）nullはアクティブウィンドウのプロファイルを引き継ぐ
+  "window.newWindowProfile": null,
+  // コマンドラインやダイアログからファイルを新規ウィンドウで開く（既定値）
+  "window.openFilesInNewWindow": "off",
+  // フォルダを新規ウィンドウで開く（既定値）
+  "window.openFoldersInNewWindow": "default",
+  // ウィンドウタイトルの書式（既定値）
+  "window.title": "${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+  // window.title で使う区切り文字（既定値）
+  "window.titleSeparator": " — ",
+
+  // =============================================
+  // Features > Accessibility - アクセシビリティ
+  // =============================================
+  // editor.accessibilitySupport を "off" にしているため、
+  // 以下の大半は実際には作用しないが、アップデートでの既定変更を検知するために明示しておく
+
+  // キー入力でアクセシブルビューを閉じて呼び出し元へフォーカスを戻す（既定値）
+  "accessibility.accessibleView.closeOnKeyPress": true,
+  // チャット応答の完了したツール呼び出しにチェックマークを表示（既定値）
+  "accessibility.chat.showCheckmarks": false,
+  // デバッグのウォッチビューで変数の変化を読み上げる（既定値）
+  "accessibility.debugWatchVariableAnnouncements": true,
+  // フォーカスのないエディタ・ターミナルを暗くする（既定値）
+  "accessibility.dimUnfocused.enabled": false,
+  // 暗くする際の不透明度（既定値）dimUnfocused.enabledが有効な時のみ作用
+  "accessibility.dimUnfocused.opacity": 0.75,
+  // アクセシブルビューを非表示にする（既定値）
+  "accessibility.hideAccessibleView": false,
+  // チャットエージェントが編集したファイルを自動で開く（既定値）
+  "accessibility.openChatEditedFiles": false,
+  // REPLでコード実行時にフォーカスを送る先（既定値）
+  "accessibility.replEditor.autoFocusReplExecution": "input",
+  // REPLの実行結果を読み上げる（既定値）
+  "accessibility.replEditor.readLastExecutionOutput": true,
+  // カーソル位置の変化通知をデバウンスする（既定値）
+  "accessibility.signalOptions.debouncePositionChanges": false,
+  // カーソル位置のエラー通知の遅延（実験的機能・既定値）
+  "accessibility.signalOptions.experimental.delays.errorAtPosition": {},
+  // エラー・警告以外の全シグナルの遅延（実験的機能・既定値）
+  "accessibility.signalOptions.experimental.delays.general": {},
+  // カーソル位置の警告通知の遅延（実験的機能・既定値）
+  "accessibility.signalOptions.experimental.delays.warningAtPosition": {},
+  // シグナル音の音量（既定値・0〜100%）
+  "accessibility.signalOptions.volume": 70,
+  // チャット編集のあるファイルを開いた時の音（既定値）
+  "accessibility.signals.chatEditModifiedFile": { "sound": "auto" },
+  // チャットのリクエスト送信時の音・読み上げ（既定値）
+  "accessibility.signals.chatRequestSent": { "sound": "auto", "announcement": "auto" },
+  // チャットの応答受信時の音（既定値）
+  "accessibility.signals.chatResponseReceived": { "sound": "auto" },
+  // チャットでユーザー操作が必要になった時の音・読み上げ（既定値）
+  "accessibility.signals.chatUserActionRequired": { "sound": "auto", "announcement": "auto" },
+  // ターミナル・出力などをクリアした時の音・読み上げ（既定値）
+  "accessibility.signals.clear": { "sound": "auto", "announcement": "auto" },
+  // コードアクション適用時の音（既定値）
+  "accessibility.signals.codeActionApplied": { "sound": "auto" },
+  // コードアクション実行時の音（既定値）
+  "accessibility.signals.codeActionTriggered": { "sound": "auto" },
+  // 差分の削除行へ移動した時の音（既定値）
+  "accessibility.signals.diffLineDeleted": { "sound": "auto" },
+  // 差分の追加行へ移動した時の音（既定値）
+  "accessibility.signals.diffLineInserted": { "sound": "auto" },
+  // 差分の変更行へ移動した時の音（既定値）
+  "accessibility.signals.diffLineModified": { "sound": "auto" },
+  // 編集内容を保持した時の音・読み上げ（既定値）
+  "accessibility.signals.editsKept": { "sound": "auto", "announcement": "auto" },
+  // 編集内容を元に戻した時の音・読み上げ（既定値）
+  "accessibility.signals.editsUndone": { "sound": "auto", "announcement": "auto" },
+  // フォーマット実行時の音・読み上げ（既定値）
+  "accessibility.signals.format": { "sound": "never", "announcement": "never" },
+  // 現在行にブレークポイントがある時の音・読み上げ（既定値）
+  "accessibility.signals.lineHasBreakpoint": { "sound": "auto", "announcement": "auto" },
+  // 現在行にエラーがある時の音・読み上げ（既定値）
+  "accessibility.signals.lineHasError": { "sound": "auto", "announcement": "auto" },
+  // 現在行に折りたたみ可能な領域がある時の音・読み上げ（既定値）
+  "accessibility.signals.lineHasFoldedArea": { "sound": "auto", "announcement": "auto" },
+  // 現在行にインライン補完がある時の音（既定値）
+  "accessibility.signals.lineHasInlineSuggestion": { "sound": "auto" },
+  // 現在行に警告がある時の音・読み上げ（既定値）
+  "accessibility.signals.lineHasWarning": { "sound": "auto", "announcement": "auto" },
+  // 次の編集候補がある時の音・読み上げ（既定値）
+  "accessibility.signals.nextEditSuggestion": { "sound": "auto", "announcement": "auto" },
+  // インレイヒントのない行を読もうとした時の音・読み上げ（既定値）
+  "accessibility.signals.noInlayHints": { "sound": "auto", "announcement": "auto" },
+  // ノートブックのセル実行が成功した時の音・読み上げ（既定値）
+  "accessibility.signals.notebookCellCompleted": { "sound": "auto", "announcement": "auto" },
+  // ノートブックのセル実行が失敗した時の音・読み上げ（既定値）
+  "accessibility.signals.notebookCellFailed": { "sound": "auto", "announcement": "auto" },
+  // ブレークポイントで停止した時の音・読み上げ（既定値）
+  "accessibility.signals.onDebugBreak": { "sound": "auto", "announcement": "auto" },
+  // カーソル位置にエラーがある時の音・読み上げ（既定値）
+  "accessibility.signals.positionHasError": { "sound": "auto", "announcement": "auto" },
+  // カーソル位置に警告がある時の音・読み上げ（既定値）
+  "accessibility.signals.positionHasWarning": { "sound": "auto", "announcement": "auto" },
+  // 処理中の音・読み上げ（既定値）
+  "accessibility.signals.progress": { "sound": "auto", "announcement": "off" },
+  // ファイル保存時の音・読み上げ（既定値）
+  "accessibility.signals.save": { "sound": "never", "announcement": "never" },
+  // タスク完了時の音・読み上げ（既定値）
+  "accessibility.signals.taskCompleted": { "sound": "auto", "announcement": "auto" },
+  // タスク失敗時の音・読み上げ（既定値）
+  "accessibility.signals.taskFailed": { "sound": "auto", "announcement": "auto" },
+  // ターミナルのベル音が鳴った時の音・読み上げ（既定値）
+  "accessibility.signals.terminalBell": { "sound": "auto", "announcement": "auto" },
+  // ターミナルのコマンドが失敗した時の音・読み上げ（既定値）
+  "accessibility.signals.terminalCommandFailed": { "sound": "auto", "announcement": "auto" },
+  // ターミナルのコマンドが成功した時の音・読み上げ（既定値）
+  "accessibility.signals.terminalCommandSucceeded": { "sound": "auto", "announcement": "auto" },
+  // ターミナルのクイックフィックスが利用可能な時の音・読み上げ（既定値）
+  "accessibility.signals.terminalQuickFix": { "sound": "auto", "announcement": "auto" },
+  // 音声録音開始時の音（既定値）
+  "accessibility.signals.voiceRecordingStarted": { "sound": "on" },
+  // 音声録音終了時の音（既定値）
+  "accessibility.signals.voiceRecordingStopped": { "sound": "on" },
+  // ワークベンチ内のリンクに下線を引く（既定値）
+  "accessibility.underlineLinks": false,
+  // チャット処理中に詳細な進捗を読み上げる（既定値）
+  "accessibility.verboseChatProgressUpdates": true,
+  // コメントウィジェットで可能な操作を案内する（既定値）
+  "accessibility.verbosity.comments": true,
+  // デバッグコンソールのヘルプを案内する（既定値）反映にはウィンドウの再読み込みが必要
+  "accessibility.verbosity.debug": true,
+  // 差分エディタでの変更間の移動方法を案内する（既定値）
+  "accessibility.verbosity.diffEditor": true,
+  // 差分エディタがアクティブになったことを通知する（既定値）
+  "accessibility.verbosity.diffEditorActive": true,
+  // 空のエディタで可能な操作を案内する（既定値）
+  "accessibility.verbosity.emptyEditorHint": true,
+  // 検索入力時にヘルプメニューの開き方を案内する（既定値）
+  "accessibility.verbosity.find": true,
+  // ホバーをアクセシブルビューで開く方法を案内する（既定値）
+  "accessibility.verbosity.hover": true,
+  // インラインチャットのヘルプを案内する（既定値）
+  "accessibility.verbosity.inlineChat": true,
+  // インライン補完のホバー・アクセシブルビューの開き方を案内する（既定値）
+  "accessibility.verbosity.inlineCompletions": true,
+  // キーバインド設定エディタの操作方法を案内する（既定値）
+  "accessibility.verbosity.keybindingsEditor": true,
+  // ノートブックのセル・エディタへのフォーカス方法を案内する（既定値）
+  "accessibility.verbosity.notebook": true,
+  // 通知をアクセシブルビューで開く方法を案内する（既定値）
+  "accessibility.verbosity.notification": true,
+  // チャット入力時にヘルプメニューの開き方を案内する（既定値）
+  "accessibility.verbosity.panelChat": true,
+  // REPLエディタのヘルプメニューの開き方を案内する（既定値）
+  "accessibility.verbosity.replEditor": true,
+  // ソース管理のヘルプメニューの開き方を案内する（既定値）
+  "accessibility.verbosity.sourceControl": true,
+  // ターミナルのヘルプメニューの開き方を案内する（既定値）
+  "accessibility.verbosity.terminal": true,
+  // チャットのターミナル出力をアクセシブルビューで開く方法を案内する（既定値）
+  "accessibility.verbosity.terminalChatOutput": true,
+  // ウォークスルーをアクセシブルビューで開く方法を案内する（既定値）
+  "accessibility.verbosity.walkthrough": true,
+  // スクリーンリーダー使用時にwindow.titleを最適化する（既定値）
+  "accessibility.windowTitleOptimized": true,
 
   // =============================================
   // Features > Explorer - エクスプローラー
   // =============================================
 
-  // アクティブファイルのエクスプローラー上での自動追跡を無効化（デフォルト: true）
+  // エクスプローラーにドロップしたファイルを自動的に開く（既定値）
+  "explorer.autoOpenDroppedFile": true,
+  // 開いているファイルをエクスプローラー上で自動追跡・選択する（デフォルト: true）
+  // ツリーが勝手にスクロールするのを防ぐため無効化
   "explorer.autoReveal": false,
+  // 自動追跡（autoReveal）の対象外にするパス（既定値）
+  "explorer.autoRevealExclude": {
+    "**/node_modules": true,
+    "**/bower_components": true
+  },
+  // 子が1つだけのフォルダをまとめて表示（既定値）Javaのパッケージ構造などで有用
+  "explorer.compactFolders": true,
+  // ファイル・フォルダの削除時に確認する（既定値）
+  "explorer.confirmDelete": true,
+  // ドラッグ＆ドロップでの移動時に確認する（既定値）
+  "explorer.confirmDragAndDrop": true,
+  // OS上のファイルを貼り付ける際に確認する（既定値）
+  "explorer.confirmPasteNative": true,
+  // 元に戻す操作の際に確認する（既定値）
+  "explorer.confirmUndo": "default",
+  // パスをコピーする際の区切り文字（既定値）
+  "explorer.copyPathSeparator": "auto",
+  // 相対パスをコピーする際の区切り文字（既定値）
+  "explorer.copyRelativePathSeparator": "auto",
+  // ファイル装飾（Git状態など）にバッジを使う（既定値）
+  "explorer.decorations.badges": true,
+  // ファイル装飾に色を使う（既定値）
+  "explorer.decorations.colors": true,
+  // エクスプローラー内でのドラッグ＆ドロップ移動を許可（既定値）
+  "explorer.enableDragAndDrop": true,
+  // ファイル操作の取り消し（undo）を有効化（既定値）
+  "explorer.enableUndo": true,
+  // .gitignore の対象をエクスプローラーから隠す（既定値）
+  "explorer.excludeGitIgnore": false,
+  // フォルダが1つだけのマルチルートワークスペースを初期展開する（既定値）
+  "explorer.expandSingleFolderWorkspaces": true,
+  // ファイルのネスト表示（関連ファイルを親の下にまとめる）（既定値）
+  "explorer.fileNesting.enabled": false,
+  // ネストを自動展開する（既定値）fileNesting.enabledが有効な時のみ作用
+  "explorer.fileNesting.expand": true,
+  // ネストの親子パターン（既定値）fileNesting.enabledが有効な時のみ作用
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.tsx": "${capture}.ts",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
+  },
+  // 複製時の命名規則（既定値）
+  "explorer.incrementalNaming": "simple",
+  // 「開いているエディター」ペインの最小表示枠数（既定値）0は動的にリサイズ
+  "explorer.openEditors.minVisible": 0,
+  // 「開いているエディター」ペインの並び順（既定値）
+  "explorer.openEditors.sortOrder": "editorOrder",
+  // 「開いているエディター」ペインの初期最大表示数（既定値）
+  "explorer.openEditors.visible": 9,
+  // ファイル・フォルダの並び順（既定値）
+  "explorer.sortOrder": "default",
+  // 名前の辞書順ソートの方式（既定値）
+  "explorer.sortOrderLexicographicOptions": "default",
+  // 並び順を逆にする（既定値）
+  "explorer.sortOrderReverse": false,
 
   // =============================================
-  // Features > Terminal - ターミナル
+  // Features > Search - 検索
   // =============================================
-  // 外部ターミナル関連の設定はブラウザから機能しないため持ち込まない
 
-  // 統合ターミナルのカーソルスタイル（デフォルト: "block"）
-  "terminal.integrated.cursorStyle": "line",
+  // 検索ビューの行内アクションバーの位置（既定値）
+  "search.actionsPosition": "right",
+  // 検索結果を展開した状態にする（既定値）
+  "search.collapseResults": "alwaysExpand",
+  // 検索結果のファイル装飾にバッジを使う（既定値）
+  "search.decorations.badges": true,
+  // 検索結果のファイル装飾に色を使う（既定値）
+  "search.decorations.colors": true,
+  // 検索結果の既定の表示形式（既定値）
+  "search.defaultViewMode": "list",
+  // 全文検索・クイックオープンから除外するパス（既定値）
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  },
+  // 閉じているノートブックのリッチコンテンツも検索結果に出す（実験的機能・既定値）
+  "search.experimental.closedNotebookRichContentResults": false,
+  // 検索時にシンボリックリンクを辿る（既定値）
+  "search.followSymlinks": true,
+  // 検索ビューでmacOSの共有検索クリップボードを使う（既定値）
+  "search.globalFindClipboard": false,
+  // 検索結果の最大件数（既定値）nullで無制限
+  "search.maxResults": 20000,
+  // 「ファイル内を検索」の実行先（既定値）検索ビューで開く
+  "search.mode": "view",
+  // クイック検索の入力内容を次回に復元（既定値）
+  "search.quickAccess.preserveInput": false,
+  // クイックオープンで絞り込んだ際の履歴の並び順（既定値）
+  "search.quickOpen.history.filterSortOrder": "default",
+  // クイックオープンに最近開いたファイルを含める（既定値）
+  "search.quickOpen.includeHistory": true,
+  // クイックオープンにシンボル検索結果を含める（既定値）
+  "search.quickOpen.includeSymbols": false,
+  // 検索（ripgrep）に使うスレッド数（既定値）0は自動決定
+  "search.ripgrep.maxThreads": 0,
+  // 検索エディタで前後に表示する行数（既定値）
+  "search.searchEditor.defaultNumberOfContextLines": 1,
+  // 検索エディタで結果をダブルクリックした時の動作（既定値）
+  "search.searchEditor.doubleClickBehaviour": "goToLocation",
+  // 検索実行時に入力欄ではなく結果にフォーカスする（既定値）
+  "search.searchEditor.focusResultsOnSearch": false,
+  // 新規検索エディタで前回の検索条件を引き継ぐ（既定値）
+  "search.searchEditor.reusePriorSearchConfiguration": false,
+  // 検索エディタで結果をシングルクリックした時の動作（既定値）
+  "search.searchEditor.singleClickBehaviour": "default",
+  // 入力しながら逐次検索する（既定値）
+  "search.searchOnType": true,
+  // 逐次検索を開始するまでの待ち時間（既定値）
+  "search.searchOnTypeDebouncePeriod": 300,
+  // 検索ビューでキーワード候補を提示（既定値）
+  "search.searchView.keywordSuggestions": false,
+  // 検索ビューのセマンティック検索の動作（既定値）
+  "search.searchView.semanticSearchBehavior": "manual",
+  // 検索ビューにフォーカスした際に選択テキストを検索欄へ入れる（既定値）
+  "search.seedOnFocus": false,
+  // 選択がない場合にカーソル位置の単語を検索欄へ入れる（既定値）
+  "search.seedWithNearestWord": false,
+  // 検索結果に行番号を表示（既定値）
+  "search.showLineNumbers": false,
+  // すべて小文字なら大文字小文字を区別しない検索にする（既定値）
+  "search.smartCase": false,
+  // 検索結果の並び順（既定値）
+  "search.sortOrder": "default",
+  // グローバルgitignoreを検索除外に使う（既定値）useIgnoreFilesの有効化が必要
+  "search.useGlobalIgnoreFiles": false,
+  // .gitignore / .ignore を検索除外に使う（既定値）
+  "search.useIgnoreFiles": true,
+  // 親ディレクトリの .gitignore も検索除外に使う（既定値）
+  "search.useParentIgnoreFiles": false,
+  // 置換時にプレビューを開く（既定値）
+  "search.useReplacePreview": true,
 
   // =============================================
-  // Features > SCM (Git) - ソース管理
+  // Features > Debug - デバッグ
   // =============================================
-  // Git連携はVS Code組み込みのため拡張機能なしで動作する
 
-  // Git同期時の確認ダイアログを非表示（デフォルト: true）
-  "git.confirmSync": false,
-  // コミット署名（GPG/SSH）を有効化（デフォルト: false）
-  "git.enableCommitSigning": true,
-  // ステージ済み変更がない時に全変更を自動ステージしてコミット（デフォルト: false）
-  "git.enableSmartCommit": true,
-  // リモートからの自動フェッチを有効化（デフォルト: false）
+  // 任意のファイルにブレークポイントを設定できるようにする（既定値）
+  "debug.allowBreakpointsEverywhere": false,
+  // ゲッターなど遅延評価される変数を自動的に展開する（既定値）
+  "debug.autoExpandLazyVariables": "auto",
+  // ブレークポイントビューの表示形式（既定値）
+  "debug.breakpointsView.presentation": "list",
+  // デバッグ終了時に読み取り専用タブを閉じる（既定値）
+  "debug.closeReadonlyTabsOnEnd": false,
+  // デバッグセッション中のウィンドウを閉じる際に確認する（既定値）
+  "debug.confirmOnExit": "never",
+  // デバッグコンソールでEnterによる補完確定を行う（既定値）Enterは式の評価に使うため無効
+  "debug.console.acceptSuggestionOnEnter": "off",
+  // デバッグ終了時にデバッグコンソールを閉じる（既定値）
+  "debug.console.closeOnEnd": false,
+  // デバッグコンソールで同一行をまとめて件数バッジで表示（既定値）
+  "debug.console.collapseIdenticalLines": true,
+  // デバッグコンソールのフォントファミリー（既定値）
+  "debug.console.fontFamily": "default",
+  // デバッグコンソールのフォントサイズ（既定値）
+  "debug.console.fontSize": 12,
+  // デバッグコンソールで過去の入力を候補に出す（既定値）
+  "debug.console.historySuggestions": true,
+  // デバッグコンソールの行の高さ（既定値）0はフォントサイズから算出
+  "debug.console.lineHeight": 0,
+  // デバッグコンソールの最大行数（既定値）
+  "debug.console.maximumLines": 10000,
+  // デバッグコンソールで行を折り返す（既定値）
+  "debug.console.wordWrap": true,
+  // 逆アセンブルビューにソースコードを表示（既定値）
+  "debug.disassemblyView.showSourceCode": true,
+  // デバッグ中にステータスバーの色を変える（既定値）
+  "debug.enableStatusBarColor": true,
+  // ブレーク時にエディタへフォーカスする（既定値）
+  "debug.focusEditorOnBreak": true,
+  // ブレーク時にウィンドウをフォーカスする（既定値）
+  "debug.focusWindowOnBreak": true,
+  // ガター（行番号左の余白）を中クリックした時の動作（既定値）
+  "debug.gutterMiddleClickAction": "logpoint",
+  // デバッグ中に「デバッグの開始」コントロールを隠す（既定値）
+  "debug.hideLauncherWhileDebugging": false,
+  // preLaunchTaskが長時間実行されている際の警告を隠す（既定値）
+  "debug.hideSlowPreLaunchWarning": false,
+  // デバッグ中に変数の値をエディタ内へインライン表示（既定値）
+  "debug.inlineValues": "auto",
+  // デバッグコンソールを開くタイミング（既定値）
+  "debug.internalConsoleOptions": "openOnFirstSessionStart",
+  // 自動アタッチの対象プロセス（既定値）
+  "debug.javascript.autoAttachFilter": "disabled",
+  // 自動アタッチが"smart"の場合の対象パターン（既定値）
+  "debug.javascript.autoAttachSmartPattern": [
+    "${workspaceFolder}/**",
+    "!**/node_modules/**",
+    "**/$KNOWN_TOOLS$/**"
+  ],
+  // リモートWebアプリのデバッグ時に自動でトンネルを張る（既定値）
+  "debug.javascript.automaticallyTunnelRemoteServer": true,
+  // 条件付きブレークポイントがエラーを投げた際に停止する（既定値）
+  "debug.javascript.breakOnConditionalError": false,
+  // npmスクリプトの実行・デバッグ用CodeLensの表示位置（既定値）
+  "debug.javascript.codelens.npmScripts": "top",
+  // JavaScriptデバッグターミナルで開いたリンクをデバッグする（既定値）
+  "debug.javascript.debugByLinkOptions": "on",
+  // 起動構成で使う既定のruntimeExecutable（既定値）
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "node"
+  },
+  // ネットワークビューを有効化（既定値）
+  "debug.javascript.enableNetworkView": true,
+  // 「Node.jsプロセスにアタッチ」実行時の既定オプション（既定値）
+  "debug.javascript.pickAndAttachOptions": {},
+  // ソースマップ等のリソース取得時のリクエストオプション（既定値）
+  "debug.javascript.resourceRequestOptions": {},
+  // JavaScriptデバッグターミナルの既定の起動オプション（既定値）
+  "debug.javascript.terminalOptions": {},
+  // 元ファイルを読めないソースマップを自動的に解除する（既定値）falseは確認ダイアログを出す
+  "debug.javascript.unmapMissingSources": false,
+  // preLaunchTaskでエラーが出た際の挙動（既定値）
+  "debug.onTaskErrors": "prompt",
+  // デバッグビューを開くタイミング（既定値）
+  "debug.openDebug": "openOnDebugBreak",
+  // デバッグ終了時にエクスプローラーを開く（既定値）
+  "debug.openExplorerOnEnd": false,
+  // デバッグ開始前に保存するエディタの範囲（既定値）
+  "debug.saveBeforeStart": "allEditorsInActiveGroup",
+  // 概要ルーラーにブレークポイントを表示（既定値）
+  "debug.showBreakpointsInOverviewRuler": false,
+  // ステータスバーにデバッグ項目を表示するタイミング（既定値）
+  "debug.showInStatusBar": "onFirstSessionStart",
+  // デバッグ中にインラインのブレークポイント候補を表示（既定値）
+  "debug.showInlineBreakpointCandidates": true,
+  // デバッグツールバーにサブセッションを表示（既定値）
+  "debug.showSubSessionsInToolBar": false,
+  // 変数ペインに型を表示（既定値）
+  "debug.showVariableTypes": false,
+  // デバッグ開始前にターミナルをクリアする（既定値）
+  "debug.terminal.clearBeforeReusing": false,
+  // デバッグツールバーの表示位置（既定値）
+  "debug.toolBarLocation": "floating",
+
+  // =============================================
+  // Features > Testing - テスト
+  // =============================================
+
+  // 実行中のテストを常に表示する（既定値）falseは失敗したテストのみ
+  "testing.alwaysRevealTestOnStateChange": false,
+  // エラーのPeekビューを自動的に開くタイミング（既定値）
+  "testing.automaticallyOpenPeekView": "never",
+  // 継続実行モード中にPeekビューを自動的に開く（既定値）
+  "testing.automaticallyOpenPeekViewDuringAutoRun": false,
+  // テストビューを開くタイミング（既定値）
+  "testing.automaticallyOpenTestResults": "openOnTestStart",
+  // アクティビティバーのテストアイコンに出すカウントバッジ（既定値）
+  "testing.countBadge": "failed",
+  // カバレッジバーの色のしきい値（既定値）
+  "testing.coverageBarThresholds": {
+    "red": 0,
+    "yellow": 60,
+    "green": 90
+  },
+  // エディタにカバレッジのツールバーを表示（既定値）
+  "testing.coverageToolbarEnabled": false,
+  // ガターのテストアイコンを左クリックした時の動作（既定値）
+  "testing.defaultGutterClickAction": "run",
+  // カバレッジとして既定で表示する割合の種類（既定値）
+  "testing.displayedCoveragePercent": "totalCoverage",
+  // テストエクスプローラーで実行中のテストを追跡する（既定値）
+  "testing.followRunningTest": false,
+  // エディタのガターにテストアイコンを表示（既定値）
+  "testing.gutterEnabled": true,
+  // テスト結果ビューのレイアウト（既定値）
+  "testing.resultsView.layout": "treeRight",
+  // テスト実行前に未保存のエディタを保存する（既定値）
+  "testing.saveBeforeTest": true,
+  // すべてのテスト実行のメッセージを表示（既定値）
+  "testing.showAllMessages": false,
+  // エクスプローラーにカバレッジを表示（既定値）
+  "testing.showCoverageInExplorer": true,
+
+  // =============================================
+  // Features > Task - タスク
+  // =============================================
+
+  // 自動タスクを有効化（既定値）信頼されていないワークスペースでは実行されない
+  "task.allowAutomaticTasks": "off",
+  // タスクプロバイダーによるタスクの自動検出（既定値）遅い場合は無効化すると改善する
+  "task.autoDetect": "on",
+  // 非フォーカス時にOS通知を出すタスクの最小実行時間（既定値）-1で通知無効
+  "task.notifyWindowOnTaskCompletion": 60000,
+  // タスク実行時に問題マッチャーの選択を確認しない（既定値）
+  "task.problemMatchers.neverPrompt": false,
+  // タスクのクイックピックに詳細を表示（既定値）
+  "task.quickOpen.detail": true,
+  // タスクのクイックオープンで保持する履歴数（既定値）
+  "task.quickOpen.history": 30,
+  // 「タスクの実行」で低速な全件表示を使う（既定値）
+  "task.quickOpen.showAll": false,
+  // タスクが1つだけの場合にクイックピックを省略する（既定値）
+  "task.quickOpen.skip": false,
+  // ウィンドウ再読み込み時に問題マッチャー付きタスクへ再接続する（既定値）
+  "task.reconnection": true,
+  // タスク実行前に未保存のエディタを保存する（既定値）
+  "task.saveBeforeRun": "always",
+  // タスクプロバイダーが遅い場合に警告を出す（既定値）
+  "task.slowProviderWarning": true,
+  // タスクの詳細ログを有効化（既定値）
+  "task.verboseLogging": false,
+
+  // =============================================
+  // Features > Problems - 問題
+  // =============================================
+
+  // ファイルを開いた際に問題ビューで自動的に表示する（既定値）
+  "problems.autoReveal": true,
+  // ファイル・フォルダにエラー／警告の装飾を表示（既定値）
+  "problems.decorations.enabled": true,
+  // 問題ビューの既定の表示形式（既定値）
+  "problems.defaultViewMode": "tree",
+  // ステータスバーに現在の問題を表示（既定値）
+  "problems.showCurrentInStatus": false,
+  // 問題を移動する際の並び順（既定値）
+  "problems.sortOrder": "severity",
+  // エディタ・ワークベンチ全体で問題を表示する（既定値）
+  "problems.visibility": true,
+
+  // =============================================
+  // Features > Output - 出力
+  // =============================================
+
+  // 出力ビューのスマートスクロール（既定値）クリックでスクロール追従をロック／解除できる
+  "output.smartScroll.enabled": true,
+
+  // =============================================
+  // Features > Comments - コメント
+  // =============================================
+
+  // 解決済みのコメントスレッドを折りたたむ（既定値）
+  "comments.collapseOnResolve": true,
+  // コメントウィジェットの高さを制限してスクロールさせる（既定値）
+  "comments.maxHeight": true,
+  // コメントビューを開くタイミング（既定値）
+  "comments.openView": "firstFile",
+  // コメントスレッドを折りたたむ際に確認する条件（既定値）
+  "comments.thread.confirmOnCollapse": "whenHasUnsubmittedComments",
+  // コメントのタイムスタンプを相対時間で表示（既定値）
+  "comments.useRelativeTime": true,
+  // エディタ内にコメントバー・コメントスレッドを表示（既定値）
+  "comments.visible": true,
+
+  // =============================================
+  // Features > Timeline - タイムライン
+  // =============================================
+
+  // 末尾までスクロールした際に次のページを読み込む（既定値）
+  "timeline.pageOnScroll": true,
+  // タイムラインビューに表示する項目数（既定値）nullは表示領域から自動決定
+  "timeline.pageSize": 50,
+
+  // --- Git 本体 ---
+
+  // AI生成コードを含むコミットに Co-authored-by を自動追加（既定値）
+  "git.addAICoAuthor": "off",
+  // 強制プッシュを許可（既定値）事故防止のため無効のまま
+  "git.allowForcePush": false,
+  // pre-commit / commit-msg フックを省略したコミットを許可（既定値）
+  "git.allowNoVerifyCommit": false,
+  // ステージ済み変更のグループを常に表示（既定値）
+  "git.alwaysShowStagedChangesResourceGroup": false,
+  // すべてのコミットに signoff を付ける（既定値）
+  "git.alwaysSignOff": false,
+  // リポジトリを自動検出するタイミング（既定値）
+  "git.autoRepositoryDetection": true,
+  // pull前に変更を自動stashし、成功後に復元する（既定値）
+  "git.autoStash": false,
+  // リモートからの自動フェッチ（デフォルト: false）変更を早く把握するため有効化
   "git.autofetch": true,
+  // 自動フェッチの実行間隔（既定値・秒）
+  "git.autofetchPeriod": 180,
+  // ソース管理ビューの自動更新（既定値）
+  "git.autorefresh": true,
+  // blame装飾のホバーを無効化（既定値）
+  "git.blame.editorDecoration.disableHover": false,
+  // エディタ内にblame情報を装飾表示（既定値）
+  "git.blame.editorDecoration.enabled": false,
+  // blame装飾の表示書式（既定値）
+  "git.blame.editorDecoration.template": "${subject}, ${authorName} (${authorDateAgo})",
+  // blame計算時に空白の変更を無視する（既定値）
+  "git.blame.ignoreWhitespace": false,
+  // ステータスバーにblame情報を表示（既定値）
+  "git.blame.statusBarItem.enabled": true,
+  // ステータスバーのblame情報の書式（既定値）
+  "git.blame.statusBarItem.template": "${authorName} (${authorDateAgo})",
+  // 新規ブランチ名に付ける接頭辞（既定値）
+  "git.branchPrefix": "",
+  // 保護ブランチの一覧（既定値）
+  "git.branchProtection": [],
+  // 保護ブランチへのコミット前に確認する（既定値）
+  "git.branchProtectionPrompt": "alwaysPrompt",
+  // ランダムなブランチ名の生成に使う辞書（既定値）
+  "git.branchRandomName.dictionary": ["adjectives", "animals"],
+  // 新規ブランチ作成時にランダムな名前を生成する（既定値）
+  "git.branchRandomName.enable": false,
+  // ブランチ一覧の並び順（既定値）コミット日時順
+  "git.branchSortOrder": "committerdate",
+  // 新規ブランチ名を検証する正規表現（既定値）
+  "git.branchValidationRegex": "",
+  // ブランチ名の空白を置き換える文字（既定値）
+  "git.branchWhitespaceChar": "-",
+  // 「チェックアウト先...」に表示するrefの種類（既定値）
+  "git.checkoutType": ["local", "remote", "tags"],
+  // stash・コミット・破棄などの操作後に差分エディタを閉じる（既定値）
+  "git.closeDiffOnOperation": false,
+  // stdoutをGit出力パネルへ記録するgitコマンド（既定値）
+  "git.commandsToLog": [],
+  // 短縮コミットハッシュの桁数（既定値）
+  "git.commitShortHashLength": 7,
+  // コミット済みファイルの削除前に確認する（既定値）
+  "git.confirmCommittedDelete": true,
+  // 空コミットの作成前に確認する（既定値）
+  "git.confirmEmptyCommits": true,
+  // 強制プッシュ前に確認する（既定値）
+  "git.confirmForcePush": true,
+  // 検証を省略したコミットの前に確認する（既定値）
+  "git.confirmNoVerifyCommit": true,
+  // 同期（pull+push）前の確認ダイアログ（デフォルト: true）都度の確認が煩雑なため無効化
+  "git.confirmSync": false,
+  // Gitのカウントバッジの対象（既定値）
+  "git.countBadge": "all",
+  // エクスプローラー等にGitの色・バッジを表示（既定値）
+  "git.decorations.enabled": true,
+  // 新規リポジトリ初期化時の既定ブランチ名（既定値）
+  "git.defaultBranchName": "main",
+  // クローン先の既定ディレクトリ（既定値）
+  "git.defaultCloneDirectory": null,
+  // サブモジュールを自動検出する（既定値）
+  "git.detectSubmodules": true,
+  // 検出するサブモジュールの上限（既定値）
+  "git.detectSubmodulesLimit": 10,
+  // ワークツリーを自動検出する（既定値）
+  "git.detectWorktrees": false,
+  // 検出するワークツリーの上限（既定値）
+  "git.detectWorktreesLimit": 50,
+  // コミット前に未解決の診断（エラー）を確認する（既定値）
+  "git.diagnosticsCommitHook.enabled": false,
+  // コミット前に確認する診断のソースと最小重要度（既定値）
+  "git.diagnosticsCommitHook.sources": {
+    "*": "error"
+  },
+  // 未追跡ファイルの破棄でゴミ箱へ移動する（既定値）完全削除を避けるため変更しない
+  "git.discardUntrackedChangesToTrash": true,
+  // コミット署名（GPG / X.509 / SSH）を有効化（デフォルト: false）
+  "git.enableCommitSigning": true,
+  // ステージ済み変更がない時に全変更をステージしてコミット（デフォルト: false）
+  "git.enableSmartCommit": true,
+  // ステータスバーに同期コマンドを表示（既定値）
+  "git.enableStatusBarSync": true,
+  // Git連携を有効化（既定値）
+  "git.enabled": true,
+  // pull時に全ブランチをフェッチする（既定値）
+  "git.fetchOnPull": false,
+  // 同期時に注釈付きタグもプッシュする（既定値）
+  "git.followTagsWhenSync": false,
+  // 古いGitバージョンの警告を無視する（既定値）
+  "git.ignoreLegacyWarning": false,
+  // 変更が多すぎる場合の警告を無視する（既定値）
+  "git.ignoreLimitWarning": false,
+  // Gitが見つからない場合の警告を無視する（既定値）
+  "git.ignoreMissingGitWarning": false,
+  // pull時のリベース警告を無視する（既定値）
+  "git.ignoreRebaseWarning": false,
+  // サブモジュールの変更をファイルツリーで無視する（既定値）
+  "git.ignoreSubmodules": false,
+  // Windows版Git 2.25〜2.26の警告を無視する（既定値）
+  "git.ignoreWindowsGit27Warning": false,
+  // 無視するリポジトリの一覧（既定値）
+  "git.ignoredRepositories": [],
+  // コミットメッセージの入力検証を表示（既定値）
+  "git.inputValidation": false,
+  // コミットメッセージの警告を出す文字数（既定値）
+  "git.inputValidationLength": 72,
+  // コミットメッセージ1行目の警告を出す文字数（既定値）
+  "git.inputValidationSubjectLength": 50,
+  // コンフリクト中のファイルをマージエディタで開く（既定値）
+  "git.mergeEditor": false,
+  // クローン後にリポジトリを自動で開く（既定値）
+  "git.openAfterClone": "prompt",
+  // 変更をクリックした際に差分エディタを開く（既定値）
+  "git.openDiffOnClick": true,
+  // 親フォルダにあるリポジトリを開くか（既定値）
+  "git.openRepositoryInParentFolders": "prompt",
+  // gitコマンド実行後にソース管理ビューを楽観的に更新する（既定値）
+  "git.optimisticUpdate": true,
+  // git実行ファイルのパス（既定値）nullはPATHから解決
+  "git.path": null,
+  // コミット成功後に実行するgitコマンド（既定値）
+  "git.postCommitCommand": "none",
+  // コミット前に未保存ファイルを確認する（既定値）
+  "git.promptToSaveFilesBeforeCommit": "always",
+  // stash前に未保存ファイルを確認する（既定値）
+  "git.promptToSaveFilesBeforeStash": "always",
+  // フェッチ時にprune（削除済みリモートブランチの整理）を行う（既定値）
+  "git.pruneOnFetch": false,
+  // チェックアウト前にfast-forwardでpullする（既定値）
+  "git.pullBeforeCheckout": false,
+  // pull時に全タグを取得する（既定値）
+  "git.pullTags": true,
+  // 同期時にrebaseを使う（既定値）
+  "git.rebaseWhenSync": false,
+  // 直前のコミット後コマンドを記憶する（既定値）
+  "git.rememberPostCommitCommand": false,
+  // pull時にタグが衝突したらリモートのタグで置き換える（既定値）
+  "git.replaceTagsWhenPull": false,
+  // リポジトリ探索時に無視するフォルダ（既定値）
+  "git.repositoryScanIgnoredFolders": ["node_modules"],
+  // リポジトリ探索の深さ（既定値）-1で無制限
+  "git.repositoryScanMaxDepth": 1,
+  // Gitのユーザー設定を必須にする（既定値）
+  "git.requireGitUserConfig": true,
+  // リポジトリを探索する追加パス（既定値）
+  "git.scanRepositories": [],
+  // ソース管理ビューに表示するアクションボタン（既定値）
+  "git.showActionButton": {
+    "commit": true,
+    "publish": true,
+    "sync": true
+  },
+  // ソース管理パネルにコミット入力欄を表示（既定値）
+  "git.showCommitInput": true,
+  // 変更ビューにインラインの「ファイルを開く」を表示（既定値）
+  "git.showInlineOpenFileAction": true,
+  // Git操作の進捗を表示（既定値）
+  "git.showProgress": true,
+  // プッシュ成功時に通知を出す（既定値）
+  "git.showPushSuccessNotification": false,
+  // ブランチ・タグの選択時に最新コミットの詳細を表示（既定値）
+  "git.showReferenceDetails": true,
+  // リネームと判定する類似度のしきい値（既定値）
+  "git.similarityThreshold": 50,
+  // スマートコミットで自動ステージする変更の範囲（既定値）
+  "git.smartCommitChanges": "all",
+  // git statusから解析する変更数の上限（既定値）0で無制限
+  "git.statusLimit": 10000,
+  // スマートコミットの有効化を提案する（既定値）
+  "git.suggestSmartCommit": true,
+  // 同期の実行時にキャンセル可能な通知を出す（既定値）
+  "git.supportCancellation": false,
+  // 統合ターミナルのGit認証をVSCodeが処理する（既定値）反映にはターミナルの再起動が必要
+  "git.terminalAuthentication": true,
+  // 統合ターミナルのGitエディタをVSCodeにする（既定値）反映にはターミナルの再起動が必要
+  "git.terminalGitEditor": false,
+  // タイムラインビューで使う日付（既定値）
+  "git.timeline.date": "committed",
+  // タイムラインビューに作者を表示（既定値）
+  "git.timeline.showAuthor": true,
+  // タイムラインビューに未コミットの変更を表示（既定値）
+  "git.timeline.showUncommitted": false,
+  // 未追跡ファイルの扱い（既定値）
+  "git.untrackedChanges": "mixed",
+  // コミット入力欄の内容をstashの既定メッセージに使う（既定値）
+  "git.useCommitInputAsStashMessage": false,
+  // 入力欄が空の場合にエディタでコミットメッセージを書く（既定値）
+  "git.useEditorAsCommitInput": true,
+  // 強制プッシュに force-if-includes を使う（既定値）useForcePushWithLeaseの有効化が必要
+  "git.useForcePushIfIncludes": true,
+  // 強制プッシュに安全な force-with-lease を使う（既定値）
+  "git.useForcePushWithLease": true,
+  // GIT_ASKPASS を統合版で上書きする（既定値）
+  "git.useIntegratedAskPass": true,
+  // useEditorAsCommitInput 有効時に verbose 出力を使う（既定値）
+  "git.verboseCommit": false,
+  // 新規ワークツリー作成時にコピーするファイル（既定値）
+  "git.worktreeIncludeFiles": [],
+
+  // --- GitHub ---
+
+  // GitHub Enterprise / GHE.com のURI（既定値）
+  "github-enterprise.uri": "",
+  // GitHubリポジトリのブランチ保護ルールを問い合わせる（既定値）
+  "github.branchProtection": true,
+  // gitコマンドのGitHub認証を自動化する（既定値）
+  "github.gitAuthentication": true,
+  // GitHubリポジトリのクローンに使うプロトコル（既定値）
+  "github.gitProtocol": "https",
+  // ホバー等にコミット作者のGitHubアバターを表示（既定値）
+  "github.showAvatar": true,
+
+  // --- マージコンフリクト / マージエディタ ---
+
+  // コンフリクト解決後に次のコンフリクトへ自動移動する（既定値）
+  "merge-conflict.autoNavigateNextConflict.enabled": false,
+  // コンフリクトブロックにCodeLensを表示（既定値）
+  "merge-conflict.codeLens.enabled": true,
+  // コンフリクトブロックに装飾を表示（既定値）
+  "merge-conflict.decorators.enabled": true,
+  // コンフリクトの差分ビューを開く位置（既定値）
+  "merge-conflict.diffViewPosition": "Current",
+  // マージエディタの差分アルゴリズム（既定値）
+  "mergeEditor.diffAlgorithm": "advanced",
+  // ベース側の削除を縦棒で示す（既定値）
+  "mergeEditor.showDeletionMarkers": true,
+
+  // --- ソース管理ビュー（SCM）---
+
+  // ソース管理ビューのインラインアクションを常に表示（既定値）
+  "scm.alwaysShowActions": false,
+  // ソース管理ビューでリポジトリを常に表示（既定値）
+  "scm.alwaysShowRepositories": false,
+  // ファイルを開いた際にソース管理ビューで自動的に表示する（既定値）
+  "scm.autoReveal": true,
+  // ソース管理ビューでフォルダをまとめて表示（既定値）
+  "scm.compactFolders": true,
+  // アクティビティバーのソース管理アイコンのカウントバッジ（既定値）
+  "scm.countBadge": "all",
+  // ソース管理ビューの既定の表示形式（既定値）
+  "scm.defaultViewMode": "list",
+  // リスト表示時の既定の並び順（既定値）
+  "scm.defaultViewSortKey": "path",
+  // エディタ内の差分装飾（既定値）
+  "scm.diffDecorations": "all",
+  // ガターの差分装飾をクリックした時の動作（既定値）
+  "scm.diffDecorationsGutterAction": "diff",
+  // ガターの差分装飾にパターンを使う（既定値）
+  "scm.diffDecorationsGutterPattern": {
+    "added": false,
+    "modified": true
+  },
+  // ガターの差分装飾の表示条件（既定値）
+  "scm.diffDecorationsGutterVisibility": "always",
+  // ガターの差分装飾の幅（既定値・px）
+  "scm.diffDecorationsGutterWidth": 3,
+  // ガターの差分装飾で前後の空白を無視する（既定値）文字列として指定する点に注意
+  "scm.diffDecorationsIgnoreTrimWhitespace": "false",
+  // ソース管理グラフビューに表示するバッジ（既定値）
+  "scm.graph.badges": "filter",
+  // グラフビューで末尾までスクロールした際に次を読み込む（既定値）
+  "scm.graph.pageOnScroll": true,
+  // グラフビューに表示する項目数（既定値）
+  "scm.graph.pageSize": 50,
+  // グラフビューに受信（incoming）の変更を表示（既定値）
+  "scm.graph.showIncomingChanges": true,
+  // グラフビューに送信（outgoing）の変更を表示（既定値）
+  "scm.graph.showOutgoingChanges": true,
+  // コミットメッセージ入力欄のフォント（既定値）
+  "scm.inputFontFamily": "default",
+  // コミットメッセージ入力欄のフォントサイズ（既定値）
+  "scm.inputFontSize": 13,
+  // コミットメッセージ入力欄が自動拡張する最大行数（既定値）
+  "scm.inputMaxLineCount": 10,
+  // コミットメッセージ入力欄の最小行数（既定値）
+  "scm.inputMinLineCount": 1,
+  // ソース管理プロバイダーのヘッダーに出すカウントバッジ（既定値）
+  "scm.providerCountBadge": "hidden",
+  // リポジトリビューにリポジトリの成果物を表示（実験的機能・既定値）
+  "scm.repositories.explorer": false,
+  // リポジトリビューの選択モード（既定値）
+  "scm.repositories.selectionMode": "multiple",
+  // リポジトリビューの並び順（既定値）
+  "scm.repositories.sortOrder": "discovery time",
+  // リポジトリビューに表示するリポジトリ数（既定値）0で手動リサイズ可能
+  "scm.repositories.visible": 10,
+  // ソース管理ビューにアクションボタンを表示（既定値）
+  "scm.showActionButton": true,
+  // ソース管理の入力欄にアクションボタンを表示（既定値）
+  "scm.showInputActionButton": true,
+  // 履歴アイテムグループ切り替え時の既定のワーキングセット（既定値）
+  "scm.workingSets.default": "current",
+  // 履歴アイテムグループ切り替え時にエディタのワーキングセットを保存する（既定値）
+  "scm.workingSets.enabled": false,
+
+  // --- 統合ターミナル: 表示・フォント ---
+
+  // ターミナルのフォントファミリー（既定値）空はeditor.fontFamilyを継承
+  "terminal.integrated.fontFamily": "",
+  // ターミナルで合字を有効化（既定値）
+  "terminal.integrated.fontLigatures.enabled": false,
+  // フォントが解析できない場合に使う合字の代替リスト（既定値）
+  "terminal.integrated.fontLigatures.fallbackLigatures": [
+    "<--", "<---", "<<-", "<-", "->", "->>", "-->", "--->",
+    "<==", "<===", "<<=", "<=", "=>", "=>>", "==>", "===>",
+    ">=", ">>=", "<->", "<-->", "<--->", "<---->", "<=>", "<==>",
+    "<===>", "<====>", "::", ":::", "<~~", "</", "</>", "/>",
+    "~~>", "==", "!=", "/=", "~=", "<>", "===", "!==",
+    "!===", "<:", ":=", "*=", "*+", "<*", "<*>", "*>",
+    "<|", "<|>", "|>", "+*", "=*", "=:", ":>", "/*",
+    "*/", "+++", "<!--", "<!---"
+  ],
+  // 合字有効時のfont-feature-settings（既定値）
+  "terminal.integrated.fontLigatures.featureSettings": "\"calt\" on",
+  // ターミナルのフォントサイズ（既定値）
+  "terminal.integrated.fontSize": 12,
+  // 通常テキストのフォントの太さ（既定値）
+  "terminal.integrated.fontWeight": "normal",
+  // 太字テキストのフォントの太さ（既定値）
+  "terminal.integrated.fontWeightBold": "bold",
+  // 文字間隔（既定値・追加ピクセル数）
+  "terminal.integrated.letterSpacing": 0,
+  // 行の高さ（既定値）フォントサイズに対する倍率
+  "terminal.integrated.lineHeight": 1,
+  // カーソルを点滅させる（既定値）
+  "terminal.integrated.cursorBlinking": false,
+  // フォーカス時のカーソル形状（デフォルト: "block"）エディタと揃えて線カーソルにする
+  "terminal.integrated.cursorStyle": "line",
+  // 非フォーカス時のカーソル形状（既定値）
+  "terminal.integrated.cursorStyleInactive": "outline",
+  // cursorStyleが"line"の時のカーソル幅（既定値）
+  "terminal.integrated.cursorWidth": 1,
+  // 罫線などをフォントではなく独自グリフで描画（既定値）gpuAccelerationが有効な時のみ作用
+  "terminal.integrated.customGlyphs": true,
+  // 太字を明るいANSI色で描画する（既定値）
+  "terminal.integrated.drawBoldTextInBrightColors": true,
+  // GPUによる描画を使う（既定値）
+  "terminal.integrated.gpuAcceleration": "auto",
+  // 前景色を調整して確保する最小コントラスト比（既定値）
+  "terminal.integrated.minimumContrastRatio": 4.5,
+  // 隣のセルにはみ出すグリフを横方向に縮小する（既定値）
+  "terminal.integrated.rescaleOverlappingGlyphs": true,
+  // アニメーション付きスクロール（既定値）
+  "terminal.integrated.smoothScrolling": false,
+  // 文字の点滅表示を有効化（既定値）
+  "terminal.integrated.textBlinking": false,
+  // 文字幅計算に使うUnicodeのバージョン（既定値）
+  "terminal.integrated.unicodeVersion": "11",
+  // タブストップの桁数（既定値）
+  "terminal.integrated.tabStopWidth": 8,
+  // 画像表示を有効化（既定値）gpuAccelerationが有効な時のみ作用
+  "terminal.integrated.enableImages": false,
+
+  // --- 統合ターミナル: 動作 ---
+
+  // 未信頼のワークスペースでターミナルを作成できるようにする（既定値）
+  // 起動時にコードが実行され得るためセキュリティ上の保護。無効のまま
+  "terminal.integrated.allowInUntrustedWorkspace": false,
+  // ターミナル内でコード（連続キー）バインドを許可（既定値）
+  "terminal.integrated.allowChords": true,
+  // Alt+Fなどでメニューバーを開けるようにする（既定値）macOSでは無効
+  "terminal.integrated.allowMnemonics": false,
+  // ターミナルからリンクを開ける URIスキーム（既定値）
+  "terminal.integrated.allowedLinkSchemes": [
+    "file",
+    "http",
+    "https",
+    "mailto",
+    "vscode",
+    "vscode-insiders"
+  ],
+  // Option+クリックでカーソルを移動する（既定値）
+  "terminal.integrated.altClickMovesCursor": true,
+  // 特定のメッセージに自動応答する設定（既定値）
+  "terminal.integrated.autoReplies": {},
+  // ベル表示の継続時間（既定値・ミリ秒）
+  "terminal.integrated.bellDuration": 1000,
+  // シェルへ送らずVSCodeが処理するコマンドID（既定値）
+  "terminal.integrated.commandsToSkipShell": [],
+  // ターミナル実行中にウィンドウを閉じる際に確認する（既定値）
+  "terminal.integrated.confirmOnExit": "never",
+  // 子プロセスがあるターミナルを終了する際に確認する（既定値）
+  "terminal.integrated.confirmOnKill": "editor",
+  // 選択したテキストを自動的にクリップボードへコピー（既定値）
+  "terminal.integrated.copyOnSelection": false,
+  // ターミナルの起動ディレクトリ（既定値）空はワークスペースルート
+  "terminal.integrated.cwd": "",
+  // 新規ターミナルを作成する場所（既定値）
+  "terminal.integrated.defaultLocation": "view",
+  // Linuxの既定プロファイル（既定値）
+  "terminal.integrated.defaultProfile.linux": null,
+  // macOSの既定プロファイル（既定値）nullは$SHELLを使う
+  "terminal.integrated.defaultProfile.osx": null,
+  // Windowsの既定プロファイル（既定値）
+  "terminal.integrated.defaultProfile.windows": null,
+  // $LANG をUTF-8対応の値に自動設定する（既定値）
+  "terminal.integrated.detectLocale": "auto",
+  // ファイルリンクを有効化（既定値）ネットワークドライブでは遅くなることがある
+  "terminal.integrated.enableFileLinks": "on",
+  // kittyキーボードプロトコルを有効化（既定値）Shift+Enterなどを詳細に扱える
+  "terminal.integrated.enableKittyKeyboardProtocol": true,
+  // 複数行を貼り付ける際に警告を出す（既定値）
+  "terminal.integrated.enableMultiLinePasteWarning": "auto",
+  // OSC 99による通知を表示（既定値）
+  "terminal.integrated.enableNotifications": true,
+  // ウィンドウ再読み込み後もターミナルのセッション・履歴を保持（既定値）
+  "terminal.integrated.enablePersistentSessions": true,
+  // ビジュアルベル（視覚的なベル通知）を有効化（既定値）
+  "terminal.integrated.enableVisualBell": false,
+  // Windowsの拡張キーボード入力モードを有効化（既定値）
+  "terminal.integrated.enableWin32InputMode": false,
+  // Linuxのターミナルに追加する環境変数（既定値）
+  "terminal.integrated.env.linux": {},
+  // macOSのターミナルに追加する環境変数（既定値）
+  "terminal.integrated.env.osx": {},
+  // Windowsのターミナルに追加する環境変数（既定値）
+  "terminal.integrated.env.windows": {},
+  // 拡張機能が環境変数を変更した際にターミナルを自動再起動する（既定値）
+  "terminal.integrated.environmentChangesRelaunch": true,
+  // Alt+スクロール時の高速スクロール倍率（既定値）
+  "terminal.integrated.fastScrollSensitivity": 5,
+  // 「選択範囲をターミナルで実行」後のフォーカス先（既定値）
+  "terminal.integrated.focusAfterRun": "none",
+  // 最後のターミナルを閉じた際にターミナルビューを隠す（既定値）
+  "terminal.integrated.hideOnLastClosed": true,
+  // 起動時にターミナルビューを隠す（既定値）
+  "terminal.integrated.hideOnStartup": "never",
+  // ブラケットペーストモードを無視する（既定値）
+  "terminal.integrated.ignoreBracketedPasteMode": false,
+  // confirmOnKillで無視するプロセス名（既定値）
+  "terminal.integrated.ignoreProcessNames": ["starship", "oh-my-posh", "bash", "zsh"],
+  // 新規シェルがVSCodeの環境を引き継ぐ（既定値）$PATH等の初期化のためログインシェルを経由する
+  "terminal.integrated.inheritEnv": true,
+  // 最初のターミナルに操作ヒントを表示（既定値）
+  "terminal.integrated.initialHint": true,
+  // ローカルエコーを有効にする条件（既定値）
+  "terminal.integrated.localEchoEnabled": "off",
+  // ローカルエコーを無効にするプログラム名（既定値）
+  "terminal.integrated.localEchoExcludePrograms": ["vim", "vi", "nano", "tmux"],
+  // ローカルエコーを行うネットワーク遅延のしきい値（既定値・ミリ秒）
+  "terminal.integrated.localEchoLatencyThreshold": 30,
+  // ローカルエコーされた文字のスタイル（既定値）
+  "terminal.integrated.localEchoStyle": "dim",
+  // macOSでOption+クリック時に矩形選択ではなく通常選択を強制する（既定値）
+  "terminal.integrated.macOptionClickForcesSelection": false,
+  // macOSでOptionキーをMetaキーとして扱う（既定値）
+  "terminal.integrated.macOptionIsMeta": false,
+  // 中クリック時の動作（既定値）
+  "terminal.integrated.middleClickBehavior": "default",
+  // マウスホイールのスクロール量倍率（既定値）
+  "terminal.integrated.mouseWheelScrollSensitivity": 1,
+  // Cmd+ホイールでフォントサイズを変更（既定値）
+  "terminal.integrated.mouseWheelZoom": false,
+  // 永続セッションのプロセスを復元するタイミング（既定値）
+  "terminal.integrated.persistentSessionReviveProcess": "onExit",
+  // 永続セッション復元時に戻すスクロールバックの行数（既定値）反映には再起動が必要
+  "terminal.integrated.persistentSessionScrollback": 100,
+  // 右クリック時の動作（既定値）
+  "terminal.integrated.rightClickBehavior": "selectWord",
+  // スクロールバックの最大行数（既定値）増やすとメモリ使用量も増える
+  "terminal.integrated.scrollback": 1000,
+  // ほとんどのキーバインドをシェルへ送る（既定値）
+  "terminal.integrated.sendKeybindingsToShell": false,
+  // 「終了コード」の警告を表示（既定値）
+  "terminal.integrated.showExitAlert": true,
+  // リンクのホバーを表示（既定値）
+  "terminal.integrated.showLinkHover": true,
+  // 分割したターミナルの作業ディレクトリ（既定値）
+  "terminal.integrated.splitCwd": "inherited",
+  // WSLディストリビューションをターミナル一覧に表示（既定値）
+  "terminal.integrated.useWslProfiles": true,
+  // VSCode同梱の conpty.dll を使う（既定値）Windowsのみ
+  "terminal.integrated.windowsUseConptyDll": true,
+  // ダブルクリックの単語選択で区切りとみなす文字（既定値）
+  "terminal.integrated.wordSeparators": " ()[]{}',\"`─‘’“”|",
+
+  // --- 統合ターミナル: プロファイル ---
+
+  // Linuxのターミナルプロファイル（既定値）
+  "terminal.integrated.profiles.linux": {
+    "bash": { "path": "bash", "icon": "terminal-bash" },
+    "zsh": { "path": "zsh" },
+    "fish": { "path": "fish" },
+    "tmux": { "path": "tmux", "icon": "terminal-tmux" },
+    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" }
+  },
+  // macOSのターミナルプロファイル（既定値）
+  "terminal.integrated.profiles.osx": {
+    "bash": { "path": "bash", "args": ["-l"], "icon": "terminal-bash" },
+    "zsh": { "path": "zsh", "args": ["-l"] },
+    "fish": { "path": "fish", "args": ["-l"] },
+    "tmux": { "path": "tmux", "icon": "terminal-tmux" },
+    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" }
+  },
+  // Windowsのターミナルプロファイル（既定値）
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": { "source": "PowerShell", "icon": "terminal-powershell" },
+    "Command Prompt": {
+      "path": ["${env:windir}\\Sysnative\\cmd.exe", "${env:windir}\\System32\\cmd.exe"],
+      "args": [],
+      "icon": "terminal-cmd"
+    },
+    "Git Bash": { "source": "Git Bash", "icon": "terminal-git-bash" }
+  },
+  // タスク・デバッグ用（自動化）のプロファイル: Linux（既定値）
+  "terminal.integrated.automationProfile.linux": null,
+  // タスク・デバッグ用（自動化）のプロファイル: macOS（既定値）
+  "terminal.integrated.automationProfile.osx": null,
+
+  // --- 統合ターミナル: シェル統合 ---
+
+  // シェル統合を自動注入する（既定値）コマンド追跡・cwd検出などが有効になる
+  "terminal.integrated.shellIntegration.enabled": true,
+  // コマンドごとに装飾を表示（既定値）
+  "terminal.integrated.shellIntegration.decorationsEnabled": "both",
+  // シェルの環境情報を報告する（既定値）プロンプト表示が遅くなる場合がある
+  "terminal.integrated.shellIntegration.environmentReporting": false,
+  // ターミナルのコマンド履歴の保持件数（既定値）0で履歴無効
+  "terminal.integrated.shellIntegration.history": 100,
+  // コマンドのクイックフィックスを有効化（既定値）
+  "terminal.integrated.shellIntegration.quickFixEnabled": true,
+  // コマンドのホバー時にガイドを表示（既定値）
+  "terminal.integrated.shellIntegration.showCommandGuide": true,
+  // シェル統合の待ち時間（既定値・ミリ秒）-1は自動判定
+  "terminal.integrated.shellIntegration.timeout": -1,
+  // 実行中のコマンドを上部に固定表示（既定値）シェル統合の有効化が必要
+  "terminal.integrated.stickyScroll.enabled": true,
+  // 固定表示の対象外にするコマンド（既定値）
+  "terminal.integrated.stickyScroll.ignoredCommands": [
+    "clear",
+    "cls",
+    "clear-host",
+    "agent",
+    "agy",
+    "copilot",
+    "claude",
+    "codex",
+    "gemini"
+  ],
+  // 固定表示する最大行数（既定値）
+  "terminal.integrated.stickyScroll.maxLineCount": 5,
+
+  // --- 統合ターミナル: 入力補完 ---
+
+  // ターミナルの入力補完（IntelliSense）を有効化（既定値）シェル統合の有効化が必要
+  "terminal.integrated.suggest.enabled": true,
+  // $CDPATH のサポート（既定値）
+  "terminal.integrated.suggest.cdPath": "absolute",
+  // シェルのインライン補完を検出して候補に反映する（既定値）
+  "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTop",
+  // 候補確定後に空白を自動挿入する（既定値）
+  "terminal.integrated.suggest.insertTrailingSpace": false,
+  // 補完候補の提供元（既定値）
+  "terminal.integrated.suggest.providers": {
+    "lsp": false,
+    "vscode.terminal-suggest": true
+  },
+  // 入力中に候補を自動表示する範囲（既定値）
+  "terminal.integrated.suggest.quickSuggestions": {
+    "commands": "off",
+    "arguments": "off",
+    "unknown": "off"
+  },
+  // Enterで候補を確定した際に即実行する（既定値）
+  "terminal.integrated.suggest.runOnEnter": "never",
+  // 候補の選択方式（既定値）
+  "terminal.integrated.suggest.selectionMode": "partial",
+  // 候補一覧にステータスバーを表示（既定値）
+  "terminal.integrated.suggest.showStatusBar": true,
+  // トリガー文字の入力で候補を自動表示（既定値）
+  "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
+  // 上矢印キーでコマンド履歴を辿る（既定値）
+  "terminal.integrated.suggest.upArrowNavigatesHistory": true,
+  // 候補に含めるWindowsの実行ファイル拡張子（既定値）
+  "terminal.integrated.suggest.windowsExecutableExtensions": {},
+
+  // --- 統合ターミナル: タブ ---
+
+  // ターミナルタブをリスト表示する（既定値）
+  "terminal.integrated.tabs.enabled": true,
+  // ターミナルアイコンの既定の色（既定値）
+  "terminal.integrated.tabs.defaultColor": null,
+  // ターミナルアイコンの既定のアイコン（既定値）
+  "terminal.integrated.tabs.defaultIcon": "terminal",
+  // タイトル右側に表示する説明の書式（既定値）
+  "terminal.integrated.tabs.description": "${task}${separator}${local}${separator}${cwdFolder}",
+  // タブのステータスにアニメーションを使う（既定値）
+  "terminal.integrated.tabs.enableAnimation": true,
+  // タブのターミナルにフォーカスする操作（既定値）
+  "terminal.integrated.tabs.focusMode": "doubleClick",
+  // タブビューを隠す条件（既定値）
+  "terminal.integrated.tabs.hideCondition": "singleTerminal",
+  // タブビューの表示位置（既定値）
+  "terminal.integrated.tabs.location": "right",
+  // タイトル・説明で使う区切り文字（既定値）
+  "terminal.integrated.tabs.separator": " - ",
+  // 分割・終了ボタンを表示する条件（既定値）
+  "terminal.integrated.tabs.showActions": "singleTerminalOrNarrow",
+  // アクティブなターミナル情報を表示する条件（既定値）
+  "terminal.integrated.tabs.showActiveTerminal": "singleTerminalOrNarrow",
+  // ターミナルタイトルの書式（既定値）
+  "terminal.integrated.tabs.title": "${process}",
+
+  // --- 統合ターミナル: アクセシビリティ・開発者向け ---
+
+  // コマンド実行時にアクセシブルビューへフォーカスする（既定値）
+  "terminal.integrated.accessibleViewFocusOnCommandExecution": false,
+  // アクセシブルビューでカーソル位置を保持する（既定値）
+  "terminal.integrated.accessibleViewPreserveCursorPosition": false,
+  // ターミナルの開発者モード（既定値）シェル統合シーケンスのデバッグ情報を表示
+  "terminal.integrated.developer.devMode": false,
+  // ptyホストへの呼び出しに加える擬似遅延（既定値）テスト用
+  "terminal.integrated.developer.ptyHost.latency": 0,
+  // ptyホストの擬似起動遅延（既定値）テスト用
+  "terminal.integrated.developer.ptyHost.startupDelay": 0,
+
+  // --- インタラクティブウィンドウ（REPL）---
+
+  // 実行結果が見えるように自動スクロールする（既定値）
+  "interactiveWindow.alwaysScrollOnNewCell": true,
+  // コードセルの入力を既定で折りたたむ（既定値）
+  "interactiveWindow.collapseCellInputCode": "fromEditor",
+  // Shift+Enterで実行する（既定値）Enterは改行になる
+  "interactiveWindow.executeWithShiftEnter": false,
+  // 閉じる際に保存を確認する（既定値）
+  "interactiveWindow.promptToSaveOnClose": false,
+  // 入力欄に実行方法のヒントを表示（既定値）
+  "interactiveWindow.showExecutionHint": true,
+
+  // --- ノートブック本体 ---
+
+  // ノートブックのパンくずリストにコードセルを含める（既定値）
+  "notebook.breadcrumbs.showCodeCells": true,
+  // セルの実行時間表示の詳細度（既定値）
+  "notebook.cellExecutionTimeVerbosity": "default",
+  // セル実行の失敗時に診断を表示（既定値）
+  "notebook.cellFailureDiagnostics": true,
+  // セルのフォーカスインジケーターの表示位置（既定値）
+  "notebook.cellFocusIndicator": "gutter",
+  // セルのツールバーの表示位置（既定値）
+  "notebook.cellToolbarLocation": {
+    "default": "right"
+  },
+  // セルのツールバーを表示する操作（既定値）
+  "notebook.cellToolbarVisibility": "click",
+  // 保存時に実行するコードアクション（既定値）
+  "notebook.codeActionsOnSave": {},
+  // ノートブックをコンパクト表示にする（既定値）
+  "notebook.compactView": true,
+  // 実行中のセルを削除する際に確認する（既定値）
+  "notebook.confirmDeleteRunningCell": true,
+  // 出力ツールバーに出力アクションをまとめて表示（既定値）
+  "notebook.consolidatedOutputButton": true,
+  // 実行ボタンの隣にドロップダウンで追加アクションを表示（既定値）
+  "notebook.consolidatedRunButton": false,
+  // ノートブックの既定フォーマッター（既定値）
+  "notebook.defaultFormatter": null,
+  // ノートブックの差分に拡張テキスト差分エディタを使う（既定値）
+  "notebook.diff.enablePreview": true,
+  // インライン差分エディタの切り替えコマンドを有効化（実験的機能・既定値）
+  "notebook.diff.experimental.toggleInline": false,
+  // 差分でメタデータの違いを隠す（既定値）
+  "notebook.diff.ignoreMetadata": false,
+  // 差分で出力の違いを隠す（既定値）
+  "notebook.diff.ignoreOutputs": false,
+  // 差分エディタに概要ルーラーを表示（既定値）
+  "notebook.diff.overviewRuler": false,
+  // 出力MIMEタイプの優先順位（既定値）
+  "notebook.displayOrder": [],
+  // ドラッグ＆ドロップでセルを移動できるようにする（既定値）
+  "notebook.dragAndDropEnabled": true,
+  // ノートブック内エディタへの editor.* 設定の上書き（既定値）
+  "notebook.editorOptionsCustomizations": {},
+  // インラインチャット付きのコードセル生成アクション（実験的機能・既定値）
+  "notebook.experimental.generate": true,
+  // ノートブックの差分保存（実験的機能・既定値）大きなノートブックで高速になる
+  "notebook.experimental.remoteSave": false,
+  // 検索ウィジェットの検索対象（既定値）
+  "notebook.find.filters": {
+    "markupSource": true,
+    "markupPreview": true,
+    "codeSource": true,
+    "codeOutput": true
+  },
+  // セル実行時にフォーマットする（既定値）
+  "notebook.formatOnCellExecution": false,
+  // 保存時にノートブックをフォーマットする（既定値）
+  "notebook.formatOnSave.enabled": false,
+  // ノートブック上部にグローバルツールバーを表示（既定値）
+  "notebook.globalToolbar": true,
+  // グローバルツールバーのアクションにラベルを表示（既定値）
+  "notebook.globalToolbarShowLabel": "always",
+  // 「シンボルへ移動」にコードシンボルも表示（既定値）
+  "notebook.gotoSymbols.showAllSymbols": true,
+  // セル実行後にインライン値を表示（既定値）
+  "notebook.inlineValues": "off",
+  // 保存時にコードセル末尾へ改行を挿入（既定値）
+  "notebook.insertFinalNewline": false,
+  // セル挿入アクションの表示位置（既定値）
+  "notebook.insertToolbarLocation": "both",
+  // セルエディタの行番号表示（既定値）
+  "notebook.lineNumbers": "off",
+  // Markdownセルの行の高さ（既定値）0は"normal"
+  "notebook.markdown.lineHeight": 0,
+  // レンダリングされたマークアップのフォント（既定値）
+  "notebook.markup.fontFamily": "",
+  // レンダリングされたマークアップのフォントサイズ（既定値）0はeditor.fontSizeの120%
+  "notebook.markup.fontSize": 0,
+  // 複数セルにまたがるマルチカーソル（実験的機能・既定値）
+  "notebook.multiCursor.enabled": false,
+  // セルの先頭・末尾で前後のセルへカーソル移動する（既定値）
+  "notebook.navigation.allowNavigateToSurroundingCells": true,
+  // アウトラインにコードセルのシンボルを表示（既定値）showCodeCellsの有効化が必要
+  "notebook.outline.showCodeCellSymbols": true,
+  // アウトラインにコードセルを表示（既定値）
+  "notebook.outline.showCodeCells": false,
+  // アウトラインに見出しを含むMarkdownセルのみ表示（既定値）
+  "notebook.outline.showMarkdownHeadersOnly": true,
+  // セル出力のフォント（既定値）空はeditor.fontFamilyを使う
+  "notebook.output.fontFamily": "",
+  // セル出力のフォントサイズ（既定値）0はeditor.fontSizeを使う
+  "notebook.output.fontSize": 0,
+  // セル出力の行の高さ（既定値）
+  "notebook.output.lineHeight": 0,
+  // セル出力のファイルパスをリンクにする（既定値）
+  "notebook.output.linkifyFilePaths": true,
+  // エラー出力を簡略表示する（既定値）
+  "notebook.output.minimalErrorRendering": false,
+  // 長い出力をスクロール領域に収める（既定値）
+  "notebook.output.scrolling": false,
+  // テキスト出力の表示行数（既定値）
+  "notebook.output.textLineLimit": 30,
+  // 出力の行を折り返す（既定値）
+  "notebook.output.wordWrap": false,
+  // 次のセルを表示する際のスクロール量（既定値）
+  "notebook.scrolling.revealNextCellOnExecute": "fullCell",
+  // セルのステータスバーを表示（既定値）
+  "notebook.showCellStatusBar": "visible",
+  // Markdown見出しの折りたたみ矢印を表示するタイミング（既定値）
+  "notebook.showFoldingControls": "mouseover",
+  // ノートブックのスティッキースクロール（実験的機能・既定値）
+  "notebook.stickyScroll.enabled": false,
+  // スティッキースクロールのネスト表示方法（既定値）
+  "notebook.stickyScroll.mode": "indented",
+  // セルごとに独立したundo/redo履歴を持つ（既定値）
+  "notebook.undoRedoPerCell": true,
+  // デバッグパネル内の変数ビュー（実験的機能・既定値）
+  "notebook.variablesView": false,
+
+  // =============================================
+  // Features > Emmet - Emmet
+  // =============================================
+
+  // Emmet展開を無効にする言語（既定値）
+  "emmet.excludeLanguages": ["markdown"],
+  // Emmetのプロファイル・スニペットを置くパス（既定値）
+  "emmet.extensionsPath": [],
+  // 既定で非対応の言語でEmmetを有効にするマッピング（既定値）
+  "emmet.includeLanguages": {},
+  // CSS/SCSS/Lessでカーソル周辺のみ解析する（既定値）
+  "emmet.optimizeStylesheetParsing": true,
+  // Emmetの動作を変更する詳細設定（既定値）
+  "emmet.preferences": {},
+  // Emmetの略語を補完候補として表示（既定値）
+  "emmet.showAbbreviationSuggestions": true,
+  // 展開後のEmmet略語を補完候補として表示（既定値）
+  "emmet.showExpandedAbbreviation": "always",
+  // Emmetの候補をスニペットとして表示（既定値）
+  "emmet.showSuggestionsAsSnippets": false,
+  // 構文ごとのEmmetプロファイル（既定値）
+  "emmet.syntaxProfiles": {},
+  // Tabキーで略語を展開する（既定値）
+  "emmet.triggerExpansionOnTab": false,
+  // Emmetの展開にインライン補完を使う（既定値）
+  "emmet.useInlineCompletions": false,
+  // Emmetスニペット内で使う変数（既定値）
+  "emmet.variables": {},
+
+  // =============================================
+  // Features > Extensions - 拡張機能
+  // =============================================
+
+  // 拡張機能・MCPサーバーをモーダルエディタで開く（既定値）
+  "extensions.allowOpenInModalEditor": false,
+  // 使用を許可する拡張機能の一覧（既定値）"*"はすべて許可
+  "extensions.allowed": "*",
+  // 拡張機能の更新を自動確認する（既定値）
+  "extensions.autoCheckUpdates": true,
+  // 拡張機能の自動更新（既定値）
+  "extensions.autoUpdate": "on",
+  // 拡張機能ビューから離れた際に詳細エディタを閉じる（既定値）
+  "extensions.closeExtensionDetailsOnViewChange": false,
+  // URIハンドリング時に確認を出さない拡張機能ID（既定値）
+  "extensions.confirmedUriHandlerExtensionIds": [],
+  // 拡張機能を別の拡張機能ホストプロセスで動かす設定（実験的機能・既定値）
+  "extensions.experimental.affinity": {},
+  // onStartupFinished の拡張機能をタイムアウト後に有効化（実験的機能・既定値）
+  "extensions.experimental.deferredStartupFinishedActivation": false,
+  // クイックアクセスから拡張機能を検索・報告できるようにする（実験的機能・既定値）
+  "extensions.experimental.issueQuickAccess": true,
+  // 拡張機能の推奨通知を表示しない（既定値）
+  "extensions.ignoreRecommendations": false,
+  // マーケットプレイスへのHTTPリクエストのタイムアウト（既定値・ミリ秒）
+  "extensions.requestTimeout": 60000,
+  // Node.jsのnavigatorオブジェクトをグローバルに公開（既定値）
+  "extensions.supportNodeGlobalNavigator": false,
+  // 未信頼ワークスペースでの拡張機能サポートを上書き（既定値）
+  "extensions.supportUntrustedWorkspaces": {},
+  // 仮想ワークスペースでの拡張機能サポートを上書き（既定値）
+  "extensions.supportVirtualWorkspaces": {},
+  // Web Worker拡張機能ホストを有効化（既定値）
+  "extensions.webWorker": "auto",
+
+  // =============================================
+  // Features > Remote - リモート
+  // =============================================
+
+  // 新しいプロセスが待ち受けるポートを自動転送する（既定値）
+  "remote.autoForwardPorts": true,
+  // 自動転送の方式を process から hybrid に切り替えるポート数（既定値）0で無効
+  "remote.autoForwardPortsFallback": 20,
+  // ポート自動転送の検出元（既定値）
+  "remote.autoForwardPortsSource": "process",
+  // ローカルに入っている場合にリモートへも入れる拡張機能（既定値）
+  "remote.defaultExtensionsIfInstalledLocally": [
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "GitHub.vscode-pull-request-github"
+  ],
+  // 拡張機能の実行場所（ui=ローカル / workspace=リモート）の上書き（既定値）
+  "remote.extensionKind": {
+    "pub.name": ["ui"]
+  },
+  // ターミナル・デバッグコンソールから開いたローカルURLを転送する（既定値）
+  "remote.forwardOnOpen": true,
+  // ポート転送に使うローカルのホスト名（既定値）
+  "remote.localPortHost": "localhost",
+  // portsAttributesに該当しないポートの既定プロパティ（既定値）
+  "remote.otherPortsAttributes": {},
+  // ポート番号ごとの転送時プロパティ（既定値）
+  "remote.portsAttributes": {
+    "443": { "protocol": "https" },
+    "8443": { "protocol": "https" }
+  },
+  // ワークスペースで転送したポートを復元する（既定値）
+  "remote.restoreForwardedPorts": true,
+
+  // --- エージェント動作 ---
+
+  // エージェントモードを有効化（既定値）
+  "chat.agent.enabled": true,
+  // 1ターンあたりの最大リクエスト数（既定値）超えると継続確認が出る
+  "chat.agent.maxRequests": 50,
+  // 編集適用時にコードブロックへ進捗アニメーションを表示（既定値）
+  "chat.agent.codeBlockProgress": true,
+  // 思考セクションでのツール呼び出しの表示方法（既定値）
+  "chat.agent.thinking.collapsedTools": "always",
+  // 思考セクションの要約タイトルをLLMで生成する（既定値）
+  "chat.agent.thinking.generateTitles": true,
+  // 思考中に表示するメッセージのカスタマイズ（既定値）
+  "chat.agent.thinking.phrases": {
+    "mode": "append",
+    "phrases": []
+  },
+  // ターミナルのツール呼び出しを思考ドロップダウン内に表示（既定値）
+  "chat.agent.thinking.terminalTools": true,
+  // 思考の描画方法（既定値）
+  "chat.agent.thinkingStyle": "fixedScrolling",
+  // エージェントセッションのプロジェクションモード（既定値）
+  "chat.agentSessionProjection.enabled": false,
+  // タイトルバーのエージェント状態インジケーターの表示（既定値）
+  "chat.agentsControl.enabled": "compact",
+
+  // --- カスタマイズファイルの探索先 ---
+
+  // カスタムエージェント定義（*.agent.md）の場所（既定値）
+  "chat.agentFilesLocations": {
+    ".github/agents": true,
+    ".claude/agents": true,
+    "~/.copilot/agents": true
+  },
+  // エージェントスキル（SKILL.md）の場所（既定値）
+  "chat.agentSkillsLocations": {
+    ".agents/skills": true,
+    ".github/skills": true,
+    ".claude/skills": true,
+    "~/.agents/skills": true,
+    "~/.copilot/skills": true,
+    "~/.claude/skills": true
+  },
+  // フック設定ファイルの場所（既定値）
+  "chat.hookFilesLocations": {
+    ".github/hooks": true,
+    ".claude/settings.local.json": true,
+    ".claude/settings.json": true,
+    "~/.copilot/hooks": true,
+    "~/.claude/settings.json": true
+  },
+  // インストラクションファイル（*.instructions.md）の場所（既定値）
+  "chat.instructionsFilesLocations": {
+    ".github/instructions": true,
+    ".claude/rules": true,
+    "~/.copilot/instructions": true,
+    "~/.claude/rules": true
+  },
+  // 再利用可能なプロンプトファイル（*.prompt.md）の場所（既定値）
+  "chat.promptFilesLocations": {
+    ".github/prompts": true
+  },
+  // ウェルカムビューで推奨するプロンプトファイル（既定値）
+  "chat.promptFilesRecommendations": {},
+
+  // --- チャットの表示 ---
+
+  // チャットメッセージのフォント（既定値）
+  "chat.fontFamily": "default",
+  // チャットメッセージのフォントサイズ（既定値）
+  "chat.fontSize": 13,
+  // コードブロックのフォント（既定値）
+  "chat.editor.fontFamily": "default",
+  // コードブロックのフォントサイズ（既定値）
+  "chat.editor.fontSize": 12,
+  // コードブロックのフォントの太さ（既定値）
+  "chat.editor.fontWeight": "default",
+  // コードブロックの行の高さ（既定値）0はフォントサイズから算出
+  "chat.editor.lineHeight": 0,
+  // コードブロックで行を折り返す（既定値）
+  "chat.editor.wordWrap": "off",
+  // ファイル・シンボル参照の表示形式（既定値）
+  "chat.inlineReferences.style": "box",
+  // KaTeXによる数式レンダリングを有効化（既定値）
+  "chat.math.enabled": true,
+  // ユーザーメッセージの上にヒントを表示（既定値）
+  "chat.tips.enabled": true,
+  // 高評価ボタンのアニメーション（既定値）
+  "chat.upvoteAnimation": "floatingThumbs",
+  // 進行中のエージェントセッションにバッジを表示（既定値）
+  "chat.viewProgressBadge.enabled": false,
+  // チャットが空の時などにエージェントセッション一覧を表示（既定値）
+  "chat.viewSessions.enabled": true,
+  // セッション一覧の表示方向（デフォルト: "sideBySide"）縦積みにする
+  "chat.viewSessions.orientation": "stacked",
+  // 成長促進の通知を表示（既定値）
+  "chat.growthNotification.enabled": false,
+  // コマンドセンターを統合チャット・検索ウィジェットに置き換える（既定値）
+  "chat.unifiedAgentsBar.enabled": false,
+
+  // --- チャットの動作 ---
+
+  // 質問カルーセルを自動でスキップする（既定値）意図しない選択につながるため有効化しない
+  "chat.autoReply": false,
+  // チェックポイント（過去の状態への復元）を有効化（既定値）
+  "chat.checkpoints.enabled": true,
+  // チェックポイントのファイル変更を表示（既定値）
+  "chat.checkpoints.showFileChanges": false,
+  // コンテキストウィンドウの使用量インジケーターを表示（既定値）
+  "chat.contextUsage.enabled": true,
+  // チャット参加者の自動検出を有効化（既定値）
+  "chat.detectParticipant.enabled": true,
+  // 組み込みのAI機能（Copilot）を無効化して隠す（既定値）
+  "chat.disableAIFeatures": false,
+  // 送信済みリクエストの編集を有効化（既定値）
+  "chat.editRequests": "inline",
+  // 委譲後にチャットパネルを自動的に閉じる（既定値）
+  "chat.exitAfterDelegation": false,
+  // サードパーティ拡張機能が提供するツールを使う（既定値）
+  "chat.extensionTools.enabled": true,
+  // GitHub Copilot拡張機能の統合（既定値）
+  "chat.extensionUnification.enabled": true,
+  // 拡張機能向けにセッションウィンドウ固有の挙動を有効化（既定値）
+  "chat.experimentalSessionsWindowOverride": false,
+  // スキル遵守を強く促すプロンプトを使う（実験的機能・既定値）
+  "chat.experimental.useSkillAdherencePrompt": false,
+  // Exploreサブエージェントの既定モデル（既定値）
+  "chat.exploreAgent.defaultModel": "",
+  // Planエージェントの既定モデル（既定値）
+  "chat.planAgent.defaultModel": "",
+  // 確認・質問が必要な際にOS通知を出す（既定値）
+  "chat.notifyWindowOnConfirmation": "windowNotFocused",
+  // 応答を受信した際にOS通知を出す（既定値）
+  "chat.notifyWindowOnResponseReceived": "windowNotFocused",
+  // 実行中にキューボタンで行う既定のアクション（既定値）
+  "chat.requestQueuing.defaultAction": "steer",
+  // 再起動後にパネルの直近セッションを復元する（既定値）
+  "chat.restoreLastPanelSession": false,
+  // 取り消し時にチャット入力欄へ内容を復元する（既定値）
+  "chat.undoRequests.restoreInput": true,
+
+  // --- コンテキスト・カスタマイズの利用 ---
+
+  // アクティブなエディタを自動的にコンテキストに含める場所（既定値）
+  "chat.implicitContext.enabled": {
+    "panel": "always"
+  },
+  // 推奨コンテキストの提示フローを表示（既定値）
+  "chat.implicitContext.suggestedContext": true,
+  // applyTo が一致するインストラクションを自動的に含める（既定値）
+  "chat.includeApplyingInstructions": true,
+  // 参照されたインストラクションを自動的に含める（既定値）
+  "chat.includeReferencedInstructions": false,
+  // エージェントスキルを利用する（既定値）
+  "chat.useAgentSkills": true,
+  // AGENTS.md の内容を全リクエストに添付する（既定値）
+  "chat.useAgentsMdFile": true,
+  // ネストされた AGENTS.md も一覧に含める（既定値）
+  "chat.useNestedAgentsMdFiles": false,
+  // CLAUDE.md の内容を全リクエストに添付する（既定値）
+  "chat.useClaudeMdFile": true,
+  // Claude形式のフックを実行する（既定値）
+  "chat.useClaudeHooks": false,
+  // チャットフックを実行する（既定値）
+  "chat.useHooks": true,
+  // 親リポジトリのカスタマイズファイルを使う（既定値）
+  "chat.useCustomizationsInParentRepositories": false,
+
+  // --- 編集の適用 ---
+
+  // チャットの変更を自動承認するまでの遅延（既定値・秒）0で無効
+  "chat.editing.autoAcceptDelay": 0,
+  // リクエスト削除前に確認する（既定値）
+  "chat.editing.confirmEditRequestRemoval": true,
+  // リクエスト再試行前に確認する（既定値）
+  "chat.editing.confirmEditRequestRetry": true,
+  // 変更内容の「説明」ボタンを表示（実験的機能・既定値）
+  "chat.editing.explainChanges.enabled": false,
+  // チャットからファイルを開く際のエディタ関連付け（既定値）
+  "chat.editorAssociations": {},
+
+  // --- MCP（Model Context Protocol）---
+
+  // インストール済みMCPサーバーへのアクセス制御（既定値）
+  "chat.mcp.access": "all",
+  // MCPサーバーがツール呼び出しに独自UIを提供できるようにする（既定値）
+  "chat.mcp.apps.enabled": true,
+  // NuGet経由のMCPサーバー導入を有効化（既定値）
+  "chat.mcp.assisted.nuget.enabled": false,
+  // メッセージ送信時にMCPサーバーを自動起動する（既定値）
+  "chat.mcp.autostart": "newAndOutdated",
+  // 他アプリの設定からMCPサーバーを検出する（既定値）
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": false,
+    "windsurf": false,
+    "cursor-global": false,
+    "cursor-workspace": false
+  },
+  // MCPサーバーのマーケットプレイスを有効化（既定値）
+  "chat.mcp.gallery.enabled": false,
+  // MCPサーバーに公開するサンプリング用モデル（既定値）
+  "chat.mcp.serverSampling": {},
+
+  // --- プラグイン ---
+
+  // エージェントプラグイン連携を有効化（既定値）
+  "chat.plugins.enabled": true,
+  // 探索するプラグインディレクトリ（既定値）
+  "chat.pluginLocations": {},
+  // 参照するプラグインマーケットプレイス（既定値）
+  "chat.plugins.marketplaces": [
+    "github/copilot-plugins",
+    "github/awesome-copilot#marketplace"
+  ],
+
+  // --- ツールの自動承認 ---
+
+  // ツール失敗時に詳細を自動展開する（既定値）
+  "chat.tools.autoExpandFailures": true,
+  // エージェントによる編集を自動承認する対象（既定値）
+  // 意図しない副作用を招きやすいファイルは既定で除外されている
+  "chat.tools.edits.autoApprove": {
+    "**/*": true,
+    "**/.vscode/*.json": false,
+    "**/.git/**": false,
+    "**/{package.json,server.xml,build.rs,web.config,.gitattributes,.env,Cargo.toml}": false,
+    "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props,gradle,gradle.kts}": false,
+    "**/gradle.properties": false,
+    "**/ruby_lsp/*/addon": false,
+    "**/*.lock": false,
+    "**/*-lock.{yaml,json}": false
+  },
+  // 自動承認の対象となりうるツール（既定値）
+  "chat.tools.eligibleForAutoApproval": {},
+  // すべてのツールの手動承認を無効化する（既定値）
+  // 「YOLOモード」と呼ばれる非常に危険な設定。無効のまま
+  "chat.tools.global.autoApprove": false,
+  // ツールが要求したURLの自動承認（既定値）
+  "chat.tools.urls.autoApprove": {
+    "https://code.visualstudio.com": true,
+    "https://github.com/microsoft/vscode/wiki/*": true
+  },
+  // チャット入力欄の上にTODOリストウィジェットを表示（既定値）
+  "chat.tools.todos.showWidget": true,
+
+  // --- ターミナルツール ---
+
+  // ワークスペースのpackage.jsonに定義されたnpmスクリプトを自動承認（既定値）
+  "chat.tools.terminal.autoApproveWorkspaceNpmScripts": true,
+  // 検出したファイル書き込み操作をブロックする範囲（既定値）
+  "chat.tools.terminal.blockDetectedFileWrites": "outsideWorkspace",
+  // ターミナルツールの自動承認を許可する（既定値）
+  "chat.tools.terminal.enableAutoApprove": true,
+  // モデルが指定したタイムアウトを適用する（既定値）
+  "chat.tools.terminal.enforceTimeoutFromModel": true,
+  // 組み込みの自動承認ルールを無視する（既定値）
+  "chat.tools.terminal.ignoreDefaultAutoApproveRules": false,
+  // ターミナルツールの出力表示先（既定値）
+  "chat.tools.terminal.outputLocation": "chat",
+  // ターミナルツールのコマンドをシェル履歴に残さない（既定値）
+  "chat.tools.terminal.preventShellHistory": true,
+  // ターミナルのツール呼び出しを折りたたみ表示にする（既定値）
+  "chat.tools.terminal.simpleCollapsible": true,
+  // ターミナルツールが使うプロファイル: Linux（既定値）
+  "chat.tools.terminal.terminalProfile.linux": null,
+  // ターミナルツールが使うプロファイル: macOS（既定値）
+  "chat.tools.terminal.terminalProfile.osx": null,
+  // ターミナルツールが使うプロファイル: Windows（既定値）
+  "chat.tools.terminal.terminalProfile.windows": null,
+
+  // --- インラインチャット ---
+
+  // テキスト選択時にインラインチャットの導線を表示（既定値）
+  "inlineChat.affordance": "off",
+  // インラインチャットの既定モデル（既定値）
+  "inlineChat.defaultModel": "",
+  // 診断に対する「修正」アクションを表示（既定値）
+  "inlineChat.fixDiagnostics": true,
+  // ノートブックのインラインチャットでエージェント的な挙動を有効化（既定値）
+  "inlineChat.notebookAgent": false,
+
+  // --- 画像プレビュー ---
+
+  // エクスプローラーの右クリックに「Images Previewで開く」を表示（既定値）
+  "imageCarousel.explorerContextMenu.enabled": true,
+
+  // =============================================
+  // Application > General - アプリケーション全般
+  // =============================================
+
+  // 現在の接続を従量制として扱う（既定値）従量制では自動更新等が延期される
+  "network.meteredConnection": "auto",
+
+  // =============================================
+  // Application > Proxy - プロキシ
+  // =============================================
+
+  // Electronのfetch実装を使う（既定値）
+  "http.electronFetch": false,
+  // ネットワークインターフェース変更の確認間隔（実験的機能・既定値・秒）-1で無効
+  "http.experimental.networkInterfaceCheckInterval": 300,
+  // OSからのCA証明書読み込みの新方式（実験的機能・既定値）
+  "http.experimental.systemCertificatesV2": false,
+  // Node.jsのfetchにプロキシ・システム証明書のサポートを追加する（既定値）
+  "http.fetchAdditionalSupport": true,
+  // プロキシを経由しないドメイン（既定値）
+  "http.noProxy": [],
+  // 使用するプロキシ（既定値）空の場合は http_proxy / https_proxy 環境変数を継承
+  "http.proxy": "",
+  // Proxy-Authorizationヘッダーの値（既定値）
+  "http.proxyAuthorization": null,
+  // Kerberos認証のサービスプリンシパル名（既定値）
+  "http.proxyKerberosServicePrincipal": "",
+  // プロキシサーバーの証明書を検証する（既定値）
+  "http.proxyStrictSSL": true,
+  // 拡張機能へのプロキシサポート（既定値）
+  "http.proxySupport": "override",
+  // OSからCA証明書を読み込む（既定値）
+  "http.systemCertificates": true,
+  // Node.js組み込みのシステム証明書サポートを使う（既定値）
+  "http.systemCertificatesNode": false,
+  // リモート開発時にローカルのプロキシ設定を使う（既定値）
+  "http.useLocalProxyConfiguration": true,
+  // 組み込みWebSocketにプロキシ・システム証明書のサポートを追加する（既定値）
+  "http.webSocketAdditionalSupport": true,
+
+  // =============================================
+  // Application > Keyboard - キーボード
+  // =============================================
+
+  // キー入力のディスパッチ方式（既定値）"code"が推奨
+  "keyboard.dispatch": "code",
+
+  // =============================================
+  // Application > Update - 更新
+  // =============================================
+
+  // 自動更新の受け取り方（既定値）
+  "update.mode": "default",
+  // 更新後にリリースノートを表示（既定値）
+  "update.showReleaseNotes": true,
+  // タイトルバーに更新インジケーターを表示（既定値）
+  "update.titleBar": true,
+
+  // =============================================
+  // Application > Telemetry - テレメトリ
+  // =============================================
+  // ※ 全体のテレメトリ送信は telemetry.telemetryLevel で制御する（現在は既定の "all"）。
+  //    無効化したい場合は "off" を明示的に追加すること
+
+  // 詳細な編集統計のテレメトリ（既定値）
+  "telemetry.editStats.details.enabled": false,
+  // 編集統計のテレメトリ（既定値）
+  "telemetry.editStats.enabled": true,
+  // 編集テレメトリの装飾を表示（既定値）
+  "telemetry.editStats.showDecorations": false,
+  // 編集テレメトリのステータスバーを表示（既定値）
+  "telemetry.editStats.showStatusBar": false,
+  // 問題報告・アンケートなどのフィードバック機能を有効化（既定値）
+  "telemetry.feedback.enabled": true,
+
+  // =============================================
+  // Security > Workspace - ワークスペースの信頼
+  // =============================================
+
+  // 制限モードのバナーを表示するタイミング（既定値）
+  "security.workspace.trust.banner": "untilDismissed",
+  // 空のウィンドウを既定で信頼する（既定値）
+  "security.workspace.trust.emptyWindow": true,
+  // ワークスペースの信頼機能を有効化（既定値）セキュリティ機能のため無効化しない
+  "security.workspace.trust.enabled": true,
+  // 起動時に信頼を確認するプロンプトを出すタイミング（既定値）
+  "security.workspace.trust.startupPrompt": "never",
+  // 信頼済みワークスペースで未信頼ファイルを開く際の扱い（既定値）
+  "security.workspace.trust.untrustedFiles": "prompt",
+
+  // --- GitHub Authentication ---
+
+  // 認証にデバイスコードフローを優先する（既定値）
+  "github-authentication.preferDeviceCodeFlow": false,
+  // HTTPリクエストにElectronのfetchを使う（既定値）反映には再起動が必要
+  "github-authentication.useElectronFetch": true,
+
+  // --- Grunt / Gulp / Jake（同梱タスク検出）---
+
+  // Gruntタスクの自動検出（既定値）ワークスペースのファイルが実行され得るため無効
+  "grunt.autoDetect": "off",
+  // Gulpタスクの自動検出（既定値）
+  "gulp.autoDetect": "off",
+  // Jakeタスクの自動検出（既定値）
+  "jake.autoDetect": "off",
+
+  // --- .ipynb（Jupyterノートブック）サポート ---
+
+  // ノートブックのシリアライズをワーカースレッドで行う（実験的機能・既定値）
+  "ipynb.experimental.serialization": true,
+  // Markdownセルへの画像貼り付けを有効化（既定値）
+  "ipynb.pasteImagesAsAttachments.enabled": true,
+
+  // --- Markdown（同梱プレビュー）---
+
+  // 組み込みMarkdownプレビューで数式を描画（既定値）
+  "markdown.math.enabled": true,
+  // 数式のカスタムマクロ（既定値）
+  "markdown.math.macros": {},
+
+  // --- Media Preview（同梱）---
+
+  // 動画を自動再生する（既定値）
+  "mediaPreview.video.autoPlay": false,
+  // 動画をループ再生する（既定値）
+  "mediaPreview.video.loop": false,
+
+  // --- Microsoft 認証（同梱）---
+
+  // Microsoftアカウントのサインイン実装（既定値）
+  "microsoft-authentication.implementation": "msal",
+  // ソブリンクラウドのカスタム構成（既定値）
+  "microsoft-sovereign-cloud.customEnvironment": {},
+  // 認証に使うソブリンクラウド（既定値）
+  "microsoft-sovereign-cloud.environment": "",
+
+  // --- References（同梱）---
+
+  // CodeLensの参照をクリックした際の表示方法（既定値）
+  "references.preferredLocation": "peek",
+
+  // --- Simple Browser（同梱）---
+
+  // フォーカス中を示すフローティングインジケーターを表示（既定値）
+  "simpleBrowser.focusLockIndicator.enabled": true,
 
   // =============================================
   // 言語別設定
   // =============================================
-  // 組み込みフォーマッターを使うものだけ残す
+  // 言語ごとに上書きする設定。ここでの指定はトップレベルの設定より優先される
 
+  // JSON: 組み込みのJSON言語機能でフォーマットする
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
+  // JSONC: 組み込みのJSON言語機能でフォーマットする
   "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
+  // Markdown: 組み込みフォーマッターを使い、空白の差分も検出する
   "[markdown]": {
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
+    "editor.formatOnPaste": true
   },
+  // XML: 末尾の余分な改行を削除する（フォーマッターは拡張機能に依存するため指定しない）
   "[xml]": {
-    "files.trimFinalNewlines": true,
-  },
+    "files.trimFinalNewlines": true
+  }
 }
