@@ -282,6 +282,17 @@ if [ ! -f $HOME/.gitconfig.user.local ]; then
 fi
 print_success "Git configuration files created"
 
+# AWS CLI configuration
+# Copy instead of symlink: the config holds an account-specific ARN
+# and this repository is public
+mkdir -p $HOME/.aws
+if [ ! -f $HOME/.aws/config ]; then
+  cp $SCRIPT_DIR/aws/config $HOME/.aws/config
+  print_success "AWS configuration file created"
+else
+  print_success "AWS configuration file already exists"
+fi
+
 # Editor user settings
 # settings.json is shared across VSCode / VSCode Insiders / Cursor (vscode/settings.json)
 # Requires each application to be installed and launched at least once
