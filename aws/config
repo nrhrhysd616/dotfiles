@@ -1,0 +1,9 @@
+# Please copy and use this file, do not use symbolic link.
+#
+# Authentication uses `aws login` (requires AWS CLI 2.32.0 or later).
+# Browser-based sign-in issues short-term credentials cached under
+# ~/.aws/login/cache, so no long-term access keys are stored on disk.
+# Sign in as an IAM user with MFA, never as the root user.
+[default]
+  login_session = # arn:aws:iam::<account-id>:user/<iam-user-name>
+  region = ap-northeast-1

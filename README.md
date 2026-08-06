@@ -67,6 +67,31 @@
     サインインさえ済ませておけば接続は切っておいてよい  
     `csctl`が必要なときだけ自動で接続し、使い終わったら自動で切断する
 
+9. AWS CLIの認証設定
+
+    `aws/config`からコピーされた`~/.aws/config`を編集し、`login_session`にIAMユーザーのARNを設定する
+
+    ```ini
+    [default]
+      login_session = arn:aws:iam::<account-id>:user/<iam-user-name>
+      region = ap-northeast-1
+    ```
+
+    認証は`aws login`で行う（AWS CLI 2.32.0以降が必要）  
+    ブラウザでコンソールにサインインすると一時クレデンシャルが`~/.aws/login/cache`に発行される  
+    有効期限は最長12時間で、その間15分ごとに自動更新される
+
+    ```zsh
+    aws login
+    aws sts get-caller-identity  # ARNを確認
+    ```
+
+    この方式では**長期のアクセスキーを一切作らない**ため、`~/.aws/credentials`は存在しない
+
+    サインインには**MFAを設定したIAMユーザー**を使うこと  
+    ルートユーザーはアカウント解約・支払い情報の変更などルート専用の操作にのみ使い、
+    日常の操作やCLIからは使わない
+
 ### miseの使い方
 
 [mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、Bunなどをmiseで管理しています。
