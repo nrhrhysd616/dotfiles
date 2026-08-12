@@ -94,7 +94,7 @@
 
 ### miseの使い方
 
-[mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、Bunなどをmiseで管理しています。
+[mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、pnpm、Bun、Go、Terraformをmiseで管理しています。
 
 - **インストール済みツールの確認**
 
