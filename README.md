@@ -27,19 +27,32 @@
 
 4. `.gitconfig.user.local`ファイルを編集
 
-    - signingkey: ssh公開鍵の情報
     - name: アルファベットフルネーム
-    - email: sshキーの設定と同一のGithubで利用しているメールアドレス
+    - email: Githubで利用しているメールアドレス
 
-5. コミット署名のローカル検証用に`~/.ssh/allowed_signers`ファイルを作成
+    `user.signingkey`と`gpg.ssh.program`は端末ごとに絶対パスが変わるため、
+    次の手順の`gen-mac-git-signkey`が書き込む（手で設定しない）
 
-    `git log --show-signature`で署名を検証できるようにするための設定  
-    メールアドレスと公開鍵は`.gitconfig.user.local`に設定したものと同一にする
+5. コミット署名用の鍵をSecure Enclaveに用意する
+
+    `init-mac.zsh`が既に一度実行しているが、手順4でメールアドレスを設定した後に
+    もう一度実行して、GitHubへの鍵登録と署名者リストへの追記まで済ませる
 
     ```zsh
-    echo "<email> <signingkeyの公開鍵>" > ~/.ssh/allowed_signers
-    chmod 644 ~/.ssh/allowed_signers
+    gen-mac-git-signkey
     ```
+
+    `gh`のトークンに鍵登録用のスコープが無い場合は案内が出るので、追加してから再実行する
+
+    ```zsh
+    gh auth refresh -h github.com -s admin:ssh_signing_key,admin:public_key
+    gen-mac-git-signkey
+    ```
+
+    この端末の公開鍵が`git/allowed_signers`へ追記されるので、commitしてpushする  
+    そうすると他の端末でもこの端末が作った署名を検証できるようになる
+
+    仕組みと運用は後述の[コミット署名とSSH認証（Secure Enclave）](#コミット署名とssh認証secure-enclave)を参照
 
 6. sshdを再起動して設定を反映する
 
@@ -91,6 +104,63 @@
     サインインには**MFAを設定したIAMユーザー**を使うこと  
     ルートユーザーはアカウント解約・支払い情報の変更などルート専用の操作にのみ使い、
     日常の操作やCLIからは使わない
+
+### コミット署名とSSH認証（Secure Enclave）
+
+コミット署名とGitHubへのSSH認証には、macOSのSecure Enclave内に作った鍵を使います。
+秘密鍵はハードウェアから取り出せず、`sc_auth create-ctk-identity -t none`で作るため
+署名のたびに生体認証を求められません。コミット1回あたり0.1秒程度で、
+Claude等のコーディングエージェントに無人で作業させても承認待ちで止まりません。
+
+| 要素 | 役割 |
+| --- | --- |
+| `bin/gen-mac-git-signkey` | 鍵の生成、GitHubへの登録、gitconfigへの反映、状態確認 |
+| `bin/mac-ssh-keygen` | gitが署名時に呼ぶssh-keygenラッパー（Secure Enclaveのプロバイダを渡す） |
+| `git/allowed_signers` | 全端末の公開鍵を集めた署名者リスト（`git log --show-signature`用） |
+| `ssh/config` | GitHubへの認証にSecure Enclaveの鍵を使う設定 |
+| `~/.ssh/id_git_sign` | ハードウェア内の鍵を指すハンドル（秘密鍵そのものではない） |
+
+- **鍵は端末ごとに別になる**
+
+  Secure Enclaveの秘密鍵はエクスポートできないため、`~/.ssh/id_git_sign`を他の端末へ
+  コピーしても機能しません。端末ごとに鍵を作り、GitHubには端末ごとに署名キーと
+  認証キーを登録します。鍵のパスとgitconfigの構造は全端末で同じなので、
+  運用上の違いは出ません
+
+- **状態を確認する**
+
+  ```zsh
+  gen-mac-git-signkey --status
+  ```
+
+  鍵、証明書の残り有効期間、gitconfigの設定値、GitHubへの登録状況、署名テストの結果が出ます
+
+- **鍵を作り直す**
+
+  ```zsh
+  gen-mac-git-signkey --recreate
+  ```
+
+  `sc_auth`が発行する自己署名証明書の有効期間は**1年**しかないため、期限が近づいたら
+  作り直します（`--status`が残り90日を切ると警告します）
+
+  作り直したあとも、GitHub上の古い鍵と`git/allowed_signers`の古い行は消さないこと  
+  消すとその鍵で署名した過去のコミットが`Unverified`になります
+
+- **1Passwordの署名に戻す**
+
+  旧鍵と`op-ssh-sign`は残してあるので、`~/.gitconfig.user.local`と`~/.ssh/config`を戻せば復帰できます
+
+  ```zsh
+  git config --file ~/.gitconfig.user.local gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  git config --file ~/.gitconfig.user.local user.signingkey "<1Passwordに入れている公開鍵の文字列>"
+  # ~/.ssh/config は init-mac.zsh が作ったバックアップ（config.bak.<timestamp>）から復元する
+  ```
+
+- **セキュリティ上の前提**
+
+  秘密鍵は取り出せませんが、`-t none`で作った鍵は**その端末で動くプロセスなら誰でも署名に使えます**。
+  端末そのものが乗っ取られた場合は署名を偽造されうるので、そこは端末の安全性に依存します
 
 ### miseの使い方
 

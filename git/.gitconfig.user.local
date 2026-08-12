@@ -1,5 +1,7 @@
 # Please copy and use this file, do not use symbolic link.
+#
+# user.signingkey と gpg.ssh.program は端末ごとに絶対パスが変わるため、
+# gen-mac-git-signkey が自動で書き込む（手で書かなくてよい）
 [user]
-  signingkey = # GPG or SSH signing key
   name = # Full Name
   email = # GitHub email address

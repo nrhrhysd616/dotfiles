@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# mac-ssh-keygen - Secure Enclave上の鍵を扱えるようにしたssh-keygenのラッパー
+#
+# SSH_SK_PROVIDERにmacOS標準のFIDOミドルウェア(/usr/lib/ssh-keychain.dylib)を
+# 設定してから/usr/bin/ssh-keygenへそのまま委譲する。引数は"$@"で透過するので
+# git専用ではなくssh-keygenの代替として使える。プロバイダはSecure Enclave固定で、
+# ssh-keychain.dylibはmacOSにしか無いため、このコマンドはmacOS専用である。
+#
+# なぜこのラッパーが必要か:
+#
+# Secure Enclave上の鍵はOpenSSHから見ると「FIDO認証器の中の鍵」
+# (sk-ecdsa-sha2-nistp256@openssh.com)であり、署名演算はssh-keychain.dylibを
+# 経由してSecure Enclaveに依頼される。ssh-keygenはこのライブラリの場所を
+# 知らないと署名できず、教える手段は`-w <provider>`引数か
+# SSH_SK_PROVIDER環境変数の2つしかない。
+#
+# gitは署名時にgpg.ssh.programのプログラムをssh-keygen互換のCLIとして呼ぶが
+# (`-Y sign -n git -f <鍵>`をgit自身が組み立てる)、そこへ追加の引数を渡す設定は
+# 存在しないため`-w`を差し込めない。
+#
+# 残る環境変数も、.zshrcでexportしただけではVSCode・Cursorのgit統合や
+# code-server、launchd経由で起動されたプロセスには届かない(これらは.zshrcを
+# 読まない)。そこから呼ばれたgitは署名に失敗してしまう。
+#
+# そのため、環境変数を自分で立ててからssh-keygenにexecで成り代わるこの
+# ラッパーをgpg.ssh.programに指定する。どこからgitが呼ばれても必ず
+# プロバイダが渡り、execなので余分なプロセスも残らない。
+#
+# @see gen-mac-git-signkey (鍵の生成とgitconfigへの登録)
+
+export SSH_SK_PROVIDER=/usr/lib/ssh-keychain.dylib
+exec /usr/bin/ssh-keygen "$@"

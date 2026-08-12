@@ -33,6 +33,25 @@
 - 以前はNixを第一候補にしていたが、ストアパスが更新のたびに変わるため絶対パスを要求する設定
   （Todo Tree拡張のripgrepパス）で使えないなど例外が積み上がり、管理コストが見合わないため撤廃した
 
+### コミット署名とSSH認証
+
+Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave内に作った鍵を使う
+（`sc_auth create-ctk-identity -k p-256-ne -t none`）
+
+- `-t none`で作るため署名のたびに生体認証ダイアログが出ない。コーディングエージェントに
+  無人でコミット・pushさせられる（以前は1Passwordの`op-ssh-sign`とSSH agentを使っていたが、
+  コミット・pushごとに人間の承認が必要で作業が止まっていた）
+- **秘密鍵はエクスポート不可なので鍵は端末ごとに別になる。** `~/.ssh/id_git_sign`は
+  ハードウェア内の鍵を指すハンドルでしかなく、他の端末にコピーしても使えない。
+  新しい端末では`gen-mac-git-signkey`で鍵を作り、GitHubに署名キーと認証キーを追加登録する
+- 署名検証用の公開鍵は`git/allowed_signers`に全端末分を集約し、`~/.ssh/allowed_signers`へ
+  シンボリックリンクする。古い鍵の行は消さない（消すとその鍵で署名した過去のコミットが
+  検証できなくなる）
+- `sc_auth`が発行する自己署名証明書の有効期間は1年しかないため、期限が近づいたら
+  `gen-mac-git-signkey --recreate`で作り直す運用になる（`--status`が残り90日で警告する）
+- `gpg.ssh.program`と`user.signingkey`は`~/.gitconfig.user.local`に**絶対パス**で書く。
+  gitがこれらのチルダを展開しないため、全端末で共有する`git/.gitconfig`には書けない
+
 ## 初期化スクリプト
 
 ### `init-mac.zsh`
@@ -53,11 +72,12 @@
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
-6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・`csctl`コマンドをシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
 7. **Cline拡張設定のコピー**（VSCode Cline拡張が存在する場合のみ）
-8. **SSH設定**: `sshd_config` を `/etc/ssh/` へシンボリックリンク（要sudo）、`authorized_keys` をコピー
-9. **iTerm2シェルインテグレーションのインストール**
-10. **macOSシステム設定**: キーリピート速度、DNS（Google Public DNS）、Finder設定など
+8. **SSH設定**: `sshd_config` を `/etc/ssh/` へコピー（要sudo）、`authorized_keys` をコピー、`ssh/config`と`git/allowed_signers`をシンボリックリンク（既存の実ファイルはバックアップしてから置き換える）
+9. **Git署名鍵の生成**: `gen-mac-git-signkey`でSecure Enclave内に鍵を作り、gitconfigとGitHubへ登録（冪等。`user.email`未設定の初回は署名者リストへの追記だけスキップされる）
+10. **iTerm2シェルインテグレーションのインストール**
+11. **macOSシステム設定**: キーリピート速度、DNS（Google Public DNS）、Finder設定など
 
 ## ディレクトリ構成
 
@@ -65,14 +85,14 @@
 | --- | --- |
 | `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
-| `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する） |
+| `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
 | `claude-code/` | ユーザーレベルのClaude Code設定 |
 | `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
-| `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`） |
+| `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる） |
 | `iterm2/` | iTerm2の設定・プロファイル・カラースキーム（Monokaiテーマ各種） |
 | `java/` | Javaコードフォーマッター設定（Google Styleベースのフォーマットプロファイル） |
-| `ssh/` | SSHクライアント設定（`authorized_keys`） |
+| `ssh/` | SSHクライアント設定（`config`※GitHub認証にSecure Enclaveの鍵を使う設定、`authorized_keys`） |
 | `sshd/` | SSHサーバー設定（`sshd_config`。symlinkではなくコピーで配置される） |
 | `vscode/` | VSCodeの設定（`settings.json`※VSCode Insiders・Cursorと共有、`keybindings.json`、Cline拡張設定） |
 | `vscode-insiders/` | VSCode Insidersの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
