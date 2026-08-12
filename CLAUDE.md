@@ -51,6 +51,11 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
   `gen-mac-git-signkey --recreate`で作り直す運用になる（`--status`が残り90日で警告する）
 - `gpg.ssh.program`と`user.signingkey`は`~/.gitconfig.user.local`に**絶対パス**で書く。
   gitがこれらのチルダを展開しないため、全端末で共有する`git/.gitconfig`には書けない
+- FIDO鍵は署名・認証の直前に`Confirm user presence`という通知を出す。標準エラーが端末でないと
+  OpenSSHは`SSH_ASKPASS`のプログラムでこれを表示しようとし、VSCodeやcode-serverは
+  `SSH_ASKPASS`を自前の入力ボックスに設定しているため、答える必要のない通知が毎回
+  プロンプトとして現れる。`core.sshCommand`（fetch/push用）と`bin/mac-ssh-keygen`（署名用）の
+  両方で`SSH_ASKPASS_REQUIRE=never`を設定して抑止している
 
 ## 初期化スクリプト
 

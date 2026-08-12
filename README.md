@@ -157,6 +157,20 @@ Claude等のコーディングエージェントに無人で作業させても�
   # ~/.ssh/config は init-mac.zsh が作ったバックアップ（config.bak.<timestamp>）から復元する
   ```
 
+- **VSCodeなどGUIから操作したときに出るプロンプトについて**
+
+  FIDO鍵は署名・認証の直前に`Confirm user presence for key ...`という**通知**を出します。
+  標準エラーが端末ならそこへ1行出るだけですが、端末でない場合OpenSSHは`SSH_ASKPASS`の
+  プログラムを起動してこれを表示しようとします。VSCodeやcode-serverは`SSH_ASKPASS`を
+  自前の入力ボックスに設定しているため、答える必要のない通知が毎回プロンプトとして現れます
+  （VSCodeがメッセージをパスワード要求として解釈するので`"key" has fingerprint ""`のような
+  崩れた表示になります）
+
+  `-t none`で作った鍵はSecure Enclaveが即座に応答するので確認する相手はいません。
+  `git/.gitconfig`の`core.sshCommand`（fetch/push用）と`bin/mac-ssh-keygen`（署名用）の
+  両方で`SSH_ASKPASS_REQUIRE=never`を設定して抑止しています。
+  手動の`ssh`コマンドには影響しないため、新しいホストの鍵確認は従来どおりできます
+
 - **セキュリティ上の前提**
 
   秘密鍵は取り出せませんが、`-t none`で作った鍵は**その端末で動くプロセスなら誰でも署名に使えます**。
