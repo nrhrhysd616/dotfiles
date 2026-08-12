@@ -240,6 +240,12 @@ install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix p
 # @see https://poppler.freedesktop.org/
 install_command 'Poppler' 'pdftotext' 'which pdftotext' 'nix profile add nixpkgs#poppler-utils' 'nix profile upgrade poppler-utils'
 
+# ripgrep install (used by the VSCode Todo Tree extension via todo-tree.ripgrep.ripgrep)
+# Homebrew instead of Nix: the extension needs an absolute path in settings.json,
+# and Nix profile paths point into hash-based store paths that change on every update
+# @see https://github.com/BurntSushi/ripgrep
+install_command 'ripgrep' 'rg' 'rg --version' 'brew install ripgrep' 'brew upgrade ripgrep'
+
 # code-server install (VS Code in the browser, driven by the csctl command)
 # Homebrew instead of Nix/mise: nixpkgs has no aarch64-darwin build and the npm
 # package pins Node 22 while mise tracks the current LTS. The formula bundles

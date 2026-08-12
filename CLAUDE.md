@@ -22,7 +22,7 @@
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
    例: Python、Node.js、pnpm、Bun、Terraform
 3. **Homebrew**（最終手段）: GUIアプリ・フォントなど、Nix/miseでカバーできない、またはNixで問題が起きるもの
-   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok、code-server（nixpkgsがaarch64-darwin非対応、npm版はNode 22固定のため）
+   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok、code-server（nixpkgsがaarch64-darwin非対応、npm版はNode 22固定のため）、ripgrep（設定ファイルに絶対パスを書く必要があり、Nixのストアパスは更新のたびに変わるため）
 
 **SDKMAN**がJavaバージョンを管理する（上記の優先順位とは独立した専用ツール）
 
@@ -43,6 +43,7 @@
    - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
+   - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
 6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・`csctl`コマンドをシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
