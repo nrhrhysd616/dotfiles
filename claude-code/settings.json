@@ -2,7 +2,12 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(rm /private/tmp/claude-501/:*)",
+      "Bash(rm -f /private/tmp/claude-501/:*)",
+      "Bash(rm -r /private/tmp/claude-501/:*)",
+      "Bash(rm -rf /private/tmp/claude-501/:*)",
+      "Bash(rmdir /private/tmp/claude-501/:*)"
     ],
     "deny": [
       "Read(*.env)",
@@ -10,8 +15,7 @@
       "Read(**/*.pem)",
       "Read(**/id_rsa*)",
       "Read(**/id_ed25519*)",
-      "Bash(rm:*)",
-      "Bash(rmdir:*)",
+      "Bash(sudo rm:*)",
       "Bash(git push --force:*)",
       "Read(./secrets/**)"
     ],
