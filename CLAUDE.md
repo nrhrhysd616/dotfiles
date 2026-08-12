@@ -17,14 +17,21 @@
 
 複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
 
-1. **Nix**（第一候補）: 基盤的なCLIツール全般。宣言的でバージョン管理不要、再現性が高い
-   例: Git、ghq、GitHub CLI、curl、fzf、mise、Go、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler
+1. **Homebrew**（第一候補）: 基盤的なCLIツール全般、GUIアプリ、フォント
+   例: Git、ghq、GitHub CLI、fzf、mise、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler、ripgrep、Codex CLI、Fira Code、ngrok、code-server
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
-   例: Python、Node.js、pnpm、Bun、Terraform
-3. **Homebrew**（最終手段）: GUIアプリ・フォントなど、Nix/miseでカバーできない、またはNixで問題が起きるもの
-   例: Codex CLI、Fira Code（Nixでのフォント配置にバグがあるため）、ngrok、code-server（nixpkgsがaarch64-darwin非対応、npm版はNode 22固定のため）、ripgrep（設定ファイルに絶対パスを書く必要があり、Nixのストアパスは更新のたびに変わるため）
+   例: Python、Node.js、pnpm、Bun、Go、Terraform
 
 **SDKMAN**がJavaバージョンを管理する（上記の優先順位とは独立した専用ツール）
+
+補足:
+
+- `curl`はmacOS標準のものを使う。Homebrew版はkeg-onlyで、使うには`.zshrc`へのPATH追加が必要になるため
+- `init-mac.zsh`でHomebrew管理ツールの導入判定に`brew list`を使っているのは、コマンドの有無で判定すると
+  Xcode Command Line Toolsの`git`のようなHomebrew管理外のものを「インストール済み」と誤判定し、
+  未インストールのまま`brew upgrade`が走って失敗するため。formulaは`--formula`、caskは`--cask`で判定する
+- 以前はNixを第一候補にしていたが、ストアパスが更新のたびに変わるため絶対パスを要求する設定
+  （Todo Tree拡張のripgrepパス）で使えないなど例外が積み上がり、管理コストが見合わないため撤廃した
 
 ## 初期化スクリプト
 
@@ -33,14 +40,14 @@
 新規macOS環境のセットアップを自動化するスクリプト。macOS以外では実行不可。
 以下の処理を順番に行う：
 
-1. **パッケージマネージャーのインストール**: Nix（パッケージ管理のメイン）・Homebrew（一部パッケージ用）
+1. **パッケージマネージャーのインストール**: Homebrew（パッケージ管理のメイン）
 2. **Zsh設定**: `zsh/.zshrc` をホームディレクトリへシンボリックリンク
 3. **Xcode Command Line Toolsのインストール**
 4. **開発ツールのインストール**（未インストールの場合のみ）:
-   - Git、ghq、GitHub CLI、curl、fzf（Nixで管理）
-   - mise（マルチ言語バージョンマネージャー）、Go（Nixで管理）
+   - Git、ghq、GitHub CLI、fzf（Homebrewで管理）
+   - mise（マルチ言語バージョンマネージャー、Homebrewで管理）
    - SDKMAN（Java用バージョンマネージャー）
-   - Python、Node.js（LTS）、pnpm、Bun、Terraform（miseで管理）
+   - Python、Node.js（LTS）、pnpm、Bun、Go、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
    - ripgrep（VSCodeのTodo Tree拡張が利用する）

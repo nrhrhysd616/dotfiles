@@ -1,8 +1,3 @@
-# Nix PATH - 最優先で読み込み
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-
 # homebrew PATH (Apple Silicon)
 if [ -e /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"

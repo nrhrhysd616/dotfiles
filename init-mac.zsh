@@ -62,36 +62,11 @@ print_success "This is macOS! Execute init-mac.zsh"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-# Nix check and install
-if command -v nix &>/dev/null; then
-  print_success "Nix already installed"
-else
-  print_section "Installing Nix"
-  curl -L https://nixos.org/nix/install | sh -s -- --daemon
-  print_success "Nix installed. Please restart terminal and re-run this script"
-  exit 0
-fi
-
-# Nixの環境読み込み
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-
-# Nix設定: 実験的機能を有効化
-print_section "Configuring Nix and Homebrew"
-mkdir -p ~/.config/nix
-if ! grep -q "experimental-features" ~/.config/nix/nix.conf 2>/dev/null; then
-  echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
-  print_success "Nix experimental features enabled"
-else
-  print_success "Nix experimental features already enabled"
-fi
-
-# Homebrew check and install (一部パッケージで使用)
+# Homebrew check and install (パッケージ管理のメイン)
+print_section "Installing Homebrew"
 if command -v brew &>/dev/null; then
   print_success "Homebrew already installed"
 else
-  print_section "Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   # Set Homebrew path based on architecture
@@ -100,16 +75,15 @@ else
   else
     eval "$(/usr/local/bin/brew shellenv)"
   fi
+  print_success "Homebrew installed"
 fi
 
 # zsh configuration
 print_section "ZSH Configuration"
 # Dependencies:
-# - fzf command
-# - curl
+# - fzf (historyexec command)
 # - mise (multi-language version manager)
-# - go
-# - sdkman
+# - sdkman (Java version manager)
 link_config $SCRIPT_DIR/zsh/.zshrc $HOME/.zshrc
 source $HOME/.zshrc
 
@@ -125,9 +99,9 @@ fi
 # Enhanced install command function
 # @param name Display name (ex. 'Git')
 # @param command Command name (ex. 'git')
-# @param checkCommand Command to check if installed (ex. 'git --version')
+# @param checkCommand Command to check if installed (ex. 'brew list --formula git')
 # @param installCommand Command to install (ex. 'brew install git')
-# @param updateCommand Command to update if already installed (ex. 'nix profile upgrade git') [optional]
+# @param updateCommand Command to update if already installed (ex. 'brew upgrade git') [optional]
 function install_command() {
   local name=$1
   local command=$2
@@ -165,27 +139,29 @@ function install_command() {
 
 print_section "Installing Development Tools"
 
+# Homebrew管理のツールは checkCommand に brew list を使う
+# コマンドの有無で判定すると、Xcode Command Line Toolsのgitのように
+# Homebrew管理外のものを「インストール済み」と誤判定し、
+# 未インストールのまま brew upgrade が走って失敗するため
+# formulaとcaskで判定に使うオプションが異なる点にも注意する
+#
+# curlはmacOS標準のものを使うためインストールしない
+# (Homebrew版はkeg-onlyで、使うにはPATHの追加が必要になるため)
 
 # Git install
-install_command 'Git' 'git' 'which git' 'nix profile add nixpkgs#git' 'nix profile upgrade git'
+install_command 'Git' 'git' 'brew list --formula git' 'brew install git' 'brew upgrade git'
 
 # ghq install
-install_command 'ghq' 'ghq' 'ghq --version' 'nix profile add nixpkgs#ghq' 'nix profile upgrade ghq'
+install_command 'ghq' 'ghq' 'brew list --formula ghq' 'brew install ghq' 'brew upgrade ghq'
 
 # GitHub CLI install
-install_command 'GitHub CLI' 'gh' 'gh --version' 'nix profile add nixpkgs#gh' 'nix profile upgrade gh'
-
-# curl install
-install_command 'curl' 'curl' 'which curl' 'nix profile add nixpkgs#curl' 'nix profile upgrade curl'
+install_command 'GitHub CLI' 'gh' 'brew list --formula gh' 'brew install gh' 'brew upgrade gh'
 
 # fzf install
-install_command 'fzf' 'fzf' 'fzf --version' 'nix profile add nixpkgs#fzf' 'nix profile upgrade fzf'
+install_command 'fzf' 'fzf' 'brew list --formula fzf' 'brew install fzf' 'brew upgrade fzf'
 
 # mise install (multi-language version manager)
-install_command 'mise' 'mise' 'mise --version' 'nix profile add nixpkgs#mise' 'nix profile upgrade mise'
-
-# Go install
-install_command 'Go' 'go' 'go version' 'nix profile add nixpkgs#go' 'nix profile upgrade go'
+install_command 'mise' 'mise' 'brew list --formula mise' 'brew install mise' 'brew upgrade mise'
 
 # SDKMAN install
 install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"' 'sdk selfupdate force'
@@ -205,6 +181,9 @@ install_command 'pnpm' 'pnpm' 'mise which pnpm' 'mise use -g pnpm@latest' 'mise 
 # @see https://bun.sh/docs/installation
 install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest' 'mise use -g bun@latest'
 
+# Go install via mise
+install_command 'Go' 'go' 'mise which go' 'mise use -g go@latest' 'mise use -g go@latest'
+
 # Terraform install via mise
 install_command 'Terraform' 'terraform' 'mise which terraform' 'mise use -g terraform@latest' 'mise use -g terraform@latest'
 
@@ -212,13 +191,13 @@ install_command 'Terraform' 'terraform' 'mise which terraform' 'mise use -g terr
 install_command 'Claude Code' 'claude' 'claude -v' 'curl -fsSL https://claude.ai/install.sh | bash' 'curl -fsSL https://claude.ai/install.sh | bash'
 
 # Codex CLI install
-install_command 'Codex CLI' 'codex' 'codex --version' 'brew install codex' 'brew upgrade codex'
+install_command 'Codex CLI' 'codex' 'brew list --cask codex' 'brew install codex' 'brew upgrade codex'
 
-# AWS CLI install
-install_command 'AWS CLI' 'aws' 'aws --version' 'nix profile add nixpkgs#awscli2' 'nix profile upgrade awscli2'
+# AWS CLI install (formula名はawscli、実体はv2)
+install_command 'AWS CLI' 'aws' 'brew list --formula awscli' 'brew install awscli' 'brew upgrade awscli'
 
 # AWS SAM CLI install
-install_command 'AWS SAM CLI' 'sam' 'sam --version' 'nix profile add nixpkgs#aws-sam-cli' 'nix profile upgrade aws-sam-cli'
+install_command 'AWS SAM CLI' 'sam' 'brew list --formula aws-sam-cli' 'brew install aws-sam-cli' 'brew upgrade aws-sam-cli'
 
 # Font Fira Code install
 # Bug: Font installation path issue, manually move and remove from brew
@@ -226,33 +205,33 @@ install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Reg
 
 # ngrok install
 # @see https://ngrok.com/docs/getting-started/
-install_command 'ngrok' 'ngrok' 'ngrok version' 'brew install ngrok' 'brew upgrade ngrok'
+install_command 'ngrok' 'ngrok' 'brew list --cask ngrok' 'brew install ngrok' 'brew upgrade ngrok'
 
 # Stripe CLI install
+# サードパーティのtapで配布されているため式名をフルパスで指定する (初回は自動でtapされる)
 # @see https://docs.stripe.com/stripe-cli
-install_command 'Stripe CLI' 'stripe' 'stripe version' 'nix profile add nixpkgs#stripe-cli' 'nix profile upgrade stripe-cli'
+install_command 'Stripe CLI' 'stripe' 'brew list --formula stripe' 'brew install stripe/stripe-cli/stripe' 'brew upgrade stripe/stripe-cli/stripe'
 
 # VHS install
 # @see https://github.com/charmbracelet/vhs
-install_command 'VHS' 'vhs' 'vhs --version' 'nix profile add nixpkgs#vhs' 'nix profile upgrade vhs'
+install_command 'VHS' 'vhs' 'brew list --formula vhs' 'brew install vhs' 'brew upgrade vhs'
 
 # Poppler install (PDF utilities: pdftotext, pdftoppm, pdfimages, etc.)
 # @see https://poppler.freedesktop.org/
-install_command 'Poppler' 'pdftotext' 'which pdftotext' 'nix profile add nixpkgs#poppler-utils' 'nix profile upgrade poppler-utils'
+install_command 'Poppler' 'pdftotext' 'brew list --formula poppler' 'brew install poppler' 'brew upgrade poppler'
 
 # ripgrep install (used by the VSCode Todo Tree extension via todo-tree.ripgrep.ripgrep)
-# Homebrew instead of Nix: the extension needs an absolute path in settings.json,
-# and Nix profile paths point into hash-based store paths that change on every update
+# The extension needs an absolute path in settings.json, so it points at
+# /opt/homebrew/bin/rg
 # @see https://github.com/BurntSushi/ripgrep
-install_command 'ripgrep' 'rg' 'rg --version' 'brew install ripgrep' 'brew upgrade ripgrep'
+install_command 'ripgrep' 'rg' 'brew list --formula ripgrep' 'brew install ripgrep' 'brew upgrade ripgrep'
 
 # code-server install (VS Code in the browser, driven by the csctl command)
-# Homebrew instead of Nix/mise: nixpkgs has no aarch64-darwin build and the npm
-# package pins Node 22 while mise tracks the current LTS. The formula bundles
-# node@22 itself. It is marked deprecated upstream (disabled 2027-04-11), so
-# revisit the install method before then.
+# Homebrew instead of mise: the npm package pins Node 22 while mise tracks the
+# current LTS. The formula bundles node@22 itself. It is marked deprecated
+# upstream (disabled 2027-04-11), so revisit the install method before then.
 # @see https://coder.com/docs/code-server
-install_command 'code-server' 'code-server' 'code-server --version' 'brew install code-server' 'brew upgrade code-server'
+install_command 'code-server' 'code-server' 'brew list --formula code-server' 'brew install code-server' 'brew upgrade code-server'
 
 print_section "Installing Java"
 

@@ -3688,7 +3688,7 @@
   "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
   // ripgrepの実行パス（デフォルト: 未設定＝拡張機能同梱のバイナリを使用）
   // 同梱バイナリが解決できずツリーが空になる不具合の回避として明示的に指定する
-  // Nixではなくhomebrew版を指すのは、Nixのパスがハッシュ付きで更新のたびに変わるため
+  // 拡張機能が絶対パスを要求するため、Homebrewで導入したripgrepのパスを指定している
   "todo-tree.ripgrep.ripgrep": "/opt/homebrew/bin/rg",
 
   // --- YAML (Red Hat) ---
