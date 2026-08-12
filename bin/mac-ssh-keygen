@@ -30,4 +30,16 @@
 # @see gen-mac-git-signkey (鍵の生成とgitconfigへの登録)
 
 export SSH_SK_PROVIDER=/usr/lib/ssh-keychain.dylib
+
+# FIDO鍵は署名の直前に「Confirm user presence for key ...」という通知を出す。
+# 標準エラーが端末ならそこへ1行出すだけだが、端末でない場合OpenSSHは
+# SSH_ASKPASSのプログラムを起動してこれを表示しようとする。
+# VSCodeやcode-serverはSSH_ASKPASSを自前の入力ボックスに設定しているため、
+# 答える必要のない通知が毎回プロンプトとして現れてしまう
+# (VSCodeがメッセージをパスワード要求として解釈するので
+#  『"key" has fingerprint ""』のような崩れた表示になる)。
+# -t noneで作った鍵はSecure Enclaveが即座に応答し、確認する相手はいない。
+# neverにしてaskpassを使わせず、端末があるときだけメッセージを出す
+export SSH_ASKPASS_REQUIRE=never
+
 exec /usr/bin/ssh-keygen "$@"

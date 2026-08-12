@@ -4,6 +4,13 @@
   quotepath = false
   ignorecase = false
   symlinks = true
+  # fetch/push時、Secure Enclaveの鍵(FIDO鍵)で認証する直前に
+  # 「Confirm user presence for key ...」という通知が出る。標準エラーが端末でないと
+  # OpenSSHはSSH_ASKPASSのプログラムでこれを表示しようとし、VSCodeやcode-serverは
+  # SSH_ASKPASSを自前の入力ボックスに設定しているため、答える必要のない通知が
+  # 毎回プロンプトとして現れてしまう。git経由のsshに限ってaskpassを使わせない
+  # (手動のsshコマンドには影響しないので、新しいホストの鍵確認は従来どおりできる)
+  sshCommand = "SSH_ASKPASS_REQUIRE=never ssh"
 [gpg]
   format = ssh
 [gpg "ssh"]
