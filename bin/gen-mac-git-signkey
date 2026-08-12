@@ -1,0 +1,691 @@
+#!/usr/bin/env zsh
+#
+# gen-mac-git-signkey - Gitのコミット署名用の鍵をmacOSのSecure Enclaveに用意する
+#
+# macOS標準のsc_authでSecure Enclave内に鍵(CTK identity)を作り、OpenSSHが
+# 読める形にエクスポートして、gitconfig・GitHub・署名者リストへの登録まで行う。
+# 何度実行しても同じ状態に収束する(冪等)。
+#
+# 目的は署名のたびに出る生体認証ダイアログを無くすこと。1Passwordのような
+# パスワードマネージャに鍵を預けると、コミットごとに人間の承認が必要になり、
+# コーディングエージェントに無人で作業させられない。Secure Enclaveの鍵を
+# -t none(認証不要)で作れば、秘密鍵をハードウェアの外に出さないまま
+# ダイアログなしで署名できる。
+#
+# 重要な制約: Secure Enclaveの秘密鍵はエクスポートできない。
+# ~/.ssh/id_git_signは秘密鍵そのものではなく、ハードウェア内の鍵を指す
+# ハンドルでしかないため、他の端末にコピーしても機能しない。
+# **鍵は端末ごとに作り、GitHubには端末ごとに追加登録する。**
+# その代わり鍵のパスとgitconfigの構造は全端末で共通なので、運用上の差は出ない。
+#
+# @see mac-ssh-keygen (gitが署名時に呼ぶssh-keygenラッパー)
+
+# ユーザーの環境設定に影響されないよう、zshの既定オプション状態にリセットする
+emulate -R zsh
+# pipe_fail: パイプ中のどれかが失敗したら全体を失敗扱いにする
+# no_unset : 未定義変数を参照したらエラーにする（タイポ対策）
+setopt pipe_fail no_unset
+
+readonly GEN_MAC_GIT_SIGNKEY_VERSION="1.0.0"
+
+# macOS標準のFIDOミドルウェア。Secure Enclave上の鍵をOpenSSHから
+# 「FIDO認証器の中の鍵」として扱えるようにする
+readonly SK_PROVIDER="/usr/lib/ssh-keychain.dylib"
+
+# Secure Enclave内に作るCTK identity(秘密鍵＋自己署名証明書の組)の設定。
+# p-256-neの-neはnon-exportable、つまり取り出せない鍵という意味。
+# -t none は署名のたびにTouch IDやパスコードを要求しないという指定で、
+# ダイアログを消すための要になる
+readonly CTK_LABEL="git-sign"
+readonly CTK_KEY_TYPE="p-256-ne"
+readonly CTK_PROTECTION="none"
+
+readonly KEY_PATH="$HOME/.ssh/id_git_sign"
+readonly PUB_PATH="$KEY_PATH.pub"
+
+# gitconfigのうち端末ごとに絶対パスが変わる項目はこちらに書く。
+# gitはgpg.ssh.programのチルダを展開しないため、共有される.gitconfigには置けない
+readonly USER_LOCAL_CONFIG="$HOME/.gitconfig.user.local"
+
+# gitが署名時に呼ぶラッパー。$HOME/.local/bin配下が本番の経路
+readonly WRAPPER_NAME="mac-ssh-keygen"
+readonly WRAPPER_PATH="$HOME/.local/bin/$WRAPPER_NAME"
+
+# このスクリプトはリポジトリ内にあり$HOME/.local/binからシンボリックリンク
+# されている。${0:A}でリンクを解決した実体のパスが得られるので、そこから
+# リポジトリのルートと、全端末で共有する署名者リストの位置を割り出す
+readonly REPO_ROOT="${0:A:h:h}"
+readonly REPO_ALLOWED_SIGNERS="$REPO_ROOT/git/allowed_signers"
+readonly HOME_ALLOWED_SIGNERS="$HOME/.ssh/allowed_signers"
+
+# sc_authが作る自己署名証明書の有効期間は1年しかない。
+# 残りがこの日数を切ったら--recreateを促す
+readonly CERT_WARN_DAYS=90
+
+# ---------------------------------------------------------------------------
+# 出力ヘルパー
+# ---------------------------------------------------------------------------
+
+# 端末に出力するときだけ色を付ける（パイプやリダイレクト時は制御文字を混ぜない）
+if [[ -t 1 ]]; then
+  RED=$'\033[0;31m'
+  GREEN=$'\033[0;32m'
+  YELLOW=$'\033[0;33m'
+  BLUE=$'\033[0;34m'
+  DIM=$'\033[2m'
+  BOLD=$'\033[1m'
+  NC=$'\033[0m'
+else
+  RED="" GREEN="" YELLOW="" BLUE="" DIM="" BOLD="" NC=""
+fi
+
+function print_info() {
+  echo "${BLUE}ℹ $1${NC}"
+}
+
+function print_success() {
+  echo "${GREEN}✓ $1${NC}"
+}
+
+# 警告・エラーは標準エラー出力へ
+function print_warning() {
+  echo "${YELLOW}⚠ $1${NC}" >&2
+}
+
+function print_error() {
+  echo "${RED}✗ $1${NC}" >&2
+}
+
+# エラーを表示して終了する
+# @param message エラーメッセージ
+function die() {
+  print_error "$*"
+  exit 1
+}
+
+# ---------------------------------------------------------------------------
+# 実行環境の確認
+# ---------------------------------------------------------------------------
+
+# Secure Enclaveを使える環境かどうかを検査する
+function require_macos() {
+  [[ "$(uname)" == "Darwin" ]] || die "macOS only (this machine is $(uname))"
+  command -v sc_auth >/dev/null 2>&1 || die "sc_auth not found"
+  [[ -f "$SK_PROVIDER" ]] \
+    || die "$SK_PROVIDER not found (macOS 14 Sonoma or later is required)"
+}
+
+# ---------------------------------------------------------------------------
+# Secure Enclave上のCTK identity
+# ---------------------------------------------------------------------------
+
+# ラベルが一致するCTK identityの行だけを取り出す。
+# sc_auth list-ctk-identitiesの出力は空白区切りで、1行目はヘッダになっている:
+#   Key Type Public Key Hash Prot Label    Common Name Email Address Valid To         Valid
+#   p-256-ne 4D40...C4       none git-sign git-sign                  2027/08/12 21:16 YES
+# -Eを付けずに作るためEmail Addressは常に空。列がずれても困らないよう、
+# 日付は行末から数えて読む（Valid=$NF、Valid To=$(NF-2) $(NF-1)）
+function ctk_lines() {
+  sc_auth list-ctk-identities 2>/dev/null | awk -v label="$CTK_LABEL" 'NR > 1 && $4 == label'
+}
+
+function ctk_hashes() {
+  ctk_lines | awk '{ print $2 }'
+}
+
+function ctk_count() {
+  local -a lines
+  lines=("${(@f)$(ctk_lines)}")
+  # 空文字列でも要素1の配列になるため、中身の有無で数え直す
+  local count=0 line
+  for line in "${lines[@]}"; do
+    [[ -n "$line" ]] && (( count++ ))
+  done
+  echo $count
+}
+
+# 証明書の期限切れまでの残り日数を返す（読めなければ失敗）
+function ctk_cert_days_left() {
+  local line valid_to expiry now
+  line=$(ctk_lines | head -1)
+  [[ -n "$line" ]] || return 1
+  valid_to=$(echo "$line" | awk '{ print $(NF-2) " " $(NF-1) }')
+  expiry=$(date -j -f "%Y/%m/%d %H:%M" "$valid_to" +%s 2>/dev/null) || return 1
+  now=$(date +%s)
+  echo $(( (expiry - now) / 86400 ))
+}
+
+# Secure Enclave内に鍵を作る
+function create_ctk_identity() {
+  print_info "Creating a key in the Secure Enclave (label: $CTK_LABEL)..."
+  sc_auth create-ctk-identity -l "$CTK_LABEL" -k "$CTK_KEY_TYPE" -t "$CTK_PROTECTION" \
+    || die "sc_auth create-ctk-identity failed"
+  print_success "Secure Enclave key created"
+}
+
+# ラベルが一致するCTK identityをすべて削除する
+function delete_ctk_identities() {
+  local -a hashes
+  hashes=()
+  local h
+  while IFS= read -r h; do
+    [[ -n "$h" ]] && hashes+=("$h")
+  done < <(ctk_hashes)
+
+  if (( ${#hashes} == 0 )); then
+    print_info "No CTK identity labeled $CTK_LABEL to delete"
+    return 0
+  fi
+
+  for h in "${hashes[@]}"; do
+    sc_auth delete-ctk-identity -h "$h" || die "sc_auth delete-ctk-identity -h $h failed"
+    print_success "Deleted CTK identity $h"
+  done
+}
+
+# ---------------------------------------------------------------------------
+# 鍵ファイルのエクスポート
+# ---------------------------------------------------------------------------
+
+# 公開鍵の「種別＋本体」だけを取り出す。コメント欄は比較の邪魔になるので落とす
+# @param path 公開鍵ファイルのパス
+function pubkey_body() {
+  awk '{ print $1 " " $2 }' "$1"
+}
+
+# Secure Enclave上の鍵をOpenSSHが読める形で~/.ssh/id_git_signへ書き出す。
+# 書き出されるのは秘密鍵そのものではなく、ハードウェア内の鍵を指すハンドル
+function export_key() {
+  local tmpdir
+  tmpdir=$(mktemp -d) || die "mktemp failed"
+
+  # -Kは認証器の中に住んでいる鍵(resident key)をカレントディレクトリへ
+  # 書き出すため、ホームやリポジトリを汚さないよう一時ディレクトリで実行する。
+  # ssh-keygenは認証器のPINを尋ねてくるが、ssh-keychain.dylibはPINを使わない。
+  # 対話待ちで止まらないよう</dev/nullで空の入力を渡す
+  if ! ( cd "$tmpdir" && ssh-keygen -w "$SK_PROVIDER" -K -N "" </dev/null >/dev/null 2>&1 ); then
+    rm -rf "$tmpdir"
+    die "ssh-keygen -K could not download the key from the Secure Enclave"
+  fi
+
+  # 出力ファイル名(id_ecdsa_sk_rk)に依存しないよう、書き出された鍵を数える。
+  # (N)はマッチしなければ空配列にするglob修飾子
+  local -a pubs
+  pubs=("$tmpdir"/*.pub(N))
+
+  if (( ${#pubs} == 0 )); then
+    rm -rf "$tmpdir"
+    die "no key was downloaded from the Secure Enclave"
+  fi
+
+  # Secure Enclave上に複数のidentityがあると、どれがgit用か区別できない。
+  # ssh-keygen -Kはラベルを見ずに全部書き出してしまうため、ここで手を止める
+  if (( ${#pubs} > 1 )); then
+    rm -rf "$tmpdir"
+    print_error "Multiple keys were downloaded from the Secure Enclave"
+    print_info "Check them with: sc_auth list-ctk-identities"
+    print_info "Then remove the ones you do not need: sc_auth delete-ctk-identity -h <hash>"
+    exit 1
+  fi
+
+  local pub="${pubs[1]}"
+  local priv="${pub%.pub}"
+
+  mkdir -p "$HOME/.ssh"
+  chmod 700 "$HOME/.ssh"
+
+  # 公開鍵が既存のものと同じなら同じ鍵なので何もしない。
+  # 秘密鍵ファイルはOpenSSH形式の乱数を含み毎回バイト列が変わるので比較しない
+  if [[ -f "$PUB_PATH" && -f "$KEY_PATH" ]] \
+    && [[ "$(pubkey_body "$pub")" == "$(pubkey_body "$PUB_PATH")" ]]; then
+    print_success "Key files are already up to date ($KEY_PATH)"
+    rm -rf "$tmpdir"
+    return 0
+  fi
+
+  # 別の鍵に入れ替わる場合は元のファイルを残しておく
+  local ts backup
+  ts=$(date +%Y%m%d%H%M%S)
+  local f
+  for f in "$KEY_PATH" "$PUB_PATH"; do
+    if [[ -e "$f" ]]; then
+      backup="$f.bak.$ts"
+      mv "$f" "$backup"
+      print_warning "Existing $f backed up to $backup"
+    fi
+  done
+
+  mv "$priv" "$KEY_PATH"
+  mv "$pub" "$PUB_PATH"
+  chmod 600 "$KEY_PATH"
+  chmod 644 "$PUB_PATH"
+  rm -rf "$tmpdir"
+  print_success "Exported the key handle to $KEY_PATH"
+}
+
+# ---------------------------------------------------------------------------
+# gitconfigへの登録
+# ---------------------------------------------------------------------------
+
+# 端末ごとに絶対パスが変わる項目を~/.gitconfig.user.localへ書き込む
+function configure_git() {
+  if [[ ! -f "$USER_LOCAL_CONFIG" ]]; then
+    if [[ -f "$REPO_ROOT/git/.gitconfig.user.local" ]]; then
+      cp "$REPO_ROOT/git/.gitconfig.user.local" "$USER_LOCAL_CONFIG"
+      print_warning "Created $USER_LOCAL_CONFIG from the template - fill in user.name and user.email"
+    else
+      die "$USER_LOCAL_CONFIG not found and no template in $REPO_ROOT/git"
+    fi
+  fi
+
+  git config --file "$USER_LOCAL_CONFIG" user.signingkey "$KEY_PATH" \
+    || die "failed to write user.signingkey to $USER_LOCAL_CONFIG"
+  git config --file "$USER_LOCAL_CONFIG" gpg.ssh.program "$WRAPPER_PATH" \
+    || die "failed to write gpg.ssh.program to $USER_LOCAL_CONFIG"
+  print_success "Set user.signingkey and gpg.ssh.program in $USER_LOCAL_CONFIG"
+
+  if [[ ! -x "$WRAPPER_PATH" ]]; then
+    print_warning "$WRAPPER_PATH is not linked yet - run init-mac.zsh, or link it by hand:"
+    echo "  ln -nfs $REPO_ROOT/bin/$WRAPPER_NAME $WRAPPER_PATH"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# GitHubへの登録
+# ---------------------------------------------------------------------------
+
+# この端末を識別する名前。GitHub上の鍵のタイトルと署名者リストのコメントに使う
+function machine_name() {
+  scutil --get ComputerName 2>/dev/null || hostname -s
+}
+
+# 指定したAPIに公開鍵が登録済みか調べる
+# @param endpoint user/ssh_signing_keys または user/keys
+function github_key_registered() {
+  local endpoint=$1
+  gh api --paginate "$endpoint" --jq '.[].key' 2>/dev/null \
+    | grep -qxF "$(pubkey_body "$PUB_PATH")"
+}
+
+# 公開鍵をGitHubへ登録する
+# @param type signing または authentication
+# @param endpoint 登録済みか調べるAPIのパス
+# @return 0 登録済みまたは登録成功 / 2 スコープ不足 / 1 その他の失敗
+function register_github_key() {
+  local type=$1
+  local endpoint=$2
+
+  # トークンにスコープが無いとAPIは404を返す。登録済みかも判断できないので
+  # 手動登録の案内に切り替える
+  if ! gh api "$endpoint" --jq '.[].key' >/dev/null 2>&1; then
+    return 2
+  fi
+
+  if github_key_registered "$endpoint"; then
+    print_success "Already registered on GitHub as a $type key"
+    return 0
+  fi
+
+  if gh ssh-key add "$PUB_PATH" --type "$type" --title "$(machine_name) (Secure Enclave)" >/dev/null 2>&1; then
+    print_success "Registered on GitHub as a $type key"
+    return 0
+  fi
+
+  return 1
+}
+
+# 自動登録できなかったときの手順を案内する
+function print_manual_registration() {
+  print_warning "Could not register the key on GitHub automatically"
+  print_info "The gh token is missing scopes. Grant them and run this command again:"
+  echo "  gh auth refresh -h github.com -s admin:ssh_signing_key,admin:public_key"
+  print_info "Or add it by hand at https://github.com/settings/ssh/new"
+  print_info "  - once as a Signing Key (to verify commits)"
+  print_info "  - once as an Authentication Key (to push over SSH)"
+  echo ""
+  echo "${DIM}$(cat "$PUB_PATH")${NC}"
+  echo ""
+}
+
+# 署名キーと認証キーの両方を登録する
+function register_github_keys() {
+  if ! command -v gh >/dev/null 2>&1; then
+    print_warning "gh not found - skipping GitHub registration"
+    print_manual_registration
+    return 0
+  fi
+
+  local signing_status=0 auth_status=0
+  register_github_key signing user/ssh_signing_keys || signing_status=$?
+  register_github_key authentication user/keys || auth_status=$?
+
+  if (( signing_status != 0 || auth_status != 0 )); then
+    print_manual_registration
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 署名者リスト(allowed_signers)
+# ---------------------------------------------------------------------------
+
+# git log --show-signature でローカル検証できるよう、この端末の公開鍵を
+# リポジトリ側の署名者リストへ追記する。端末ごとに鍵が増えるので、
+# リポジトリで一元管理して全端末で共有する。
+# コミットまでは行わない（リポジトリへの変更は利用者に確認してもらう）
+function update_allowed_signers() {
+  local email
+  email=$(git config --get user.email 2>/dev/null || true)
+  if [[ -z "$email" ]]; then
+    print_warning "user.email is not set - skipped updating allowed_signers"
+    print_info "Set it in $USER_LOCAL_CONFIG and run this command again"
+    return 0
+  fi
+
+  local body
+  body=$(pubkey_body "$PUB_PATH")
+
+  if [[ -f "$REPO_ALLOWED_SIGNERS" ]] && grep -qF -- "$body" "$REPO_ALLOWED_SIGNERS"; then
+    print_success "This machine's key is already in $REPO_ALLOWED_SIGNERS"
+  else
+    # 末尾に改行が無いファイルへ追記すると行が繋がってしまう。
+    # コマンド置換は末尾の改行を落とすので、$(tail -c1)が空なら改行済みと分かる
+    if [[ -s "$REPO_ALLOWED_SIGNERS" && -n "$(tail -c1 "$REPO_ALLOWED_SIGNERS")" ]]; then
+      echo "" >> "$REPO_ALLOWED_SIGNERS"
+    fi
+    {
+      echo "# $(machine_name) (Secure Enclave)"
+      echo "$email $body"
+    } >> "$REPO_ALLOWED_SIGNERS" || die "failed to append to $REPO_ALLOWED_SIGNERS"
+    print_success "Added this machine's key to $REPO_ALLOWED_SIGNERS"
+    print_warning "Commit and push it so your other machines can verify these signatures"
+  fi
+
+  # ~/.ssh/allowed_signersがリポジトリを指していないと、追記した鍵が
+  # ローカル検証に使われない
+  if [[ ! -L "$HOME_ALLOWED_SIGNERS" ]]; then
+    print_warning "$HOME_ALLOWED_SIGNERS is not a symlink to the repository"
+    print_info "Run init-mac.zsh, or link it by hand:"
+    echo "  ln -nfs $REPO_ALLOWED_SIGNERS $HOME_ALLOWED_SIGNERS"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 署名テスト
+# ---------------------------------------------------------------------------
+
+# 署名に使うssh-keygenラッパーの場所を決める。本番と同じ$HOME/.local/binを
+# 優先し、まだリンクされていない場合はリポジトリ内の実体で代用する
+function resolve_wrapper() {
+  if [[ -x "$WRAPPER_PATH" ]]; then
+    echo "$WRAPPER_PATH"
+  elif [[ -x "$REPO_ROOT/bin/$WRAPPER_NAME" ]]; then
+    print_warning "using $REPO_ROOT/bin/$WRAPPER_NAME ($WRAPPER_PATH is not linked yet)"
+    echo "$REPO_ROOT/bin/$WRAPPER_NAME"
+  else
+    return 1
+  fi
+}
+
+# 実際に署名して、ダイアログなしで通ることとローカル検証が成立することを確かめる
+function sign_test() {
+  local keygen
+  keygen=$(resolve_wrapper) || { print_error "$WRAPPER_NAME not found"; return 1; }
+
+  local tmpdir
+  tmpdir=$(mktemp -d) || { print_error "mktemp failed"; return 1; }
+  echo "gen-mac-git-signkey sign test" > "$tmpdir/payload"
+
+  if ! "$keygen" -Y sign -n git -f "$KEY_PATH" "$tmpdir/payload" </dev/null >/dev/null 2>&1; then
+    rm -rf "$tmpdir"
+    print_error "Signing failed"
+    return 1
+  fi
+  print_success "Signing works"
+
+  local email
+  email=$(git config --get user.email 2>/dev/null || true)
+  if [[ -n "$email" && -r "$HOME_ALLOWED_SIGNERS" ]]; then
+    if "$keygen" -Y verify -f "$HOME_ALLOWED_SIGNERS" -I "$email" -n git \
+      -s "$tmpdir/payload.sig" < "$tmpdir/payload" >/dev/null 2>&1; then
+      print_success "Local verification works (git log --show-signature)"
+    else
+      print_warning "Local verification failed - is this machine's key in $HOME_ALLOWED_SIGNERS?"
+    fi
+  fi
+
+  rm -rf "$tmpdir"
+}
+
+# ---------------------------------------------------------------------------
+# サブコマンド
+# ---------------------------------------------------------------------------
+
+function cmd_setup() {
+  require_macos
+
+  echo "${BOLD}Secure Enclave${NC}"
+  local count
+  count=$(ctk_count)
+  if (( count == 0 )); then
+    create_ctk_identity
+  elif (( count == 1 )); then
+    print_success "CTK identity already exists (label: $CTK_LABEL)"
+  else
+    print_error "Found $count CTK identities labeled $CTK_LABEL"
+    print_info "Clean them up first: gen-mac-git-signkey --recreate"
+    exit 1
+  fi
+
+  local days
+  if days=$(ctk_cert_days_left); then
+    if (( days < 0 )); then
+      print_warning "The certificate expired $(( -days )) days ago - run gen-mac-git-signkey --recreate"
+    elif (( days < CERT_WARN_DAYS )); then
+      print_warning "The certificate expires in $days days - plan to run gen-mac-git-signkey --recreate"
+    fi
+  fi
+
+  echo "\n${BOLD}Key files${NC}"
+  export_key
+
+  echo "\n${BOLD}Git configuration${NC}"
+  configure_git
+
+  echo "\n${BOLD}GitHub${NC}"
+  register_github_keys
+
+  echo "\n${BOLD}Allowed signers${NC}"
+  update_allowed_signers
+
+  echo "\n${BOLD}Signing test${NC}"
+  sign_test
+
+  echo ""
+  print_success "Done"
+}
+
+function cmd_recreate() {
+  require_macos
+
+  echo "${BOLD}Removing the current key${NC}"
+  delete_ctk_identities
+
+  # 鍵ハンドルは削除したidentityを指したままなので消しておく。
+  # export_keyが新しいハンドルを書き出す
+  local f
+  for f in "$KEY_PATH" "$PUB_PATH"; do
+    if [[ -e "$f" ]]; then
+      rm -f "$f"
+      print_success "Removed $f"
+    fi
+  done
+
+  echo ""
+  cmd_setup
+
+  echo ""
+  print_warning "The old key is still registered on GitHub and listed in git/allowed_signers"
+  print_info "Leave them alone unless you want past commits to become Unverified."
+  print_info "GitHub keys: https://github.com/settings/keys"
+}
+
+function cmd_status() {
+  require_macos
+
+  echo "${BOLD}Secure Enclave${NC}"
+  local count
+  count=$(ctk_count)
+  if (( count == 0 )); then
+    print_warning "No CTK identity labeled $CTK_LABEL - run gen-mac-git-signkey"
+  else
+    ctk_lines | while IFS= read -r line; do
+      echo "  ${DIM}$line${NC}"
+    done
+    local days
+    if days=$(ctk_cert_days_left); then
+      if (( days < 0 )); then
+        print_warning "The certificate expired $(( -days )) days ago - run gen-mac-git-signkey --recreate"
+      elif (( days < CERT_WARN_DAYS )); then
+        print_warning "The certificate expires in $days days"
+      else
+        print_success "The certificate is valid for another $days days"
+      fi
+    fi
+  fi
+
+  echo "\n${BOLD}Key files${NC}"
+  local f
+  for f in "$KEY_PATH" "$PUB_PATH"; do
+    if [[ -f "$f" ]]; then
+      print_success "$f ($(stat -f '%Sp' "$f"))"
+    else
+      print_warning "$f is missing"
+    fi
+  done
+  [[ -f "$PUB_PATH" ]] && echo "  ${DIM}$(pubkey_body "$PUB_PATH")${NC}"
+
+  echo "\n${BOLD}Git configuration${NC}"
+  local key value
+  for key in gpg.format user.signingkey gpg.ssh.program gpg.ssh.allowedSignersFile commit.gpgsign; do
+    value=$(git config --get "$key" 2>/dev/null || true)
+    if [[ -n "$value" ]]; then
+      echo "  $key = ${DIM}$value${NC}"
+    else
+      print_warning "$key is not set"
+    fi
+  done
+  if [[ -x "$WRAPPER_PATH" ]]; then
+    print_success "$WRAPPER_PATH is executable"
+  else
+    print_warning "$WRAPPER_PATH is not linked"
+  fi
+
+  echo "\n${BOLD}GitHub${NC}"
+  if ! command -v gh >/dev/null 2>&1; then
+    print_warning "gh not found"
+  elif [[ ! -f "$PUB_PATH" ]]; then
+    print_warning "no public key to look up"
+  else
+    local endpoint type
+    for endpoint type in user/ssh_signing_keys signing user/keys authentication; do
+      if ! gh api "$endpoint" --jq '.[].key' >/dev/null 2>&1; then
+        print_warning "Cannot read $endpoint (the gh token is missing scopes)"
+      elif github_key_registered "$endpoint"; then
+        print_success "Registered as a $type key"
+      else
+        print_warning "Not registered as a $type key"
+      fi
+    done
+  fi
+
+  echo "\n${BOLD}Allowed signers${NC}"
+  if [[ -L "$HOME_ALLOWED_SIGNERS" ]]; then
+    print_success "$HOME_ALLOWED_SIGNERS -> $(readlink "$HOME_ALLOWED_SIGNERS")"
+  elif [[ -f "$HOME_ALLOWED_SIGNERS" ]]; then
+    print_warning "$HOME_ALLOWED_SIGNERS is a regular file, not a symlink to the repository"
+  else
+    print_warning "$HOME_ALLOWED_SIGNERS is missing"
+  fi
+  if [[ -f "$PUB_PATH" && -r "$HOME_ALLOWED_SIGNERS" ]]; then
+    if grep -qF -- "$(pubkey_body "$PUB_PATH")" "$HOME_ALLOWED_SIGNERS"; then
+      print_success "This machine's key is listed"
+    else
+      print_warning "This machine's key is not listed"
+    fi
+  fi
+
+  echo "\n${BOLD}Signing test${NC}"
+  if [[ -f "$KEY_PATH" ]]; then
+    sign_test
+  else
+    print_warning "skipped ($KEY_PATH is missing)"
+  fi
+}
+
+function usage() {
+  # <<'EOF' とクォートすることで、中の$や`をそのまま出力する
+  cat <<'EOF'
+gen-mac-git-signkey - put a git commit signing key in the macOS Secure Enclave
+
+USAGE
+  gen-mac-git-signkey [option]
+
+OPTIONS
+  (none)        Create the key if it is missing, then register it everywhere.
+                Safe to run repeatedly - it converges on the same state.
+  --recreate    Delete the Secure Enclave key and build a new one. Use this
+                when the certificate is about to expire (sc_auth issues it for
+                one year only) or the key stopped working.
+  --status      Show the key, its certificate, the git settings, the GitHub
+                registration and the result of a signing test.
+  --help        Show this help
+  --version     Show the version
+
+WHAT IT DOES
+
+  1. Creates a non-exportable P-256 key in the Secure Enclave via
+     `sc_auth create-ctk-identity -t none`, so signing never asks for Touch ID.
+  2. Exports an OpenSSH handle for it to ~/.ssh/id_git_sign.
+  3. Writes user.signingkey and gpg.ssh.program (mac-ssh-keygen) into
+     ~/.gitconfig.user.local with absolute paths.
+  4. Registers the public key on GitHub as both a signing key and an
+     authentication key, or tells you how to do it by hand.
+  5. Appends the public key to git/allowed_signers in the dotfiles repository
+     so `git log --show-signature` can verify it. Commit that yourself.
+  6. Signs a test payload to prove no dialog appears.
+
+ONE KEY PER MACHINE
+
+  The private key cannot leave the Secure Enclave. ~/.ssh/id_git_sign is only a
+  handle to it, so copying it to another machine does not work. Every machine
+  gets its own key and its own GitHub registration; the paths and the gitconfig
+  stay identical everywhere, so nothing else differs.
+
+  Do not delete the old keys from GitHub or from git/allowed_signers when you
+  replace a key. Commits signed with them would become Unverified.
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# 引数の振り分け
+# ---------------------------------------------------------------------------
+
+function main() {
+  local option="${1:-}"
+
+  case "$option" in
+    "")                   cmd_setup ;;
+    --recreate)           cmd_recreate ;;
+    --status|--check)     cmd_status ;;
+    -h|--help|help)       usage ;;
+    -v|--version)         echo "gen-mac-git-signkey $GEN_MAC_GIT_SIGNKEY_VERSION" ;;
+    *)
+      print_error "Unknown option: $option"
+      echo ""
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

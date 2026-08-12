@@ -7,7 +7,9 @@
 [gpg]
   format = ssh
 [gpg "ssh"]
-  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  # 署名にはmacOSのSecure Enclave上の鍵を使う。gitはgpg.ssh.programのチルダを
+  # 展開しないため、programとuser.signingkeyは端末ごとの絶対パスとして
+  # gen-mac-git-signkeyが~/.gitconfig.user.localへ書き込む
   # git log --show-signature でローカル検証するための署名者リスト（README参照）
   allowedSignersFile = ~/.ssh/allowed_signers
 [filter "lfs"]

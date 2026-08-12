@@ -1,0 +1,27 @@
+# SSHクライアント設定
+#
+# GitHubへの認証にはコミット署名と同じmacOSのSecure Enclave上の鍵
+# (~/.ssh/id_git_sign)を使う。SecurityKeyProviderにmacOS標準のFIDO
+# ミドルウェアを指定することで、OpenSSHがSecure Enclaveへ署名を依頼できる。
+# 生体認証を求めないので、コーディングエージェントに無人でpushさせられる
+#
+# 秘密鍵はSecure Enclaveから取り出せないため鍵は端末ごとに別になる。
+# GitHubには端末ごとにAuthentication Keyを登録する必要がある
+# (gen-mac-git-signkeyが自動で登録する)
+
+# 端末固有の設定を先に読む。SSHは最初に見つかった値を採用するため、
+# こちらに書いた設定でこのファイルの内容を上書きできる（git管理外）
+Include ~/.ssh/config.local
+
+Host github.com
+  IdentityFile ~/.ssh/id_git_sign
+  # ssh-agentが抱えている鍵や既定の鍵を試させない。
+  # これがあるため後続のHost *のIdentityAgentはgithub.comには効かない
+  IdentitiesOnly yes
+  SecurityKeyProvider /usr/lib/ssh-keychain.dylib
+
+# GitHub以外のホストへの接続は引き続き1PasswordのSSH agentに任せる。
+# SSHは最初に見つかった値を採用するため、この設定がgithub.comの指定を
+# 上書きすることはない
+Host *
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"

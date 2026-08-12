@@ -307,6 +307,10 @@ link_config $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
 print_section "Custom Commands"
 mkdir -p $HOME/.local/bin
 link_config $SCRIPT_DIR/bin/csctl $HOME/.local/bin/csctl
+# mac-ssh-keygen is referenced by gpg.ssh.program with an absolute path,
+# so it has to be linked before gen-mac-git-signkey runs below
+link_config $SCRIPT_DIR/bin/mac-ssh-keygen $HOME/.local/bin/mac-ssh-keygen
+link_config $SCRIPT_DIR/bin/gen-mac-git-signkey $HOME/.local/bin/gen-mac-git-signkey
 
 # Cline MCP settings
 print_section "VSCode Cline extension Configuration"
@@ -359,6 +363,37 @@ fi
 cp $SCRIPT_DIR/ssh/authorized_keys $HOME/.ssh/authorized_keys
 chmod 600 $HOME/.ssh/authorized_keys
 print_success "SSH authorized_keys configuration file copied"
+
+# SSH client configuration
+# GitHubへの認証にSecure Enclave上の鍵を使う設定。1PasswordのSSH agentを
+# 指していた既存の設定へ戻せるよう、symlinkでなければバックアップを取る
+if [[ -e $HOME/.ssh/config && ! -L $HOME/.ssh/config ]]; then
+  backup_path="$HOME/.ssh/config.bak.$(date +%Y%m%d%H%M%S)"
+  cp $HOME/.ssh/config $backup_path
+  print_warning "Existing ssh config backed up to $backup_path"
+fi
+link_config $SCRIPT_DIR/ssh/config $HOME/.ssh/config
+
+# Allowed signers for commit signature verification
+# git log --show-signature が参照する署名者リスト。署名鍵は端末ごとに別になるため
+# 全端末の公開鍵をリポジトリ側(git/allowed_signers)に集約している
+if [[ -e $HOME/.ssh/allowed_signers && ! -L $HOME/.ssh/allowed_signers ]]; then
+  backup_path="$HOME/.ssh/allowed_signers.bak.$(date +%Y%m%d%H%M%S)"
+  cp $HOME/.ssh/allowed_signers $backup_path
+  print_warning "Existing allowed_signers backed up to $backup_path"
+fi
+link_config $SCRIPT_DIR/git/allowed_signers $HOME/.ssh/allowed_signers
+
+# Git commit signing key (Secure Enclave)
+# Secure Enclaveの秘密鍵は取り出せないため、鍵は端末ごとに生成する。
+# gen-mac-git-signkeyは冪等なので、既に鍵があれば作り直さない。
+# user.name / user.email が未設定の初回はallowed_signersへの追記だけが
+# スキップされるので、~/.gitconfig.user.localを編集したあとに再実行する
+print_section "Git Signing Key (Secure Enclave)"
+if ! $HOME/.local/bin/gen-mac-git-signkey; then
+  print_warning "Could not finish setting up the git signing key"
+  print_info "Edit ~/.gitconfig.user.local, then run: gen-mac-git-signkey"
+fi
 
 # iTerm2 shell integration install
 curl -sL https://iterm2.com/shell_integration/zsh -o $HOME/.iterm2_shell_integration.zsh

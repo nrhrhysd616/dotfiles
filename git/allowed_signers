@@ -1,0 +1,19 @@
+# コミット署名のローカル検証に使う署名者リスト
+# git log --show-signature や git verify-commit がこのファイルを参照する
+# (.gitconfigのgpg.ssh.allowedSignersFileが~/.ssh/allowed_signersを指し、
+#  そこからこのファイルへシンボリックリンクを張っている)
+#
+# Secure Enclaveの秘密鍵は端末の外に出せないため、鍵は端末ごとに別になる。
+# 新しい端末をセットアップすると gen-mac-git-signkey がその端末の公開鍵を
+# ここへ追記するので、commitしてpushすること。そうすると他の端末でも
+# その端末が作った署名を検証できるようになる
+#
+# 古い鍵の行は消さないこと。その鍵で署名した過去のコミットが検証できなくなる
+#
+# 形式: <principal(メールアドレス)> <鍵の種別> <公開鍵>
+# @see man ssh-keygen の ALLOWED SIGNERS セクション
+
+# 1Password管理の鍵 (Secure Enclaveへ移行する前に使っていたもの)
+norihiro.hayashida@geekstation.co.jp ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOIjzAB8PSCg1ptj7tMfIZdJNT7IJhNlhSuNnvfFpyTy
+# nrhrhysd616-Mac-mini-2025 (Secure Enclave)
+norihiro.hayashida@geekstation.co.jp sk-ecdsa-sha2-nistp256@openssh.com AAAAInNrLWVjZHNhLXNoYTItbmlzdHAyNTZAb3BlbnNzaC5jb20AAAAIbmlzdHAyNTYAAABBBMohWDwMAAg48iI0lbHOmUkIJM/2JUE8b+GBI6N5Hft/0HF1qNZjyC1kH1QZAl7nnCvLadZ2XiOkQZ/Ef++WdrcAAAAEc3NoOg==
