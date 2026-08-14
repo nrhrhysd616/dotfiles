@@ -178,7 +178,7 @@ Claude等のコーディングエージェントに無人で作業させても�
 
 ### miseの使い方
 
-[mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、pnpm、Bun、Go、Terraformをmiseで管理しています。
+[mise](https://mise.jdx.dev/)は複数の言語のバージョン管理ツールです。Python、Node.js、pnpm、Bun、Go、Ruby、Terraformをmiseで管理しています。
 
 - **インストール済みツールの確認**
 
@@ -210,7 +210,20 @@ Claude等のコーディングエージェントに無人で作業させても�
   ```zsh
   # プロジェクトディレクトリで実行
   cd /path/to/project
-  mise use python@3.11  # .tool-versionsファイルが生成される
+  mise use python@3.11  # mise.tomlが生成される
+  mise use ruby@3.3     # プロジェクトのRubyを固定したい場合
+  ```
+
+  グローバルは`latest`で運用しているため、バージョンを固定したいプロジェクトはこの方法で指定する
+
+- **rbenv・nodenv由来のバージョンファイルについて**
+
+  miseは`.ruby-version`や`.node-version`を**デフォルトでは読まない**  
+  これらが置いてあるプロジェクトでもグローバルのバージョンが使われるため、
+  尊重させたい場合はツールごとに有効化する
+
+  ```zsh
+  mise settings add idiomatic_version_file_enable_tools ruby
   ```
 
 - **現在のバージョン確認**
@@ -220,6 +233,75 @@ Claude等のコーディングエージェントに無人で作業させても�
   node --version
   bun --version
   ```
+
+### CocoaPodsの使い方（iOSプロジェクト）
+
+CocoaPodsは**グローバルにインストールせず**、プロジェクトの`Gemfile`でバージョンを固定します。  
+プロジェクトごとに`pod`のバージョンがズレても衝突せず、`sudo gem install`も不要になるためです
+（`init-mac.zsh`が用意するのはmise管理のRubyまで）。
+
+- **Expoプロジェクト（`expo run:ios`）の場合**
+
+  ルートに`Gemfile`を置くだけでよく、`pod`コマンドを自分で叩く必要はありません
+
+  ```zsh
+  cd /path/to/expo-project
+
+  bundle init            # Gemfileを生成
+  bundle add cocoapods   # GemfileとGemfile.lockにバージョンが記録される
+
+  npx expo run:ios       # prebuildでios/を生成し、pod installまで自動実行される
+  ```
+
+  Expo CLIはgitルートまでの親ディレクトリから`Gemfile`を探し、`gem "cocoapods"`の記述があって
+  `bundle exec pod --version`が通る場合に`bundle exec pod install`を使います  
+  `Gemfile`が無い場合はPATH上の`pod`を探し、見つからなければ`sudo gem install cocoapods`を促してきます
+
+  `Podfile`は`expo prebuild`が`ios/`の中に生成するため`pod init`は不要です  
+  プロジェクトルートで`pod install`を実行すると`No 'Podfile' found`になります
+
+- **Podfileを自分で管理するプロジェクトの場合**
+
+  ```zsh
+  cd /path/to/ios-project
+
+  bundle init
+  bundle add cocoapods
+
+  bundle exec pod init      # Podfileを生成（.xcodeprojと同じ階層で実行）
+  bundle exec pod install
+  ```
+
+  `Gemfile`・`Gemfile.lock`・`Podfile`・`Podfile.lock`をコミットする
+
+- **既にGemfileがあるプロジェクト**
+
+  ```zsh
+  bundle install         # Gemfile.lockのバージョンでCocoaPodsが入る
+  bundle exec pod install
+  ```
+
+- **gemの実体もプロジェクト配下に隔離する場合**
+
+  上記だけでもバージョンは`Gemfile.lock`で固定されますが、gem自体はmise管理Rubyの共有gemディレクトリに入ります  
+  完全に分けたい場合は次のように設定します
+
+  ```zsh
+  bundle config set --local path vendor/bundle  # .bundle/configが生成される
+  bundle install
+  echo "vendor/bundle" >> .gitignore
+  ```
+
+  `.bundle/config`はコミットしてよい（チーム全員が同じ配置になる）
+
+**注意:**
+
+- 手で`pod`を叩くときは`bundle exec`を付ける。グローバルに`pod`を入れていないため、
+  素の`pod install`は`command not found`になる（バージョンを取り違えないための安全弁）
+- Rubyのバージョンを固定したい場合は`mise use ruby@3.3`で`mise.toml`を生成する  
+  miseは`.ruby-version`をデフォルトでは読まない（前述の[miseの使い方](#miseの使い方)を参照）
+- 指定したバージョンにprecompiledバイナリが無いと、miseがソースビルドを行うため数分かかる  
+  ビルドに必要な`openssl@3`と`libyaml`は`init-mac.zsh`が導入済み
 
 ### csctlの使い方
 

@@ -166,6 +166,16 @@ install_command 'mise' 'mise' 'brew list --formula mise' 'brew install mise' 'br
 # SDKMAN install
 install_command 'SDKMAN' 'sdk' 'sdk version' 'curl -s "https://get.sdkman.io" | bash; source "$HOME/.sdkman/bin/sdkman-init.sh"' 'sdk selfupdate force'
 
+# Ruby build dependencies
+# miseはprecompiledのRubyがあればそれを使うが (この場合ライブラリは静的リンクされる)、
+# 無ければruby-buildでのソースビルドにフォールバックする
+# precompiledはApple Silicon向けの一部バージョンのみなので、プロジェクトの
+# .ruby-versionが古いバージョンを指すとビルドが走る。その保険として先に入れておく
+# openssl@3: macOS標準のLibreSSLではopenssl拡張をビルドできない (ruby-buildが自動で検出する)
+# libyaml: psych(YAML)がビルドされず、bundlerやCocoaPodsが動かなくなる
+install_command 'OpenSSL 3' 'openssl' 'brew list --formula openssl@3' 'brew install openssl@3' 'brew upgrade openssl@3'
+install_command 'libyaml' 'yaml' 'brew list --formula libyaml' 'brew install libyaml' 'brew upgrade libyaml'
+
 print_section "Installing mise-managed tools"
 
 # Python install via mise
@@ -183,6 +193,12 @@ install_command 'Bun' 'bun' 'mise which bun' 'mise use -g bun@latest' 'mise use 
 
 # Go install via mise
 install_command 'Go' 'go' 'mise which go' 'mise use -g go@latest' 'mise use -g go@latest'
+
+# Ruby install via mise (CocoaPodsなどiOSビルドのツールが必要とする)
+# checkCommandに `mise which` を使うのが重要
+# コマンドの有無で判定すると、macOS標準の /usr/bin/ruby を拾って
+# 「インストール済み」と誤判定する (Homebrewの判定に brew list を使うのと同じ理由)
+install_command 'Ruby (latest)' 'ruby' 'mise which ruby' 'mise use -g ruby@latest' 'mise use -g ruby@latest'
 
 # Terraform install via mise
 install_command 'Terraform' 'terraform' 'mise which terraform' 'mise use -g terraform@latest' 'mise use -g terraform@latest'
