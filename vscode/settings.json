@@ -1062,8 +1062,10 @@
   "workbench.editor.customLabels.patterns": {},
   // エディタのファイル装飾にバッジを使う（既定値）
   "workbench.editor.decorations.badges": true,
-  // エディタのファイル装飾に色を使う（既定値）
-  "workbench.editor.decorations.colors": true,
+  // エディタのファイル装飾に色を使う（デフォルト: true）
+  // gitDecoration.ignoredResourceForeground がタブ背景と同化してファイル名が読めなくなるため無効化
+  // Git状態は decorations.badges のバッジで判別できる
+  "workbench.editor.decorations.colors": false,
   // バイナリと判定されたファイルの既定エディタ（既定値）空は選択ダイアログを出す
   "workbench.editor.defaultBinaryEditor": "",
   // タブをダブルクリックした際のエディタグループのサイズ変更（既定値）
