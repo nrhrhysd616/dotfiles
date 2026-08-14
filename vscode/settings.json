@@ -354,21 +354,21 @@
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#000"
-          }
-        }
-      ]
+            "foreground": "#000",
+          },
+        },
+      ],
     },
     "[*Dark*]": {
       "textMateRules": [
         {
           "scope": "ref.matchtext",
           "settings": {
-            "foreground": "#fff"
-          }
-        }
-      ]
-    }
+            "foreground": "#fff",
+          },
+        },
+      ],
+    },
   },
   // 自動挿入された末尾空白のトリム（デフォルト: true）意図しない差分を避けるため無効化
   "editor.trimAutoWhitespace": false,
@@ -381,7 +381,7 @@
   // Unicode強調表示から除外するロケール（既定値）
   "editor.unicodeHighlight.allowedLocales": {
     "_os": true,
-    "_vscode": true
+    "_vscode": true,
   },
   // ASCIIと紛らわしい文字を強調（既定値）
   "editor.unicodeHighlight.ambiguousCharacters": true,
@@ -615,7 +615,7 @@
   "editor.quickSuggestions": {
     "other": "offWhenInlineCompletions",
     "comments": "off",
-    "strings": "off"
+    "strings": "off",
   },
   // 補完候補の自動表示までの遅延（既定値）
   "editor.quickSuggestionsDelay": 10,
@@ -746,7 +746,7 @@
     "**/.svn": true,
     "**/.hg": true,
     "**/.DS_Store": true,
-    "**/Thumbs.db": true
+    "**/Thumbs.db": true,
   },
   // 未保存ファイルをセッション間で保持する（既定値）
   "files.hotExit": "onExit",
@@ -781,7 +781,7 @@
     ".hg/store/**": true,
     "*/.git/objects/**": true,
     "*/.git/subtree-cache/**": true,
-    "*/.hg/store/**": true
+    "*/.hg/store/**": true,
   },
   // ファイル監視に追加するパス（既定値）シンボリックリンク先を監視したい場合に指定
   "files.watcherInclude": [],
@@ -1095,7 +1095,7 @@
   // 判定言語と設定言語が異なる場合にステータスバーへ修正候補を出す（既定値）
   "workbench.editor.languageDetectionHints": {
     "untitledEditors": true,
-    "notebookEditors": true
+    "notebookEditors": true,
   },
   // 同時に開けるエディタ数を制限する（既定値）
   "workbench.editor.limit.enabled": false,
@@ -1171,7 +1171,7 @@
   "workbench.editor.wrapTabs": false,
   // ファイルパターンとエディタの関連付け（既定値）
   "workbench.editorAssociations": {
-    "*.copilotmd": "vscode.markdown.preview.editor"
+    "*.copilotmd": "vscode.markdown.preview.editor",
   },
   // エディタで開く際に確認を出すファイルサイズの下限（既定値・MB単位）
   "workbench.editorLargeFileConfirmation": 1024,
@@ -1299,7 +1299,7 @@
     "showKeybindings": true,
     "showCommands": true,
     "showCommandGroups": false,
-    "showSingleEditorCursorMoves": true
+    "showSingleEditorCursorMoves": true,
   },
   // キーボードオーバーレイの表示時間（既定値）
   "screencastMode.keyboardOverlayTimeout": 800,
@@ -1544,7 +1544,7 @@
   // 自動追跡（autoReveal）の対象外にするパス（既定値）
   "explorer.autoRevealExclude": {
     "**/node_modules": true,
-    "**/bower_components": true
+    "**/bower_components": true,
   },
   // 子が1つだけのフォルダをまとめて表示（既定値）Javaのパッケージ構造などで有用
   "explorer.compactFolders": true,
@@ -1583,7 +1583,7 @@
     "*.jsx": "${capture}.js",
     "*.tsx": "${capture}.ts",
     "tsconfig.json": "tsconfig.*.json",
-    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
   },
   // 複製時の命名規則（既定値）
   "explorer.incrementalNaming": "simple",
@@ -1618,7 +1618,7 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
-    "**/*.code-search": true
+    "**/*.code-search": true,
   },
   // 閉じているノートブックのリッチコンテンツも検索結果に出す（実験的機能・既定値）
   "search.experimental.closedNotebookRichContentResults": false,
@@ -1735,7 +1735,7 @@
   "debug.javascript.autoAttachSmartPattern": [
     "${workspaceFolder}/**",
     "!**/node_modules/**",
-    "**/$KNOWN_TOOLS$/**"
+    "**/$KNOWN_TOOLS$/**",
   ],
   // リモートWebアプリのデバッグ時に自動でトンネルを張る（既定値）
   "debug.javascript.automaticallyTunnelRemoteServer": true,
@@ -1747,7 +1747,7 @@
   "debug.javascript.debugByLinkOptions": "on",
   // 起動構成で使う既定のruntimeExecutable（既定値）
   "debug.javascript.defaultRuntimeExecutable": {
-    "pwa-node": "node"
+    "pwa-node": "node",
   },
   // ネットワークビューを有効化（既定値）
   "debug.javascript.enableNetworkView": true,
@@ -1800,7 +1800,7 @@
   "testing.coverageBarThresholds": {
     "red": 0,
     "yellow": 60,
-    "green": 90
+    "green": 90,
   },
   // ミニマップにカバレッジ表示を出す（既定値）
   "testing.coverageMinimapEnabled": true,
@@ -1911,7 +1911,7 @@
   "git.diagnosticsCommitHook.enabled": false,
   // コミット前に確認する診断のソースと最小重要度（既定値）
   "git.diagnosticsCommitHook.sources": {
-    "*": "error"
+    "*": "error",
   },
   // 未追跡ファイルの破棄でゴミ箱へ移動する（既定値）完全削除を避けるため変更しない
   "git.discardUntrackedChangesToTrash": true,
@@ -1989,7 +1989,7 @@
   "git.showActionButton": {
     "commit": true,
     "publish": true,
-    "sync": true
+    "sync": true,
   },
   // ソース管理パネルにコミット入力欄を表示（既定値）
   "git.showCommitInput": true,
@@ -2062,7 +2062,7 @@
     "markdown": true,
     "scminput": false,
     "yaml": true,
-    "enableAutoCompletions": true
+    "enableAutoCompletions": true,
   },
   // 次の編集候補（NES）を有効化（既定値）
   "github.copilot.nextEditSuggestions.enabled": true,
@@ -2110,7 +2110,7 @@
   // ガターの差分装飾にパターンを使う（既定値）
   "scm.diffDecorationsGutterPattern": {
     "added": false,
-    "modified": true
+    "modified": true,
   },
   // ガターの差分装飾の表示条件（既定値）
   "scm.diffDecorationsGutterVisibility": "always",
@@ -2235,7 +2235,7 @@
     "*/",
     "+++",
     "<!--",
-    "<!---"
+    "<!---",
   ],
   // 合字有効時のfont-feature-settings（既定値）
   "terminal.integrated.fontLigatures.featureSettings": "\"calt\" on",
@@ -2296,7 +2296,7 @@
     "https",
     "mailto",
     "vscode",
-    "vscode-insiders"
+    "vscode-insiders",
   ],
   // Option+クリックでカーソルを移動する（既定値）
   "terminal.integrated.altClickMovesCursor": true,
@@ -2411,7 +2411,7 @@
     "zsh": { "path": "zsh" },
     "fish": { "path": "fish" },
     "tmux": { "path": "tmux", "icon": "terminal-tmux" },
-    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" }
+    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" },
   },
   // macOSのターミナルプロファイル（既定値）
   "terminal.integrated.profiles.osx": {
@@ -2419,7 +2419,7 @@
     "zsh": { "path": "zsh", "args": ["-l"] },
     "fish": { "path": "fish", "args": ["-l"] },
     "tmux": { "path": "tmux", "icon": "terminal-tmux" },
-    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" }
+    "pwsh": { "path": "pwsh", "icon": "terminal-powershell" },
   },
   // Windowsのターミナルプロファイル（既定値）
   "terminal.integrated.profiles.windows": {
@@ -2427,9 +2427,9 @@
     "Command Prompt": {
       "path": ["${env:windir}\\Sysnative\\cmd.exe", "${env:windir}\\System32\\cmd.exe"],
       "args": [],
-      "icon": "terminal-cmd"
+      "icon": "terminal-cmd",
     },
-    "Git Bash": { "source": "Git Bash", "icon": "terminal-git-bash" }
+    "Git Bash": { "source": "Git Bash", "icon": "terminal-git-bash" },
   },
   // タスク・デバッグ用（自動化）のプロファイル: Linux（既定値）
   "terminal.integrated.automationProfile.linux": null,
@@ -2470,7 +2470,7 @@
     "copilot",
     "claude",
     "codex",
-    "gemini"
+    "gemini",
   ],
   // 固定表示する最大行数（既定値）
   "terminal.integrated.stickyScroll.maxLineCount": 5,
@@ -2488,13 +2488,13 @@
   // 補完候補の提供元（既定値）
   "terminal.integrated.suggest.providers": {
     "lsp": false,
-    "vscode.terminal-suggest": true
+    "vscode.terminal-suggest": true,
   },
   // 入力中に候補を自動表示する範囲（既定値）
   "terminal.integrated.suggest.quickSuggestions": {
     "commands": "off",
     "arguments": "off",
-    "unknown": "off"
+    "unknown": "off",
   },
   // Enterで候補を確定した際に即実行する（既定値）
   "terminal.integrated.suggest.runOnEnter": "never",
@@ -2655,7 +2655,7 @@
   "notebook.cellFocusIndicator": "gutter",
   // セルのツールバーの表示位置（既定値）
   "notebook.cellToolbarLocation": {
-    "default": "right"
+    "default": "right",
   },
   // セルのツールバーを表示する操作（既定値）
   "notebook.cellToolbarVisibility": "click",
@@ -2696,7 +2696,7 @@
     "markupSource": true,
     "markupPreview": true,
     "codeSource": true,
-    "codeOutput": true
+    "codeOutput": true,
   },
   // セル実行時にフォーマットする（既定値）
   "notebook.formatOnCellExecution": false,
@@ -2822,7 +2822,7 @@
   "extensions.requestTimeout": 60000,
   // Agentsウィンドウでの拡張機能の有効化を上書き（デフォルト: {}）Monokai Proテーマを使うため
   "extensions.supportAgentsWindow": {
-    "monokai.theme-monokai-pro-vscode": true
+    "monokai.theme-monokai-pro-vscode": true,
   },
   // Node.jsのnavigatorオブジェクトをグローバルに公開（既定値）
   "extensions.supportNodeGlobalNavigator": false,
@@ -2849,13 +2849,13 @@
   "remote.defaultExtensionsIfInstalledLocally": [
     "GitHub.copilot",
     "GitHub.copilot-chat",
-    "GitHub.vscode-pull-request-github"
+    "GitHub.vscode-pull-request-github",
   ],
   // 拡張機能をローカルにダウンロードしてリモートへインストールする（既定値）
   "remote.downloadExtensionsLocally": false,
   // 拡張機能の実行場所（ui=ローカル / workspace=リモート）の上書き（既定値）
   "remote.extensionKind": {
-    "pub.name": ["ui"]
+    "pub.name": ["ui"],
   },
   // ターミナル・デバッグコンソールから開いたローカルURLを転送する（既定値）
   "remote.forwardOnOpen": true,
@@ -2866,7 +2866,7 @@
   // ポート番号ごとの転送時プロパティ（既定値）
   "remote.portsAttributes": {
     "443": { "protocol": "https" },
-    "8443": { "protocol": "https" }
+    "8443": { "protocol": "https" },
   },
   // ワークスペースで転送したポートを復元する（既定値）
   "remote.restoreForwardedPorts": true,
@@ -2898,7 +2898,7 @@
   // 発話終了とみなすストップフレーズ（既定値）
   "agents.voice.turn.stopPhrases": ["send it"],
   // 読み上げに使う音声（既定値）
-  "agents.voice.voice": "maya_neutral",
+  "agents.voice.voice": "birch_neutral",
 
   // --- エージェント動作 ---
 
@@ -2917,7 +2917,7 @@
   // 思考中に表示するメッセージのカスタマイズ（既定値）
   "chat.agent.thinking.phrases": {
     "mode": "append",
-    "phrases": []
+    "phrases": [],
   },
   // ターミナルのツール呼び出しを思考ドロップダウン内に表示（既定値）
   "chat.agent.thinking.terminalTools": true,
@@ -2940,7 +2940,7 @@
   "chat.agent.networkFilter": false,
   // サンドボックスランタイムの詳細設定（既定値）
   "chat.agent.sandbox.advanced.runtime": {
-    "enableWeakerNestedSandbox": false
+    "enableWeakerNestedSandbox": false,
   },
   // サンドボックス内のターミナルコマンドを自動承認する（既定値）
   "chat.agent.sandbox.allowAutoApprove": true,
@@ -2957,20 +2957,20 @@
     "denyRead": [],
     "allowRead": [],
     "allowWrite": [],
-    "denyWrite": []
+    "denyWrite": [],
   },
   // macOSサンドボックスのファイルシステムアクセス制御（既定値）
   "chat.agent.sandbox.fileSystem.mac": {
     "denyRead": [],
     "allowRead": [],
     "allowWrite": [],
-    "denyWrite": []
+    "denyWrite": [],
   },
   // Windowsサンドボックスのファイルシステムアクセス制御（既定値）
   "chat.agent.sandbox.fileSystem.windows": {
     "denyRead": [],
     "allowRead": [],
-    "allowWrite": []
+    "allowWrite": [],
   },
   // ネットワーク制限を緩めてサンドボックス内で再実行できるようにする（既定値）
   "chat.agent.sandbox.retryWithAllowNetworkRequests": true,
@@ -2981,7 +2981,7 @@
   "chat.agentFilesLocations": {
     ".github/agents": true,
     ".claude/agents": true,
-    "~/.copilot/agents": true
+    "~/.copilot/agents": true,
   },
   // エージェントスキル（SKILL.md）の場所（既定値）
   "chat.agentSkillsLocations": {
@@ -2990,7 +2990,7 @@
     ".claude/skills": true,
     "~/.agents/skills": true,
     "~/.copilot/skills": true,
-    "~/.claude/skills": true
+    "~/.claude/skills": true,
   },
   // フック設定ファイルの場所（既定値）
   "chat.hookFilesLocations": {
@@ -2998,18 +2998,18 @@
     ".claude/settings.local.json": true,
     ".claude/settings.json": true,
     "~/.copilot/hooks": true,
-    "~/.claude/settings.json": true
+    "~/.claude/settings.json": true,
   },
   // インストラクションファイル（*.instructions.md）の場所（既定値）
   "chat.instructionsFilesLocations": {
     ".github/instructions": true,
     ".claude/rules": true,
     "~/.copilot/instructions": true,
-    "~/.claude/rules": true
+    "~/.claude/rules": true,
   },
   // 再利用可能なプロンプトファイル（*.prompt.md）の場所（既定値）
   "chat.promptFilesLocations": {
-    ".github/prompts": true
+    ".github/prompts": true,
   },
   // ウェルカムビューで推奨するプロンプトファイル（既定値）
   "chat.promptFilesRecommendations": {},
@@ -3171,7 +3171,7 @@
   // 新規セッションの既定の構成（既定値）
   "chat.defaultConfiguration": {
     "mode": "interactive",
-    "approvals": "default"
+    "approvals": "default",
   },
   // 新規会話の既定モデル（既定値）
   "chat.defaultModel": "",
@@ -3200,7 +3200,7 @@
 
   // アクティブなエディタを自動的にコンテキストに含める場所（既定値）
   "chat.implicitContext.enabled": {
-    "panel": "always"
+    "panel": "always",
   },
   // アクティブなエディタを常にコンテキストとして送る（既定値）
   "chat.implicitContext.includeActiveEditor": true,
@@ -3273,7 +3273,7 @@
     "claude-desktop": false,
     "windsurf": false,
     "cursor-global": false,
-    "cursor-workspace": false
+    "cursor-workspace": false,
   },
   // MCPサーバーのマーケットプレイスを有効化（既定値）
   "chat.mcp.gallery.enabled": false,
@@ -3299,15 +3299,15 @@
   "chat.artifacts.enabled": false,
   // ファイルパスからアーティファクトを抽出するルール（既定値）
   "chat.artifacts.rules.byFilePath": {
-    "**/*plan*.md": { "groupName": "Plans" }
+    "**/*plan*.md": { "groupName": "Plans" },
   },
   // メモリファイルパスからアーティファクトを抽出するルール（既定値）
   "chat.artifacts.rules.byMemoryFilePath": {
-    "**/*plan*.md": { "groupName": "Plans" }
+    "**/*plan*.md": { "groupName": "Plans" },
   },
   // MIMEタイプからアーティファクトを抽出するルール（既定値）
   "chat.artifacts.rules.byMimeType": {
-    "image/*": { "groupName": "Screenshots", "onlyShowGroup": true }
+    "image/*": { "groupName": "Screenshots", "onlyShowGroup": true },
   },
   // 承認ピッカーにアシスト付き権限を表示（既定値）
   "chat.assistedPermissions.enabled": false,
@@ -3331,7 +3331,7 @@
     "**/gradle.properties": false,
     "**/ruby_lsp/*/addon": false,
     "**/*.lock": false,
-    "**/*-lock.{yaml,json}": false
+    "**/*-lock.{yaml,json}": false,
   },
   // 自動承認の対象となりうるツール（既定値）
   "chat.tools.eligibleForAutoApproval": {},
@@ -3345,7 +3345,7 @@
   // ツールが要求したURLの自動承認（既定値）
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": true,
-    "https://github.com/microsoft/vscode/wiki/*": true
+    "https://github.com/microsoft/vscode/wiki/*": true,
   },
   // チャット入力欄の上にTODOリストウィジェットを表示（既定値）
   "chat.tools.todos.showWidget": true,
@@ -3597,17 +3597,17 @@
   "java.configuration.runtimes": [
     {
       "name": "JavaSE-11",
-      "path": "~/.sdkman/candidates/java/11.0.29-amzn"
+      "path": "~/.sdkman/candidates/java/11.0.29-amzn",
     },
     {
       "name": "JavaSE-17",
-      "path": "~/.sdkman/candidates/java/17.0.17-amzn"
+      "path": "~/.sdkman/candidates/java/17.0.17-amzn",
     },
     {
       "name": "JavaSE-18",
       "path": "~/.sdkman/candidates/java/18.0.2-amzn",
-      "default": true
-    }
+      "default": true,
+    },
   ],
   // Eclipseフォーマッター設定XMLのURL（既定値: 未設定）このリポジトリのGoogle Styleベース設定を参照
   "java.format.settings.url": "https://raw.githubusercontent.com/nrhrhysd616/dotfiles/main/java/java-formatter-profile-nrhrhysd616-google-style.xml",
@@ -3640,7 +3640,7 @@
   "markdownlint.config": {
     "MD036": false,
     "MD040": false,
-    "MD060": false
+    "MD060": false,
   },
   // リントを実行するタイミング（デフォルト: "onType"）入力中の警告が煩雑なため保存時に
   "markdownlint.run": "onSave",
@@ -3703,7 +3703,7 @@
     "**/.gitea/workflows/*.yml",
     "**/.gitea/workflows/*.yaml",
     "**/.forgejo/workflows/*.yml",
-    "**/.forgejo/workflows/*.yaml"
+    "**/.forgejo/workflows/*.yaml",
   ],
 
   // =============================================
@@ -3713,34 +3713,34 @@
 
   // Java: Red Hat拡張機能のフォーマッターを使う（java.format.settings.url の設定が効く）
   "[java]": {
-    "editor.defaultFormatter": "redhat.java"
+    "editor.defaultFormatter": "redhat.java",
   },
   // JSON: 組み込みのJSON言語機能でフォーマットする（Prettierを使わない）
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "vscode.json-language-features",
   },
   // Markdown: markdownlintでフォーマットし、空白の差分も検出する
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true
+    "editor.formatOnPaste": true,
   },
   // PHP: intelephenseでフォーマットする
   "[php]": {
-    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
   },
   // Prisma: Prisma公式拡張機能でフォーマットする
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
+    "editor.defaultFormatter": "Prisma.prisma",
   },
   // Terraform: HashiCorp公式拡張機能でフォーマットする
   "[terraform]": {
-    "editor.defaultFormatter": "hashicorp.terraform"
+    "editor.defaultFormatter": "hashicorp.terraform",
   },
   // XML: Red Hat拡張機能でフォーマットし、末尾の余分な改行を削除する
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml",
-    "files.trimFinalNewlines": true
-  }
+    "files.trimFinalNewlines": true,
+  },
 }
