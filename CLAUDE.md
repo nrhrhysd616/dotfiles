@@ -18,9 +18,9 @@
 複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
 
 1. **Homebrew**（第一候補）: 基盤的なCLIツール全般、GUIアプリ、フォント
-   例: Git、ghq、GitHub CLI、fzf、mise、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler、ripgrep、Codex CLI、Fira Code、ngrok、code-server
+   例: Git、ghq、GitHub CLI、fzf、mise、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler、ripgrep、Codex CLI、Fira Code、ngrok、code-server、OpenSSL 3・libyaml（Rubyのビルド依存）
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
-   例: Python、Node.js、pnpm、Bun、Go、Terraform
+   例: Python、Node.js、pnpm、Bun、Go、Ruby、Terraform
 
 **SDKMAN**がJavaバージョンを管理する（上記の優先順位とは独立した専用ツール）
 
@@ -30,6 +30,15 @@
 - `init-mac.zsh`でHomebrew管理ツールの導入判定に`brew list`を使っているのは、コマンドの有無で判定すると
   Xcode Command Line Toolsの`git`のようなHomebrew管理外のものを「インストール済み」と誤判定し、
   未インストールのまま`brew upgrade`が走って失敗するため。formulaは`--formula`、caskは`--cask`で判定する
+- miseのRubyはprecompiledバイナリがあればそれを使い、無ければruby-buildでソースビルドされる。
+  precompiledはApple Silicon向けの一部バージョンのみなので、プロジェクトの`.ruby-version`が
+  古いバージョンを指すとビルドが走る。その保険として`openssl@3`（macOS標準のLibreSSLでは
+  openssl拡張がビルドできない）と`libyaml`（無いとpsychが入らずbundlerやCocoaPodsが動かない）を
+  Homebrewで先に入れている
+- Rubyの導入判定には`command -v ruby`ではなく`mise which ruby`を使う。macOS標準の
+  `/usr/bin/ruby`を「インストール済み」と誤判定するため（Homebrewで`brew list`を使うのと同じ理由）
+- CocoaPodsはグローバルに入れない。プロジェクトごとに`Gemfile`で固定して`bundle exec pod`で使う
+  （プロジェクト間で`pod`のバージョンがズレても衝突しないため）。dotfilesが用意するのはRubyまで
 - 以前はNixを第一候補にしていたが、ストアパスが更新のたびに変わるため絶対パスを要求する設定
   （Todo Tree拡張のripgrepパス）で使えないなど例外が積み上がり、管理コストが見合わないため撤廃した
 
@@ -71,7 +80,8 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
    - Git、ghq、GitHub CLI、fzf（Homebrewで管理）
    - mise（マルチ言語バージョンマネージャー、Homebrewで管理）
    - SDKMAN（Java用バージョンマネージャー）
-   - Python、Node.js（LTS）、pnpm、Bun、Go、Terraform（miseで管理）
+   - OpenSSL 3、libyaml（miseのRubyがソースビルドになった場合に必要、Homebrewで管理）
+   - Python、Node.js（LTS）、pnpm、Bun、Go、Ruby、Terraform（miseで管理）
    - Claude Code、Codex CLI、AWS CLI、AWS SAM CLI
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
