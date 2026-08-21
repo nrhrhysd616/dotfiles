@@ -27,7 +27,7 @@
       "Bash(brew install:*)",
       "Bash(brew uninstall:*)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "acceptEdits"
   },
   "statusLine": {
     "type": "command",
