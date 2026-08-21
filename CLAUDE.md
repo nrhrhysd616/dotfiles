@@ -13,6 +13,21 @@
 
 **重要:** エディタやシェル設定を変更する際は、リンク先ではなくこのリポジトリ内のソースファイルを編集すること
 
+### コーディングエージェントの設定共有
+
+Claude CodeとCodexで、ルール・ナレッジ・スキルを`agents/`配下に集約して共有する。
+両者はスキルの形式（`SKILL.md`の`name`/`description` frontmatter）が同一でsymlinkにも対応するため、
+実体は1つで済む。一方でルールの自動ロードは仕組みが異なり、Claude Codeは`~/.claude/rules/`配下を
+毎セッション全文ロードするが、Codexは`~/.codex/AGENTS.md`の1ファイルしか読まずimport機構も持たない。
+そのためCodexへは`AGENTS.md`を「置き場の地図」として渡し、ルール本文はコマンドを明示してReadさせている。
+仕様の詳細は`agents/knowledge/agent-instruction-loading.md`にある。
+
+**このリポジトリはpublic。** 業務・個人固有のナレッジは別のprivateリポジトリ
+（`agent-knowledge-private`）に置き、`init-mac.zsh`が`~/.agents/`配下へリンクする。
+どちらの層に書くかの判定は`agents/skills/knowledge/SKILL.md`の手順に従う。
+端末固有のものは同期対象外の`~/.agents/knowledge-local/`へ置く
+（publicリポジトリで`git clean -xdf`を打ったときに巻き添えで消さないよう、あえてリポジトリ外にしている）。
+
 ### パッケージマネージャーの優先順位
 
 複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
@@ -66,6 +81,18 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
   プロンプトとして現れる。`core.sshCommand`（fetch/push用）と`bin/mac-ssh-keygen`（署名用）の
   両方で`SSH_ASKPASS_REQUIRE=never`を設定して抑止している
 
+### 自作コマンドの命名
+
+`bin/`配下のコマンドが特定のプラットフォームや条件でしか動かないなら、**名前にその範囲を含める**。
+`ssh-sign`のような汎用的すぎる名前は避ける（実際に`gen-mac-git-signkey`・`mac-ssh-keygen`へ改名した）。
+
+- macOS専用なら`mac-`のようなプレフィックスで範囲を示す。
+  広い意味の名前を付けると、`bin/`に並んだときにどれが環境依存なのか分からなくなる
+- ラッパーは役割を言い換えず、ラップ対象の名前をそのまま使う
+  （`ssh-keygen`のラッパーは`mac-ssh-keygen`）
+- 名前が`gen-`のように単一の目的を表すなら、インターフェースもサブコマンドではなく
+  フラグ（`--status`、`--recreate`）にして名前と整合させる
+
 ## 初期化スクリプト
 
 ### `init-mac.zsh`
@@ -88,6 +115,10 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
 6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+   - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
+     非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
+     アクセス権のない端末でも初期化が止まらないよう、`ghq get`の前に`gh repo view`でアクセス可否を確認している
+     （`ghq get`は存在しないリポジトリに対して認証待ちでハングするため、これを存在確認に使ってはいけない）
 7. **Cline拡張設定のコピー**（VSCode Cline拡張が存在する場合のみ）
 8. **SSH設定**: `sshd_config` を `/etc/ssh/` へコピー（要sudo）、`authorized_keys` をコピー、`ssh/config`と`git/allowed_signers`をシンボリックリンク（既存の実ファイルはバックアップしてから置き換える）
 9. **Git署名鍵の生成**: `gen-mac-git-signkey`でSecure Enclave内に鍵を作り、gitconfigとGitHubへ登録（冪等。`user.email`未設定の初回は署名者リストへの追記だけスキップされる）
@@ -99,9 +130,10 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
 | ディレクトリ | 説明 |
 | --- | --- |
 | `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
+| `agents/` | Claude CodeとCodexで共有するルール・ナレッジ・スキル（`rules/`: 毎セッション全文ロードされる行動ルール、`knowledge/`: 索引だけロードし本文は必要時に読む参照情報、`skills/`: 手順、`AGENTS.md`: Codex向けの地図）。詳細は`agents/README.md` |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
 | `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
-| `claude-code/` | ユーザーレベルのClaude Code設定 |
+| `claude-code/` | Claude Code固有のユーザー設定（`CLAUDE.md`: ナレッジ索引を`@import`するエントリポイント、`settings.json`、`statusline.sh`）。エージェント非依存の資産は`agents/`側にある |
 | `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
 | `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる） |
