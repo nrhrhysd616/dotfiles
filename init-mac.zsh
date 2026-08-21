@@ -51,6 +51,42 @@ function link_config() {
   fi
 }
 
+# Create an empty knowledge index when one does not exist yet.
+# The private and local layers are not tracked by this repository, but
+# ~/.claude/CLAUDE.md imports their indexes unconditionally, so the files
+# have to exist. Never overwrite: the content is written by hand over time.
+function init_knowledge_index() {
+  local dest=$1
+  local label=$2
+
+  if [ -f "$dest" ]; then
+    print_success "Knowledge index already exists ($dest)"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+  cat > "$dest" <<EOF
+# ナレッジ索引（${label}）
+
+<!--
+  1トピック1行。「いつ読むか」のトリガーを必ず書く。
+  書き方は ~/.agents/README.md と knowledge スキルを参照。
+-->
+EOF
+  print_success "Knowledge index created ($dest)"
+}
+
+# Point the private knowledge layer at an empty directory when the private
+# repository is unavailable. ~/.claude/CLAUDE.md imports that layer's index
+# unconditionally, so the path has to resolve to something.
+# It must stay a symlink, never a real directory: `ln -nfs` only refuses to
+# follow a *symlinked* directory, so a real one here would swallow the link
+# once the repository does become available on this machine.
+function link_private_knowledge_fallback() {
+  mkdir -p $HOME/.agents/knowledge-private-unavailable
+  link_config $HOME/.agents/knowledge-private-unavailable $HOME/.agents/knowledge/private
+}
+
 # Check macOS
 print_section "Environment Check"
 if [ $(uname) != "Darwin" ] ; then
@@ -310,11 +346,59 @@ link_config $SCRIPT_DIR/vscode/keybindings.json "$HOME/Library/Application Suppo
 link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Code - Insiders/User/settings.json"
 link_config $SCRIPT_DIR/vscode-insiders/keybindings.json "$HOME/Library/Application Support/Code - Insiders/User/keybindings.json"
 
-# Claude Code user-level configuration
+# Agent shared configuration (Claude Code / Codex)
+# Rules, knowledge and skills live under ~/.agents so both agents share them.
+# ~/.claude entries point straight at the repository instead of going through
+# ~/.agents: two-level symlinks are not documented as resolvable.
+print_section "Agent Shared Configuration"
+mkdir -p $HOME/.agents/rules $HOME/.agents/knowledge $HOME/.agents/knowledge-local
+mkdir -p $HOME/.claude/rules $HOME/.codex
+
+link_config $SCRIPT_DIR/agents/AGENTS.md $HOME/.agents/AGENTS.md
+link_config $SCRIPT_DIR/agents/AGENTS.md $HOME/.codex/AGENTS.md
+link_config $SCRIPT_DIR/agents/skills $HOME/.agents/skills
+link_config $SCRIPT_DIR/agents/skills $HOME/.claude/skills
+link_config $SCRIPT_DIR/agents/rules $HOME/.agents/rules/shared
+link_config $SCRIPT_DIR/agents/rules $HOME/.claude/rules/shared
+link_config $SCRIPT_DIR/agents/knowledge $HOME/.agents/knowledge/shared
+
+# Private knowledge repository
+# Holds work/personal knowledge that must not land in this public repository.
+# A machine without access to it still has to finish setup, so failures here
+# are warnings and the layer is simply left empty.
+PRIVATE_KNOWLEDGE_REPO='github.com/nrhrhysd616/agent-knowledge-private'
+if command -v ghq &>/dev/null; then
+  PRIVATE_KNOWLEDGE_DIR="$(ghq root)/$PRIVATE_KNOWLEDGE_REPO"
+  if [ ! -d "$PRIVATE_KNOWLEDGE_DIR" ]; then
+    # Check access with gh first. `ghq get` on a repository that is missing or
+    # unreachable blocks waiting for credentials and stalls the whole setup,
+    # so it must never be the thing that discovers the repository is absent.
+    if gh repo view "${PRIVATE_KNOWLEDGE_REPO#github.com/}" &>/dev/null; then
+      GIT_TERMINAL_PROMPT=0 ghq get "$PRIVATE_KNOWLEDGE_REPO" ||
+        print_warning "Skipped private knowledge (clone failed)"
+    else
+      print_warning "Skipped private knowledge (no access to $PRIVATE_KNOWLEDGE_REPO)"
+    fi
+  fi
+  if [ -d "$PRIVATE_KNOWLEDGE_DIR" ]; then
+    link_config "$PRIVATE_KNOWLEDGE_DIR/rules" $HOME/.agents/rules/private
+    link_config "$PRIVATE_KNOWLEDGE_DIR/rules" $HOME/.claude/rules/private
+    link_config "$PRIVATE_KNOWLEDGE_DIR/knowledge" $HOME/.agents/knowledge/private
+  else
+    link_private_knowledge_fallback
+  fi
+else
+  print_warning "Skipped private knowledge (ghq not found)"
+  link_private_knowledge_fallback
+fi
+
+# Indexes for the layers no repository tracks (created only when missing)
+init_knowledge_index $HOME/.agents/knowledge/private/INDEX.md 'private・非公開'
+init_knowledge_index $HOME/.agents/knowledge-local/INDEX.md 'local・この端末限定'
+
+# Claude Code specific configuration
 print_section "Claude Code User Configuration"
-mkdir -p $HOME/.claude
 link_config $SCRIPT_DIR/claude-code/CLAUDE.md $HOME/.claude/CLAUDE.md
-link_config $SCRIPT_DIR/claude-code/skills $HOME/.claude/skills
 link_config $SCRIPT_DIR/claude-code/settings.json $HOME/.claude/settings.json
 link_config $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
 
