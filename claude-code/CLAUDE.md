@@ -1,35 +1,20 @@
 # User-Level CLAUDE.md
 
-## SHOULD: モード管理
+## ナレッジの置き場
 
-以下の条件に該当するタスクでは、作業前に `EnterPlanMode` を使用してplanモードへの移行を提案すること：
+| 種類 | 実体 | 参照の仕方 |
+| --- | --- | --- |
+| 恒久的な行動ルール | `~/.agents/rules/` | `~/.claude/rules/` 経由で自動ロード済み |
+| 参照用ナレッジ | `~/.agents/knowledge/` | 下の索引に該当したら本文を Read |
+| 手順・ワークフロー | `~/.agents/skills/` | 該当時に skill を起動 |
 
-- 3ファイル以上にまたがる変更が予想される
-- 新機能の追加・大規模リファクタリング
-- 要件が曖昧で調査フェーズが必要な場合
-- 複数の実装アプローチが考えられる場合
+Codex とファイルを共有している。追加・更新は `knowledge` スキルの手順に従うこと。
+体系の説明は `~/.agents/README.md` にある。
 
-## SHOULD: Git規約(プロジェクトで上書き可)
+## MUST: ナレッジ索引
 
-### コミットメッセージ
+各行の「読むタイミング」に該当したら、作業前に本文を Read すること。
 
-**Conventional Commits**形式を推奨:
-
-```txt
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Type:**
-
-- `feat`: 新機能
-- `fix`: バグ修正
-- `docs`: ドキュメント変更
-- `style`: デザイン修正
-- `refactor`: リファクタリング
-- `perf`: パフォーマンス改善
-- `test`: テスト追加・修正
-- `chore`: ビルドプロセスやツール変更
+@~/.agents/knowledge/shared/INDEX.md
+@~/.agents/knowledge/private/INDEX.md
+@~/.agents/knowledge-local/INDEX.md

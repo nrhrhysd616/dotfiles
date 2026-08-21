@@ -3171,7 +3171,7 @@
   // 新規セッションの既定の構成（既定値）
   "chat.defaultConfiguration": {
     "mode": "interactive",
-    "approvals": "default",
+    "approvals": "manual"
   },
   // 新規会話の既定モデル（既定値）
   "chat.defaultModel": "",
@@ -3273,7 +3273,7 @@
     "claude-desktop": false,
     "windsurf": false,
     "cursor-global": false,
-    "cursor-workspace": false,
+    "cursor-workspace": false
   },
   // MCPサーバーのマーケットプレイスを有効化（既定値）
   "chat.mcp.gallery.enabled": false,
