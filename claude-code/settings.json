@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(git add:*)",
+      "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git diff *)",
       "Bash(npm view *)",
@@ -14,11 +14,11 @@
       "Bash(pnpm lint *)",
       "Bash(pnpm test *)",
       "Bash(pnpm typecheck *)",
-      "Bash(rm -f /private/tmp/claude-501/:*)",
-      "Bash(rm -r /private/tmp/claude-501/:*)",
-      "Bash(rm -rf /private/tmp/claude-501/:*)",
-      "Bash(rm /private/tmp/claude-501/:*)",
-      "Bash(rmdir /private/tmp/claude-501/:*)"
+      "Bash(rm -f /private/tmp/claude-501/*)",
+      "Bash(rm -r /private/tmp/claude-501/*)",
+      "Bash(rm -rf /private/tmp/claude-501/*)",
+      "Bash(rm /private/tmp/claude-501/*)",
+      "Bash(rmdir /private/tmp/claude-501/*)"
     ],
     "deny": [
       "Read(*.env)",
@@ -31,17 +31,17 @@
       "Read(**/*.pem)",
       "Read(**/id_rsa*)",
       "Read(**/id_ed25519*)",
-      "Bash(sudo rm:*)",
-      "Bash(git push --force:*)",
+      "Bash(sudo rm *)",
+      "Bash(git push --force *)",
       "Read(./secrets/**)"
     ],
     "ask": [
-      "Bash(gh pr create:*)",
-      "Bash(git push:*)",
-      "Bash(git reset:*)",
-      "Bash(git rebase:*)",
-      "Bash(brew install:*)",
-      "Bash(brew uninstall:*)"
+      "Bash(gh pr create *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git rebase *)",
+      "Bash(brew install *)",
+      "Bash(brew uninstall *)"
     ],
     "defaultMode": "acceptEdits"
   },
