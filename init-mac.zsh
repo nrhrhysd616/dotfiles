@@ -193,6 +193,10 @@ install_command 'ghq' 'ghq' 'brew list --formula ghq' 'brew install ghq' 'brew u
 # GitHub CLI install
 install_command 'GitHub CLI' 'gh' 'brew list --formula gh' 'brew install gh' 'brew upgrade gh'
 
+# gitleaks install (シークレットの混入をpre-commitフックとCIで検査する)
+# @see https://gitleaks.io/
+install_command 'gitleaks' 'gitleaks' 'brew list --formula gitleaks' 'brew install gitleaks' 'brew upgrade gitleaks'
+
 # fzf install
 install_command 'fzf' 'fzf' 'brew list --formula fzf' 'brew install fzf' 'brew upgrade fzf'
 
@@ -314,6 +318,8 @@ print_section "Setting Up Configuration Files"
 # Git configuration
 link_config $SCRIPT_DIR/git/.gitconfig $HOME/.gitconfig
 link_config $SCRIPT_DIR/git/.gitignore_global $HOME/.gitignore_global
+# 全リポジトリ共通のフック置き場 (.gitconfigのcore.hooksPathが指す)
+link_config $SCRIPT_DIR/git/hooks $HOME/.git-hooks
 if [ ! -f $HOME/.gitconfig.user.local ]; then
   cp $SCRIPT_DIR/git/.gitconfig.user.local $HOME/
 fi

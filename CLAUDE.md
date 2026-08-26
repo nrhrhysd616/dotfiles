@@ -33,7 +33,7 @@ Claude CodeとCodexで、ルール・ナレッジ・スキルを`agents/`配下�
 複数のパッケージマネージャーを用途別に使い分ける。新しいツールを追加する際は以下の優先順位に従う：
 
 1. **Homebrew**（第一候補）: 基盤的なCLIツール全般、GUIアプリ、フォント
-   例: Git、ghq、GitHub CLI、fzf、mise、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler、ripgrep、Codex CLI、Fira Code、ngrok、code-server、OpenSSL 3・libyaml（Rubyのビルド依存）
+   例: Git、ghq、GitHub CLI、gitleaks、fzf、mise、AWS CLI、AWS SAM CLI、Stripe CLI、VHS、Poppler、ripgrep、Codex CLI、Fira Code、ngrok、code-server、OpenSSL 3・libyaml（Rubyのビルド依存）
 2. **mise**: 言語ランタイム、および**プロジェクト単位でバージョンを切り替えたいCLIツール**（tfenv/asdf相当の用途）
    例: Python、Node.js、pnpm、Bun、Go、Ruby、Terraform
 
@@ -81,6 +81,28 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
   プロンプトとして現れる。`core.sshCommand`（fetch/push用）と`bin/mac-ssh-keygen`（署名用）の
   両方で`SSH_ASKPASS_REQUIRE=never`を設定して抑止している
 
+### シークレット検査
+
+gitleaksでシークレットの混入を検査する。ローカルのpre-commitフックとGitHub Actionsの2箇所で走る。
+`.gitignore`やClaude Codeの`deny`はファイル名・パスしか見ておらず、ベタ書きされた値は素通りするため。
+署名鍵を`-t none`で作りエージェントに無人でコミット・pushさせている以上、機械的に止める層が要る。
+
+- **フックは全ローカルリポジトリに効かせている。** `git/hooks/`を`~/.git-hooks`へ
+  シンボリックリンクし、`git/.gitconfig`の`core.hooksPath`がそこを指す。
+  dotfilesだけ守っても他のリポジトリで漏らせば同じなので、範囲を絞らない
+- `core.hooksPath`はpathnameとして扱われ`~/`が展開される（`gpg.ssh.program`は展開されず
+  絶対パスが要る）。そのため全端末で共有する`git/.gitconfig`に直接書ける
+- **この設定は各リポジトリの`.git/hooks`を無効化する。** またhusky・lefthookを使う
+  プロジェクトではgitleaksが走らない（これらがリポジトリ側で`core.hooksPath`を設定し、
+  gitはlocalをglobalより優先するため）。そこでの最後の砦はそのプロジェクトのCIになる
+- フックの引数はgitleaks公式の`.pre-commit-hooks.yaml`に合わせている
+  （`--pre-commit --redact --staged --verbose`）。`--no-banner`だけ独自に足している。
+  付けないと毎コミットでASCIIアートのバナーが出て検出結果が埋もれる
+- gitleaksが無い端末では警告だけ出してコミットを通す。dotfilesを適用していないマシンで
+  コミットが一切できなくなるのを避けるため
+- CIの`gitleaks-action`は組織アカウントのリポジトリでのみ`GITLEAKS_LICENSE`が要る。
+  個人アカウントのここでは不要
+
 ### 自作コマンドの命名
 
 `bin/`配下のコマンドが特定のプラットフォームや条件でしか動かないなら、**名前にその範囲を含める**。
@@ -104,7 +126,7 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
 2. **Zsh設定**: `zsh/.zshrc` をホームディレクトリへシンボリックリンク
 3. **Xcode Command Line Toolsのインストール**
 4. **開発ツールのインストール**（未インストールの場合のみ）:
-   - Git、ghq、GitHub CLI、fzf（Homebrewで管理）
+   - Git、ghq、GitHub CLI、gitleaks（シークレット検査）、fzf（Homebrewで管理）
    - mise（マルチ言語バージョンマネージャー、Homebrewで管理）
    - SDKMAN（Java用バージョンマネージャー）
    - OpenSSL 3、libyaml（miseのRubyがソースビルドになった場合に必要、Homebrewで管理）
@@ -114,7 +136,7 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
-6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
    - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
      非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
      アクセス権のない端末でも初期化が止まらないよう、`ghq get`の前に`gh repo view`でアクセス可否を確認している
@@ -130,13 +152,14 @@ Gitのコミット署名とGitHubへのSSH認証には、macOSのSecure Enclave�
 | ディレクトリ | 説明 |
 | --- | --- |
 | `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
+| `.github/` | GitHub Actionsのワークフロー（`gitleaks.yml`: プルリクエストごとのシークレット検査） |
 | `agents/` | Claude CodeとCodexで共有するルール・ナレッジ・スキル（`rules/`: 毎セッション全文ロードされる行動ルール、`knowledge/`: 索引だけロードし本文は必要時に読む参照情報、`skills/`: 手順、`AGENTS.md`: Codex向けの地図）。詳細は`agents/README.md` |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
 | `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
 | `claude-code/` | Claude Code固有のユーザー設定（`CLAUDE.md`: ナレッジ索引を`@import`するエントリポイント、`settings.json`、`statusline.sh`）。エージェント非依存の資産は`agents/`側にある |
 | `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
-| `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる） |
+| `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる、`hooks/`※全リポジトリ共通のgitフック。`~/.git-hooks`へsymlinkされ`core.hooksPath`が指す） |
 | `iterm2/` | iTerm2の設定・プロファイル・カラースキーム（Monokaiテーマ各種） |
 | `java/` | Javaコードフォーマッター設定（Google Styleベースのフォーマットプロファイル） |
 | `ssh/` | SSHクライアント設定（`config`※GitHub認証にSecure Enclaveの鍵を使う設定、`authorized_keys`） |
