@@ -1,4 +1,4 @@
-# push・プルリクエストのたびにシークレットの混入を検査する
+# プルリクエストのたびにシークレットの混入を検査する
 #
 # ローカルのpre-commitフック(git/hooks/pre-commit)は --no-verify で飛ばせるうえ、
 # huskyなどがcore.hooksPathを上書きするプロジェクトでは動かない。
@@ -8,9 +8,11 @@
 # @see https://github.com/gitleaks/gitleaks-action
 name: gitleaks
 
+# pushトリガーは付けない。PRブランチへのpushではpull_requestと二重に発火して
+# 同じコミットを二度検査することになり、かといってmainへのpushに絞ると
+# 検出がマージ後になって遅い。マージ前のPRで止めるのが目的なのでこれだけでよい
 on:
   pull_request:
-  push:
   workflow_dispatch:
 
 # gitleaks-actionは検出内容をプルリクエストへコメントする(GITLEAKS_ENABLE_COMMENTS)
@@ -25,7 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # 履歴全体を検査対象にするため浅いcloneにしない
+          # gitleaks-actionはベースからHEADまでのコミット範囲を検査するため、
+          # 浅いcloneだと範囲を辿れない(公式のワークフロー例と同じ指定)
           fetch-depth: 0
       - uses: gitleaks/gitleaks-action@v3
         env:

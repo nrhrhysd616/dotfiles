@@ -152,7 +152,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 | ディレクトリ | 説明 |
 | --- | --- |
 | `.claude/` | このリポジトリ用のClaude Code設定（`settings.json`のみ追跡。planファイルは`.claude/plans/`に生成されるがgit管理外） |
-| `.github/` | GitHub Actionsのワークフロー（`gitleaks.yml`: push・PRごとのシークレット検査） |
+| `.github/` | GitHub Actionsのワークフロー（`gitleaks.yml`: プルリクエストごとのシークレット検査） |
 | `agents/` | Claude CodeとCodexで共有するルール・ナレッジ・スキル（`rules/`: 毎セッション全文ロードされる行動ルール、`knowledge/`: 索引だけロードし本文は必要時に読む参照情報、`skills/`: 手順、`AGENTS.md`: Codex向けの地図）。詳細は`agents/README.md` |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
 | `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
