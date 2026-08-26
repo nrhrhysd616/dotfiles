@@ -4,6 +4,13 @@
   quotepath = false
   ignorecase = false
   symlinks = true
+  # 全リポジトリ共通のフック置き場 (gitleaksによるシークレット検査)
+  # dotfilesのgit/hooksへのシンボリックリンクで、init-mac.zshが張る
+  # gpg.ssh.programと違いこの変数はpathnameとして扱われ、チルダが展開される
+  # (git -c core.hooksPath='~/.git-hooks' rev-parse --git-path hooks で確認できる)
+  # 注意: この設定は各リポジトリの.git/hooksを無効化する。またhusky等が
+  # リポジトリ側でcore.hooksPathを設定するとlocalが優先されこちらは効かなくなる
+  hooksPath = ~/.git-hooks
   # fetch/push時、Secure Enclaveの鍵(FIDO鍵)で認証する直前に
   # 「Confirm user presence for key ...」という通知が出る。標準エラーが端末でないと
   # OpenSSHはSSH_ASKPASSのプログラムでこれを表示しようとし、VSCodeやcode-serverは

@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# pre-commit - ステージした差分にシークレットが混ざっていないかgitleaksで検査する
+#
+# ~/.gitconfig の core.hooksPath = ~/.git-hooks から、全ローカルリポジトリ共通の
+# フックとして呼ばれる。検出した場合は非ゼロで終了しコミットを中断する。
+#
+# 引数はgitleaks公式のpre-commitフックに合わせてある:
+#   --pre-commit  git diff を検査対象にする
+#   --staged      ステージ済みの差分だけを見る
+#   --redact      検出した値をマスクして出力する(端末やログに秘密を残さない)
+#   --verbose     検出したファイル・行・ルールを表示する
+# --no-banner だけは独自に足している。付けないと毎コミットでASCIIアートの
+# バナーが出て、肝心の検出結果が埋もれるため。
+#
+# 注意: これはグローバル設定のフックなので、リポジトリ側で core.hooksPath を
+# 上書きするツール(husky、lefthookなど)を使うプロジェクトでは動かない。
+# gitはlocal設定をglobal設定より優先するため。そこでの最後の砦はCI側になる。
+#
+# @see https://github.com/gitleaks/gitleaks/blob/master/.pre-commit-hooks.yaml
+
+# dotfilesを適用していない端末やgitleaks導入前の環境でコミットが一切
+# できなくなるのを避ける(フックを置いていない状態とふるまいを揃える)
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo 'pre-commit: gitleaks not found, skipping the secret scan' >&2
+  exit 0
+fi
+
+exec gitleaks git --pre-commit --redact --staged --verbose --no-banner
