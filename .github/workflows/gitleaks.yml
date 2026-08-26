@@ -1,0 +1,32 @@
+# push・プルリクエストのたびにシークレットの混入を検査する
+#
+# ローカルのpre-commitフック(git/hooks/pre-commit)は --no-verify で飛ばせるうえ、
+# huskyなどがcore.hooksPathを上書きするプロジェクトでは動かない。
+# このリポジトリはpublicなので、公開前の最後の砦としてCIでも同じ検査を走らせる。
+#
+# GITLEAKS_LICENSEは組織アカウントのリポジトリでのみ必要になるため設定しない。
+# @see https://github.com/gitleaks/gitleaks-action
+name: gitleaks
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+# gitleaks-actionは検出内容をプルリクエストへコメントする(GITLEAKS_ENABLE_COMMENTS)
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # 履歴全体を検査対象にするため浅いcloneにしない
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
