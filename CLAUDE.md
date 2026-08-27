@@ -114,6 +114,10 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
   （`ssh-keygen`のラッパーは`mac-ssh-keygen`）
 - 名前が`gen-`のように単一の目的を表すなら、インターフェースもサブコマンドではなく
   フラグ（`--status`、`--recreate`）にして名前と整合させる
+- 逆に、**プレフィックスの無い汎用名を名乗るなら、その名前が示す範囲で実際に動かす**。
+  `copy`は`pbcopy`だけでなく`wl-copy`・`xclip`・`xsel`・`clip.exe`へフォールバックし、
+  zshが無い環境でも動くようPOSIX shで書いているため`mac-`を付けていない。
+  名前を決めてから実装を合わせる順序で考える
 
 ## 初期化スクリプト
 
@@ -136,7 +140,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
-6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
    - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
      非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
      アクセス権のない端末でも初期化が止まらないよう、`ghq get`の前に`gh repo view`でアクセス可否を確認している
@@ -155,7 +159,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 | `.github/` | GitHub Actionsのワークフロー（`gitleaks.yml`: プルリクエストごとのシークレット検査） |
 | `agents/` | Claude CodeとCodexで共有するルール・ナレッジ・スキル（`rules/`: 毎セッション全文ロードされる行動ルール、`knowledge/`: 索引だけロードし本文は必要時に読む参照情報、`skills/`: 手順、`AGENTS.md`: Codex向けの地図）。詳細は`agents/README.md` |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
-| `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
+| `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`copy`: ファイルや標準入力の内容をクリップボードへ入れる、`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
 | `claude-code/` | Claude Code固有のユーザー設定（`CLAUDE.md`: ナレッジ索引を`@import`するエントリポイント、`settings.json`、`statusline.sh`）。エージェント非依存の資産は`agents/`側にある |
 | `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
