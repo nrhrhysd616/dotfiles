@@ -412,6 +412,7 @@ link_config $SCRIPT_DIR/claude-code/statusline.sh $HOME/.claude/statusline.sh
 # $HOME/.local/bin is already on $PATH via zsh/.zshrc
 print_section "Custom Commands"
 mkdir -p $HOME/.local/bin
+link_config $SCRIPT_DIR/bin/copy $HOME/.local/bin/copy
 link_config $SCRIPT_DIR/bin/csctl $HOME/.local/bin/csctl
 # mac-ssh-keygen is referenced by gpg.ssh.program with an absolute path,
 # so it has to be linked before gen-mac-git-signkey runs below

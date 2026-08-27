@@ -1,0 +1,296 @@
+#!/bin/sh
+#
+# copy - ファイルや標準入力の内容をクリップボードへコピーする
+#
+# `copy README.md`でファイルの中身が、`git diff | copy`で標準入力がクリップボードへ入る。
+# ファイルを複数並べれば連結される。pbcopyと違ってパスを直接受け取るため、
+# `pbcopy < README.md`のようなリダイレクトを書き分けずに済む。
+#
+# 環境ごとのクリップボードコマンドの違いはこのスクリプトが吸収する
+# (macOSはpbcopy、Waylandはwl-copy、X11はxclipかxsel、WSLはclip.exe)。
+# 特定のプラットフォーム専用ではないので、bin/の命名規約が環境依存のコマンドに
+# 求めるプレフィックス(mac-など)は付けていない。zshが入っていない環境でも
+# 動くよう、実装もzshではなくPOSIX shにしてある。
+#
+# pbcopyと意図的に変えている点が2つある:
+#
+# 1つ目は、全てのパスを検査してから書き込むこと。`copy a.txt typo.txt`のように
+# 一部が読めない場合、pbcopyへリダイレクトしていたら途中まで書き込まれた状態に
+# なるが、このコマンドはクリップボードに一切触れずに終わる。
+#
+# 2つ目は、空の入力を拒否すること。`git diff | copy`で差分が無かったときに
+# クリップボードが黙って空になると、直前にコピーした内容を失う。
+#
+# @see mac-ssh-keygen (同じくPOSIX shで書いた小物コマンド)
+
+# 未定義変数の参照(タイポ)と、検査していないコマンドの失敗で止める。
+# zshで書いた他のコマンドの`setopt no_unset`と同じ意図。pipe_failに相当する
+# ものはPOSIX shに無いため、失敗を握り潰すパイプを組まないよう書いている
+set -eu
+
+readonly COPY_VERSION="1.0.0"
+
+# ---------------------------------------------------------------------------
+# 出力ヘルパー
+# ---------------------------------------------------------------------------
+
+# このコマンドの表示は完了行もエラーも全て標準エラーへ出す。標準出力を何にも
+# 使わないので`copy README.md > out`は空になり、呼び出し側のパイプを汚さない。
+# 色を付けるかどうかも、その標準エラーが端末かどうかで決める
+if [ -t 2 ]; then
+  ESC=$(printf '\033')
+  RED="${ESC}[0;31m"
+  GREEN="${ESC}[0;32m"
+  NC="${ESC}[0m"
+else
+  RED="" GREEN="" NC=""
+fi
+
+# メッセージにはファイルパスが入る。dashのechoはバックスラッシュを
+# エスケープとして解釈してしまうため、表示は一貫してprintfで組み立てる
+print_success() {
+  printf '%s✓ %s%s\n' "$GREEN" "$1" "$NC" >&2
+}
+
+print_error() {
+  printf '%s✗ %s%s\n' "$RED" "$1" "$NC" >&2
+}
+
+# エラーを表示して終了する
+# @param message エラーメッセージ
+die() {
+  print_error "$*"
+  exit 1
+}
+
+usage() {
+  # <<'EOF' とクォートすることで、中の$や`をそのまま出力する
+  cat <<'EOF'
+copy - copy file contents or standard input to the clipboard
+
+USAGE
+  copy <file>...
+  <command> | copy
+
+ARGUMENTS
+  <file>          Path whose contents are copied. "-" reads standard input.
+                  Multiple files are concatenated in the order given.
+
+OPTIONS
+  -H, --headers   Prefix each file with "==> <path> <==" so the boundaries
+                  survive in the pasted text
+  -q, --quiet     Do not print the summary line
+  -h, --help      Show this help
+  -v, --version   Show the version
+  --              Treat every remaining argument as a file path
+
+EXAMPLES
+  copy README.md                 # copy one file
+  copy src/a.ts src/b.ts         # concatenate two files
+  copy -H src/*.ts               # concatenate with "==> path <==" headers
+  git diff | copy                # copy the output of a command
+  copy - README.md < header.txt  # mix standard input and files
+
+HOW IT WORKS
+  The clipboard command is picked from the environment: pbcopy on macOS,
+  wl-copy on Wayland, xclip or xsel on X11, clip.exe on WSL.
+
+  Every path is checked before anything is written, so a missing or
+  unreadable one leaves the current clipboard untouched.
+
+  Empty input is refused instead of clearing the clipboard.
+
+  Everything this command prints goes to standard error, so standard output
+  stays clean and the summary line never lands in a pipe.
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# クリップボードツールの選定
+# ---------------------------------------------------------------------------
+
+# 環境で使えるクリップボードコマンドを探してCLIP_TOOLへ設定する。
+# WaylandとX11のクライアントが両方入っているセッションもあるため、
+# WAYLAND_DISPLAYが立っているときに限ってwl-copyを優先する
+detect_clip_tool() {
+  if command -v pbcopy >/dev/null 2>&1; then
+    CLIP_TOOL=pbcopy
+  elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-copy >/dev/null 2>&1; then
+    CLIP_TOOL=wl-copy
+  elif command -v xclip >/dev/null 2>&1; then
+    CLIP_TOOL=xclip
+  elif command -v xsel >/dev/null 2>&1; then
+    CLIP_TOOL=xsel
+  elif command -v clip.exe >/dev/null 2>&1; then
+    CLIP_TOOL=clip.exe
+  else
+    die "No clipboard command found (install wl-clipboard, xclip or xsel)"
+  fi
+}
+
+# 標準入力の内容をクリップボードへ書き込む。
+# POSIX shには配列が無くコマンドと引数の組をそのまま変数へ持てないため、
+# 選んだツール名でここに分岐している
+clip_write() {
+  case "$CLIP_TOOL" in
+    pbcopy)   pbcopy ;;
+    wl-copy)  wl-copy ;;
+    xclip)    xclip -selection clipboard ;;
+    xsel)     xsel --clipboard --input ;;
+    clip.exe) clip.exe ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
+# 完了行の組み立て
+# ---------------------------------------------------------------------------
+
+# バイト数を人が読める単位にする。POSIX shは整数演算しかできないので、
+# 10倍してから割った余りで小数第1位を作る
+# @param bytes バイト数
+human_size() {
+  if [ "$1" -lt 1024 ]; then
+    printf '%d B' "$1"
+  elif [ "$1" -lt 1048576 ]; then
+    printf '%d.%d KB' $(($1 / 1024)) $(($1 * 10 / 1024 % 10))
+  else
+    printf '%d.%d MB' $(($1 / 1048576)) $(($1 * 10 / 1048576 % 10))
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 引数の振り分け
+# ---------------------------------------------------------------------------
+
+main() {
+  headers=0
+  quiet=0
+
+  # オプションを取り除き、ファイルパスだけを位置パラメータに残す。
+  # POSIX shに配列が無いので、先頭をshiftしては末尾へ積み直して一周させる。
+  # 元の引数の数だけ回せば、残っているのは積み直したパスだけになる
+  end=$#
+  i=0
+  rest_are_files=0
+  while [ "$i" -lt "$end" ]; do
+    i=$((i + 1))
+    arg=$1
+    shift
+
+    if [ "$rest_are_files" -eq 1 ]; then
+      set -- "$@" "$arg"
+      continue
+    fi
+
+    case "$arg" in
+      -H|--headers) headers=1 ;;
+      -q|--quiet)   quiet=1 ;;
+      -h|--help)    usage; exit 0 ;;
+      -v|--version) printf 'copy %s\n' "$COPY_VERSION"; exit 0 ;;
+      --)           rest_are_files=1 ;;
+      -)            set -- "$@" "$arg" ;;
+      -?*)
+        print_error "Unknown option: $arg"
+        printf '\n' >&2
+        usage >&2
+        exit 1
+        ;;
+      *)            set -- "$@" "$arg" ;;
+    esac
+  done
+
+  # 読めないパスがあれば、この時点で中断してクリップボードを守る
+  for path in "$@"; do
+    case "$path" in
+      -) continue ;;
+    esac
+    if [ -d "$path" ]; then
+      die "Not a file: $path (directories cannot be copied)"
+    fi
+    if [ ! -e "$path" ]; then
+      die "No such file: $path"
+    fi
+    if [ ! -r "$path" ]; then
+      die "Cannot read: $path"
+    fi
+  done
+
+  # 完了行に出す入力元の名前。位置パラメータはこの後wcの結果で潰すので先に作る
+  if [ $# -eq 0 ] || { [ $# -eq 1 ] && [ "$1" = "-" ]; }; then
+    source_label="stdin"
+  elif [ $# -eq 1 ]; then
+    source_label="$1"
+  else
+    source_label="$# files"
+  fi
+
+  detect_clip_tool
+
+  # 行数とバイト数を数えるには入力をもう一度読む必要があるため、一時ファイルへ
+  # 集約してからクリップボードへ流す。mktempが作るファイルは0600で、
+  # 中断されても平文が残らないようtrapで消す
+  tmpfile=$(mktemp "${TMPDIR:-/tmp}/copy.XXXXXX")
+  trap 'rm -f "$tmpfile"' EXIT
+  trap 'rm -f "$tmpfile"; exit 130' HUP INT TERM
+
+  if [ $# -eq 0 ]; then
+    # 引数が無いときは標準入力から読む。端末のままだと入力待ちで固まるので、
+    # 打ち間違いと見なして使い方を出す
+    if [ -t 0 ]; then
+      usage >&2
+      exit 1
+    fi
+    cat >> "$tmpfile"
+  else
+    first=1
+    for path in "$@"; do
+      if [ "$headers" -eq 1 ]; then
+        # 2つ目以降は見出しの前に空行を挟む(tail -n +1 の並びに合わせる)
+        if [ "$first" -eq 0 ]; then
+          printf '\n' >> "$tmpfile"
+        fi
+        if [ "$path" = "-" ]; then
+          printf '==> stdin <==\n' >> "$tmpfile"
+        else
+          printf '==> %s <==\n' "$path" >> "$tmpfile"
+        fi
+      fi
+      first=0
+
+      if [ "$path" = "-" ]; then
+        cat >> "$tmpfile"
+      else
+        # --を挟まないと`-weird.txt`のようなパスをcatがオプションとして解釈する
+        cat -- "$path" >> "$tmpfile"
+      fi
+    done
+  fi
+
+  # wcは数値を空白で右詰めして返す。クォートせずに位置パラメータへ割り直して
+  # 単語分割させ、行数とバイト数を取り出す
+  set -- $(wc -lc < "$tmpfile")
+  lines=$1
+  bytes=$2
+
+  if [ "$bytes" -eq 0 ]; then
+    die "Nothing to copy (the input is empty)"
+  fi
+
+  # wc -lは改行の数を返すので、末尾に改行が無いと最後の行が数に入らない
+  if [ "$(tail -c 1 "$tmpfile" | wc -l)" -eq 0 ]; then
+    lines=$((lines + 1))
+  fi
+
+  clip_write < "$tmpfile"
+
+  if [ "$quiet" -eq 0 ]; then
+    if [ "$lines" -eq 1 ]; then
+      line_unit="line"
+    else
+      line_unit="lines"
+    fi
+    print_success "copied $lines $line_unit, $(human_size "$bytes") from $source_label"
+  fi
+}
+
+main "$@"
