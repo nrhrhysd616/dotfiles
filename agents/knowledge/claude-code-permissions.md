@@ -67,8 +67,11 @@ Hooks → Deny → Ask → Permission mode → Allow → callback
 
 ## 編集の制約
 
-`.claude/settings.json`（権限ファイル）は、auto mode の classifier がエージェントによる
-自動編集をブロックする。変更が要る場合はユーザーに依頼する。
+`.claude/settings.json` の**`permissions` の編集**は、auto mode の classifier が
+エージェントによる自動編集をブロックすることがある。ブロックされたらユーザーに依頼する。
+
+`permissions` 以外のキーの追加は通る（2026-09-08 に `autoMemoryDirectory` の追加で実測）。
+「settings.json だから触れない」と決めつけず、まず編集を試すこと。
 
 **Why:** 権限まわりは直感と食い違う（Ask が Allow より強い、マージであって上書きでない）。
 憶測で答えると、ユーザーの正しい設定判断を否定してしまう。

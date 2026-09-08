@@ -8,7 +8,8 @@
 -->
 
 - [エージェントの指示ファイル読み込み仕様](agent-instruction-loading.md) —
-  CLAUDE.md / AGENTS.md / rules / skills の置き場やロード順を扱うとき。
+  CLAUDE.md / AGENTS.md / rules / skills / settings / auto memory の置き場やロード順を扱うとき。
+  モノレポでサブディレクトリから起動する構成を設計するとき。
   このナレッジ基盤そのものを変更するとき
 - [Claude Codeの権限ルール](claude-code-permissions.md) —
   settings.json の permissions を読み書きするとき。

@@ -32,6 +32,28 @@ Claude Code と Codex は指示ファイルの置き場もロード方式も異�
   強制力はないので、確実に実行させたい処理は hook にする
 - ロード状況は `/context` の **Memory files** で確認する。`InstructionsLoaded` hook でも追える
 
+## Claude Code の settings と auto memory の置き場
+
+2026-09-08 に code.claude.com/docs（settings / memory）と実測で確認した内容。
+サブディレクトリから起動するモノレポ（`repo/server/` `repo/client/` 等）で効いてくる。
+
+- **project scope の設定は「起動ディレクトリ」の `.claude/` から読まれる。**
+  `settings.json` も `settings.local.json` も、`repo/server/` から起動すれば
+  `repo/server/.claude/` のものが読まれる。**祖先からは継承されない**
+- ドキュメントの「サブディレクトリから起動すると `settings.local.json` は
+  リポジトリルートのものを読み書きする」という記述は、**「Yes, and don't ask again」で
+  保存される許可ルールの書き込み先**についてのもの。設定値の読み込み範囲を否定するものではない
+  （`autoMemoryDirectory` を目印に3箇所から起動して実測。混同しやすい）
+- **auto memory の既定の置き場は `~/.claude/projects/<project>/memory/` で、
+  `<project>` は git リポジトリ由来**（cwd 由来ではない）。同一リポジトリの
+  worktree・サブディレクトリは1つのメモリを共有する
+- `autoMemoryDirectory` は**任意の settings scope**（user / project / local / policy /
+  `--settings`）から読まれる。**値は絶対パスか `~/` 始まりなら任意のディレクトリでよい**ので、
+  ユーザー名を含まない値にすれば公開リポジトリの `settings.json` へ追跡できる
+- **`.claude/` を置いていない深い階層から起動すると設定が読まれず既定へ落ちる**
+  （`repo/server/src/` から起動 → リポジトリ共有のメモリへ書かれる）。
+  ディレクトリ単位の分離は「決めた起動位置から起動する」運用とセットでのみ成立する
+
 ## Codex 側の要点
 
 - グローバル指示は `~/.codex/AGENTS.md`（`AGENTS.override.md` があればそちらが優先）。
