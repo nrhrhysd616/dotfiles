@@ -31,6 +31,9 @@ id_ed25519
 
 # Claude Code
 .claude/plans/
+# claude.ai から同期されるスキル（~/.claude/skills が agents/skills を指すため実体がここに落ちる）
+agents/skills/synced/
+agents/skills/.trash/
 
 # RunCat Neo Custom Metrics（statusline.sh等が生成する実行時ファイル）
 runcat-metrics.json
