@@ -6,10 +6,12 @@ description: Claude CodeとCodexが指示ファイル（CLAUDE.md / AGENTS.md / 
 Claude Code と Codex は指示ファイルの置き場もロード方式も異なる。
 2026-08-21 時点の公式ドキュメント（code.claude.com/docs、learn.chatgpt.com/docs）と
 実機（Codex CLI 0.147.0）で確認した内容。
+Claude Code 側は 2026-10-05 に **v2.1.289** の公式ドキュメント・CHANGELOG で再確認した。
 
 | | Claude Code | Codex |
 | --- | --- | --- |
-| スキル置き場 | `~/.claude/skills/<name>/SKILL.md` | `~/.agents/skills/<name>/SKILL.md` |
+| プロジェクト指示 | `CLAUDE.md`（無ければ `AGENTS.md`。v2.1.277〜） | `AGENTS.md` を root→cwd で連結 |
+| スキル置き場 | `~/.claude/skills/<name>/SKILL.md`（`.agents/skills` は読まない） | `~/.agents/skills/<name>/SKILL.md` |
 | SKILL.md 形式 | frontmatter `name` + `description` | 同一 |
 | スキルのロード | name+description のみ先読み、本文は使用時 | 同一（初期一覧は約8,000文字まで） |
 | スキルのsymlink | サポート | サポート（symlink先を追跡すると明記） |
@@ -31,6 +33,50 @@ Claude Code と Codex は指示ファイルの置き場もロード方式も異�
 - CLAUDE.md は system prompt ではなく「system prompt 直後の user message」として配送される。
   強制力はないので、確実に実行させたい処理は hook にする
 - ロード状況は `/context` の **Memory files** で確認する。`InstructionsLoaded` hook でも追える
+- import の最大4ホップ・1ファイル200行推奨は v2.1.289 でも変わらない。4 MiB を超えるファイルはスキップされる
+- `/doctor prompt-audit`（v2.1.283〜）で CLAUDE.md / AGENTS.md / rules / skills を、
+  古いモデル向けの書き方・存在しないファイル参照・相互矛盾の観点で監査できる（提案のみで勝手に書き換えない）
+
+## Claude Code の AGENTS.md 読み込み（v2.1.277〜）
+
+2026-10-05 に code.claude.com/docs/en/memory で確認。
+
+- **既定（`claude-md-or-agents-md`）は「CLAUDE.md が無いときだけ AGENTS.md」。**
+  cwd とその祖先に `CLAUDE.md` / `.claude/CLAUDE.md` / `CLAUDE.local.md` が1つも無ければ、
+  cwd と祖先の `AGENTS.md`・`.claude/AGENTS.md` を起動時に読む。サブディレクトリの `AGENTS.md` は
+  そこのファイルを Read したとき（そのディレクトリに CLAUDE.md 系が無ければ）遅延ロードされる
+- 判定に**数えない**もの: `~/.claude/CLAUDE.md`、managed の CLAUDE.md、`.claude/rules/`。
+  これらは AGENTS.md と並んでロードされる
+- **`CLAUDE.local.md` は数える。** AGENTS.md 運用のリポジトリに個人用の `CLAUDE.local.md` を
+  置いた瞬間、AGENTS.md が読まれなくなる。両方読ませたいなら下の設定を変える
+- **読まないもの: `AGENTS.local.md`、`AGENTS.override.md`、`.agents/` 配下すべて。**
+  このため `~/.agents/AGENTS.md`（Codex 向けの地図）が Claude Code に二重ロードされることはない
+- 切り替えは `/config` の **Project instructions**。値は `claude-md-or-agents-md`（既定）/
+  `claude-md-and-agents-md`（両方。同じディレクトリでは CLAUDE.md → AGENTS.md の順、既にロード済みの
+  AGENTS.md はスキップ）/ `claude-md` / `managed-only`
+- settings に書くなら `pluginConfigs."agents-md@builtin".options.instructionFiles`。
+  **user / `--settings` / managed でのみ有効で、project・local の settings では無視される**
+- `/plugin` で組み込みの `agents-md` プラグインを無効化すると AGENTS.md 対応ごと止まる
+- CLAUDE.md との違い: `InstructionsLoaded` hook が発火しない／`--add-dir` 先の AGENTS.md は読まない／
+  作業ディレクトリ外への `@import` はそのプロジェクトで外部 import を承認済みのときだけ（ダイアログなしで）ロード
+- 旧来の回避策の扱い: `@AGENTS.md` を import する CLAUDE.md や CLAUDE.md→AGENTS.md の symlink は
+  残しても二重ロードされない。AGENTS.md を出力する SessionStart hook は二重になるので消す。
+  「AGENTS.md を読め」と文章で書いた CLAUDE.md は、Claude が自分で開かない限り読まれない
+- v2.1.281 未満では Bedrock / Vertex / テレメトリ無効のセッションで非対応。
+  アップグレード直後の初回セッションでは読まれないことがある
+
+## claude.ai から同期されるスキル（v2.1.275〜）
+
+2026-10-05 に code.claude.com/docs/en/skills と実測で確認。
+
+- claude.ai アカウントでサインインしたターミナルセッションでは、アカウントで有効なスキル
+  （pdf・docx など）が `~/.claude/skills/synced/` へダウンロードされ、約10分ごとに更新される。
+  **一方向のコピー**で、ここを編集しても claude.ai には反映されず次の同期で上書きされる
+- **このdotfilesでは `~/.claude/skills` が `agents/skills` への symlink なので、実体が public
+  リポジトリの `agents/skills/synced/` に落ちる。** Codex からも `~/.agents/skills/synced/` として見える。
+  `.gitignore` で `agents/skills/synced/` と `agents/skills/.trash/` を除外している
+- フォルダ名 `synced` と `anthropic-skills` は予約済みで、自作スキルには使えない
+- 同期を止めるなら user settings に `syncClaudeAiSkills: false`。既存の同期分は `~/.claude/skills/.trash/` へ移る
 
 ## Claude Code の settings と auto memory の置き場
 
@@ -53,6 +99,17 @@ Claude Code と Codex は指示ファイルの置き場もロード方式も異�
 - **`.claude/` を置いていない深い階層から起動すると設定が読まれず既定へ落ちる**
   （`repo/server/src/` から起動 → リポジトリ共有のメモリへ書かれる）。
   ディレクトリ単位の分離は「決めた起動位置から起動する」運用とセットでのみ成立する
+- **`~/.claude/settings.json` を symlink にしていても、書き込まれると実ファイルに置き換わることがある。**
+  2026-10-05 に実測。Claude Code の「auto mode を既定にしますか」の承諾（v2.1.285〜）や
+  iTerm2 の Claude Code 連携による hook 追加のあと、リンクが同内容の実ファイルになっていた
+  （どちらが壊したかは特定できていない）。設定変更を承諾したら `ls -l ~/.claude/settings.json` で
+  リンクが残っているか確認し、壊れていたら差分を `claude-code/settings.json` へ取り込んでから
+  `ln -nfs` で張り直す（`init-mac.zsh` の `link_config` は差分を確認せず上書きするので先に取り込む）
+- **iTerm2 の cc-status hook は、iTerm2 が書いた展開済みの絶対パスのまま残す。** iTerm2 は
+  コマンド文字列の完全一致で登録済みかを判定しており、`$HOME` や `~` に書き換えると
+  「連携が壊れている」と判定されて再インストールを勧められる（承諾するとファイルが書き直され、
+  リンクがまた壊れる）。新しい端末で iTerm2 の初回設定が走ったとき、既存の hook を見て
+  書き込みを省くかどうかは未検証
 
 ## Codex 側の要点
 
