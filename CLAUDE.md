@@ -160,7 +160,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 | `agents/` | Claude CodeとCodexで共有するルール・ナレッジ・スキル（`rules/`: 毎セッション全文ロードされる行動ルール、`knowledge/`: 索引だけロードし本文は必要時に読む参照情報、`skills/`: 手順、`AGENTS.md`: Codex向けの地図）。詳細は`agents/README.md` |
 | `aws/` | AWS CLI設定のテンプレート（`config`）。アカウント固有のARNを含むためsymlinkではなくコピーで配置される |
 | `bin/` | 自作コマンド。`$HOME/.local/bin/`へシンボリックリンクされてPATHが通る（`copy`: ファイルや標準入力の内容をクリップボードへ入れる、`csctl`: code-serverをTailscale経由で公開する、`gen-mac-git-signkey`: Git署名鍵をSecure Enclaveに作る、`mac-ssh-keygen`: gitが署名時に呼ぶssh-keygenラッパー） |
-| `claude-code/` | Claude Code固有のユーザー設定（`CLAUDE.md`: ナレッジ索引を`@import`するエントリポイント、`settings.json`、`statusline.sh`）。エージェント非依存の資産は`agents/`側にある |
+| `claude-code/` | Claude Code固有のユーザー設定（`CLAUDE.md`: ナレッジ索引を`@import`するエントリポイント、`settings.json`、`statusline.sh`）。`settings.json`の各キーの意図とシンボリックリンクが外れたときの戻し方は`claude-code/README.md`。エージェント非依存の資産は`agents/`側にある |
 | `code-server/` | code-server（ブラウザ版VS Code）のユーザー設定。`csctl`が各インスタンスの`User/settings.json`からここへシンボリックリンクを張る。拡張機能に依存しない設定のみで構成する |
 | `cursor/` | Cursorエディタの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
 | `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる、`hooks/`※全リポジトリ共通のgitフック。`~/.git-hooks`へsymlinkされ`core.hooksPath`が指す） |
