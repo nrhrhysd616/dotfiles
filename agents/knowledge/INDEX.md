@@ -14,3 +14,6 @@
 - [Claude Codeの権限ルール](claude-code-permissions.md) —
   settings.json の permissions を読み書きするとき。
   権限プロンプトが出る・出ない理由を説明するとき
+- [Claude Codeの新機能カタログ](claude-code-features.md) —
+  Claude Code の設定・機能を提案するとき、「こういう機能はある？」と聞かれたとき。
+  `claude --version` が本文記載の確認バージョンより新しいと気づいたとき（追記して更新する）
