@@ -9,6 +9,10 @@
 {
   // VSCodeの標準ショートカットに揃える（独自に追加したキーはkeymap.jsonへ移植している）
   "base_keymap": "VSCode",
+  // AI補完はVSCodeと同じくGitHub Copilotを使う（初回にZed上でGitHubへのサインインが必要）
+  "edit_predictions": {
+    "provider": "copilot"
+  },
   "project_panel": {
     "dock": "left"
   },
