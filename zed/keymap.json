@@ -1,0 +1,32 @@
+// vscode/keybindings.jsonで独自に追加したキーをZedへ移植したもの
+// VSCodeの標準キーはsettings.jsonの"base_keymap": "VSCode"で揃えている
+// VSCode側で無効化していたcmd-k alt-cmd-s・cmd-k cmd-nはZedでは未割り当てのため書いていない
+[
+  // Project Diff上でのGit Staging / Unstaging
+  // Zedは選択範囲ではなくhunk単位で扱い、実行後に次のhunkへ移動する
+  {
+    "context": "GitDiff > Editor",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-s cmd-s": "git::StageAndNext",
+      "cmd-shift-s cmd-shift-s": "git::UnstageAndNext"
+    }
+  },
+  // インラインサジェスト（Edit Prediction）の呼び出し
+  // 既定のctrl-g（行ジャンプ）を上書きする
+  {
+    "context": "Editor && mode == full",
+    "use_key_equivalents": true,
+    "bindings": {
+      "ctrl-g": "editor::ShowEditPrediction"
+    }
+  },
+  // ターミナルでshift-enterを押したときにバックスラッシュ+改行を送る
+  {
+    "context": "Terminal",
+    "use_key_equivalents": true,
+    "bindings": {
+      "shift-enter": ["terminal::SendText", "\\\r\n"]
+    }
+  }
+]

@@ -352,6 +352,10 @@ link_config $SCRIPT_DIR/vscode/keybindings.json "$HOME/Library/Application Suppo
 link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Code - Insiders/User/settings.json"
 link_config $SCRIPT_DIR/vscode-insiders/keybindings.json "$HOME/Library/Application Support/Code - Insiders/User/keybindings.json"
 
+# Zed user settings
+link_config $SCRIPT_DIR/zed/settings.json $HOME/.config/zed/settings.json
+link_config $SCRIPT_DIR/zed/keymap.json $HOME/.config/zed/keymap.json
+
 # Agent shared configuration (Claude Code / Codex)
 # Rules, knowledge and skills live under ~/.agents so both agents share them.
 # ~/.claude entries point straight at the repository instead of going through

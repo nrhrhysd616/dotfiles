@@ -140,7 +140,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
-6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Zed・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
    - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
      非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
      アクセス権のない端末でも初期化が止まらないよう、`ghq get`の前に`gh repo view`でアクセス可否を確認している
@@ -170,4 +170,5 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 | `sshd/` | SSHサーバー設定（`sshd_config`。symlinkではなくコピーで配置される） |
 | `vscode/` | VSCodeの設定（`settings.json`※VSCode Insiders・Cursorと共有、`keybindings.json`、Cline拡張設定） |
 | `vscode-insiders/` | VSCode Insidersの設定（`keybindings.json`のみ。`settings.json`は`vscode/settings.json`を共有） |
+| `zed/` | Zedエディタの設定（`settings.json`、`keymap.json`※`vscode/keybindings.json`の独自キーを移植したもの）。`~/.config/zed/`へシンボリックリンクされる |
 | `zsh/` | Zshシェル設定（`.zshrc`） |
