@@ -9,6 +9,7 @@
     - [VSCode](https://code.visualstudio.com/download)
     - [VSCode Insiders](https://code.visualstudio.com/insiders/)
     - [Cursor](https://www.cursor.com/ja)
+    - [Zed](https://zed.dev/download)
     - [Tailscale](https://tailscale.com/download)
 
 2. 以下のZshコマンドを順番に実行
