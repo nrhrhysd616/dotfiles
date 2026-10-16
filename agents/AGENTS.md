@@ -34,6 +34,8 @@ cat ~/.agents/rules/*/*.md
 ## 手順・ワークフロー
 
 `~/.agents/skills/<name>/SKILL.md`。Claude Code / Codex とも自動で認識する。
+各 `<name>` は shared（dotfiles）か private（`agent-knowledge-private`）のスキルへの symlink。
+新しく作るときは `knowledge` スキルの手順に従うこと（ここへ直接書くとどのリポジトリにも入らない）。
 
 ## 追加・更新
 

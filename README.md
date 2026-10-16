@@ -286,6 +286,9 @@ Claude CodeとCodexに、同じルール・ナレッジ・スキルを全端末�
 `local`層をリポジトリの外に置いているのは、publicリポジトリで`git clean -xdf`を打ったときに
 業務ナレッジを巻き添えで消さないためです。
 
+スキルは2つの層のものを1つの並びに混ぜるため、ディレクトリ全体ではなく**スキルごとに**
+`~/.claude/skills/<name>`と`~/.agents/skills/<name>`へリンクします。
+
 新しい端末では`init-mac.zsh`が`agent-knowledge-private`を`ghq get`しますが、
 アクセスできない場合は警告を出して`private`層を空のままにし、初期化は続行します。
 

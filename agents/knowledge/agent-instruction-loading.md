@@ -14,7 +14,8 @@ Claude Code 側は 2026-10-05 に **v2.1.289** の公式ドキュメント・CHA
 | スキル置き場 | `~/.claude/skills/<name>/SKILL.md`（`.agents/skills` は読まない） | `~/.agents/skills/<name>/SKILL.md` |
 | SKILL.md 形式 | frontmatter `name` + `description` | 同一 |
 | スキルのロード | name+description のみ先読み、本文は使用時 | 同一（初期一覧は約8,000文字まで） |
-| スキルのsymlink | サポート | サポート（symlink先を追跡すると明記） |
+| スキルのsymlink | サポート（`<name>` が symlink でよいと明記） | サポート（symlink先を追跡すると明記） |
+| 入れ子の探索 | **記載なし**（`<dir>/<group>/<name>/` が探索されるかは不明） | **記載なし** |
 | グローバル指示 | `~/.claude/CLAUDE.md` + `~/.claude/rules/**/*.md` | `~/.codex/AGENTS.md` 1ファイルのみ |
 | ファイル分割 | `@path` import（最大4ホップ） | **import/include 機構が存在しない** |
 | サイズ上限 | なし（200行推奨） | `project_doc_max_bytes` = 32 KiB |
@@ -72,9 +73,10 @@ Claude Code 側は 2026-10-05 に **v2.1.289** の公式ドキュメント・CHA
 - claude.ai アカウントでサインインしたターミナルセッションでは、アカウントで有効なスキル
   （pdf・docx など）が `~/.claude/skills/synced/` へダウンロードされ、約10分ごとに更新される。
   **一方向のコピー**で、ここを編集しても claude.ai には反映されず次の同期で上書きされる
-- **このdotfilesでは `~/.claude/skills` が `agents/skills` への symlink なので、実体が public
-  リポジトリの `agents/skills/synced/` に落ちる。** Codex からも `~/.agents/skills/synced/` として見える。
-  `.gitignore` で `agents/skills/synced/` と `agents/skills/.trash/` を除外している
+- このdotfilesでは `~/.claude/skills` を実ディレクトリにし、スキルごとに symlink を張っているため、
+  同期分は `~/.claude/skills/synced/`（リポジトリの外）に置かれ、Codex からは見えない。
+  2026-10-16 以前は `~/.claude/skills` 自体が `agents/skills` への symlink で、同期分が public
+  リポジトリの `agents/skills/synced/` に落ちていた（`.gitignore` で除外して凌いでいた）
 - フォルダ名 `synced` と `anthropic-skills` は予約済みで、自作スキルには使えない
 - 同期を止めるなら user settings に `syncClaudeAiSkills: false`。既存の同期分は `~/.claude/skills/.trash/` へ移る
 

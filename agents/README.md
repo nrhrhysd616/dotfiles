@@ -33,12 +33,24 @@ Claude Code と Codex の両方から使う共有資産を置く。エージェ�
 
 ```
 ~/.agents/AGENTS.md        -> agents/AGENTS.md          （~/.codex/AGENTS.md からも）
-~/.agents/skills           -> agents/skills             （~/.claude/skills からも）
 ~/.agents/rules/shared     -> agents/rules              （~/.claude/rules/shared からも）
 ~/.agents/knowledge/shared -> agents/knowledge
 ~/.agents/rules/private     -> agent-knowledge-private/rules     （~/.claude/rules/private からも）
 ~/.agents/knowledge/private -> agent-knowledge-private/knowledge
+
+~/.agents/skills/<name>    -> agents/skills/<name>                  （~/.claude/skills/<name> からも）
+~/.agents/skills/<name>    -> agent-knowledge-private/skills/<name> （同上）
 ```
+
+**skills だけはディレクトリ全体ではなくスキルごとにリンクする。**
+`~/.agents/skills/` と `~/.claude/skills/` は実ディレクトリで、shared と private のスキルが
+直下に並ぶ。両エージェントのドキュメントが保証しているのは `<dir>/<name>/SKILL.md` の
+1階層と `<name>` の symlink だけで、`skills/private/<name>/` のような入れ子が探索されるかは
+書かれていないため。claude.ai から同期されるスキルも、これで `~/.claude/skills/synced/`
+（リポジトリの外）に置かれる。
+
+新しいスキルを作ったら、その端末ではリンクを手で張り、他の端末では `init-mac.zsh` を再実行する。
+手順は `knowledge` スキルにある。
 
 `~/.claude/` 側は `~/.agents/` を経由せずリポジトリを直接指す。symlink を二段にすると
 解決されるかが公式ドキュメントで保証されていないため。

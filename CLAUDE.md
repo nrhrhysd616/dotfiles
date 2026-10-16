@@ -25,6 +25,9 @@ Claude CodeとCodexで、ルール・ナレッジ・スキルを`agents/`配下�
 **このリポジトリはpublic。** 業務・個人固有のナレッジは別のprivateリポジトリ
 （`agent-knowledge-private`）に置き、`init-mac.zsh`が`~/.agents/`配下へリンクする。
 どちらの層に書くかの判定は`agents/skills/knowledge/SKILL.md`の手順に従う。
+スキルだけはディレクトリ全体ではなくスキルごとに`~/.claude/skills/`・`~/.agents/skills/`へリンクする
+（shared と private のスキルを同じ階層に並べるため。入れ子のフォルダが探索されるかは両エージェントとも
+ドキュメントに記載がない）。
 端末固有のものは同期対象外の`~/.agents/knowledge-local/`へ置く
 （publicリポジトリで`git clean -xdf`を打ったときに巻き添えで消さないよう、あえてリポジトリ外にしている）。
 
