@@ -55,7 +55,9 @@ auto memory 側に同趣旨があるなら、そちらは削除して二重管�
 パスは必ず `~/.agents/` 経由の絶対パスを使う。symlink がリポジトリへ解決するため、
 どの端末からでも同じパスで書ける。リポジトリの実パスを直接書かないこと。
 
-**rules の場合** — `~/.agents/rules/<topic>.md`
+**rules の場合** — `~/.agents/rules/<layer>/<topic>.md`（`<layer>` は `shared` か `private`）
+
+`~/.agents/rules/` 直下に書かないこと。どのリポジトリにも入らず、Claude Code にも読まれない。
 
 既存のトピックファイルに追記するのが基本。新規作成は、既存のどれにも属さないときだけ。
 ファイル冒頭にHTMLコメントで「何に関するルールか」を書く
