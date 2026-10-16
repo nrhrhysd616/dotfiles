@@ -64,6 +64,41 @@ description: Claude Codeのバージョンアップで追加された、個人�
 | `spellcheck` | 2.1.235 | aspell / hunspell / ispell でプロンプトのスペルミスに下線 |
 | `bashOutputMaxChars` / `taskOutputMaxChars` | 2.1.261 | ファイルに逃がさずインラインで受け取る出力量を最大 128K 文字まで上げる |
 
+## マルチエージェント（Workflow・ultracode・ultrareview）
+
+この節だけ 2026-10-16 / 2.1.301 で確認（code.claude.com/docs の `workflows`・`model-config`・`ultrareview`・`costs`、CHANGELOG）。
+
+| 機能 | 導入 | 何ができるか |
+| --- | --- | --- |
+| Dynamic workflows（Workflow ツール） | 2.1.154 | Claude が書いた JS をバックグラウンドで実行し、多数の subagent を束ねる。`/workflows` で進行確認。有料プランと API で使え、Pro は `/config` の Dynamic workflows で有効化。止めるなら `"disableWorkflows": true` |
+| `ultracode` キーワード | 2.1.160 | プロンプトに含めるとそのタスクだけワークフローで実行（旧キーワードは `workflow`）。人間の入力のみ有効で `-p`・スケジュール・Webhook では発火しない。`Option+W` で打ち消し、`/config` の Ultracode keyword trigger で無効化 |
+| ultracode（セッション単位） | 2.1.284 で独立トグル化 | 実質的なタスクごとに自動でワークフローを組む。`/effort ultracode [on\|off]`、`/effort` スライダーで Tab、`claude --effort ultracode`、settings の `"ultracode": true`。`effortLevel` / `CLAUDE_CODE_EFFORT_LEVEL` には指定できない |
+| `workflowSizeGuideline` | 2.1.219 | ワークフロー規模の目安（`small` <5 / `medium` <10 / `large` <50 / `unrestricted`）。助言であり上限ではない。既定は medium、Pro は small。`/config` の Dynamic workflow size でも変更可 |
+| `/code-review ultra`（旧 `/ultrareview`） | 2.1.111 | Anthropic のクラウドで複数エージェントがブランチ・PR をレビュー（15〜25分）。claude.ai ログイン必須で API キーだけでは不可。CI 用に `claude ultrareview [target]` |
+
+**Agent ツール（subagent）との違い:** 改修依頼などで Claude が自分の判断で `Explore(...)` や `Plan(...)` を
+1体ずつ呼ぶのは Agent ツールで、オプトイン不要。Workflow は Claude が段取りを JS で書き、
+ランタイムがその通りに多数のエージェントを走らせるもので、ユーザーのオプトイン（キーワード・ultracode・
+「ワークフローで」と頼む）が無いと起動できない。どちらが動いたかは `/workflows` に記録があるかで分かる。
+
+- **たとえ:** Agent ツールは現場監督が部下に1件ずつ頼み、次の段取りを頭の中でアドリブで決める方式。
+  Workflow は監督が先に作業手順書（プログラム）を書き、機械がそれを実行して大勢を一斉に動かす方式で、
+  監督には最終報告だけが届く。例:「3観点のレビュアーに同時レビュー → 指摘ごとに反論役3人で検証 →
+  2人以上が本物と判断したものだけ残す」。「全員待つ」「出なくなるまで繰り返す」「多数決で落とす」を
+  確実に実行できるのが利点
+- **ultracode の正体:** この手順書方式を毎回の標準にするスイッチ。トークンを多く使ってでも網羅性・正確さを取る。
+  大規模な監査・網羅的レビュー・多ファイルの移行向きで、普段の改修なら通常モードで足りることが多い
+
+**課金の違い（公式ドキュメント）:**
+
+- **Workflow・ultracode はプランの使用量枠から引かれる**（"Runs count toward your plan's usage and rate limits"）。
+  ultracode をオンにすると1依頼が複数ワークフローになるため、セッション・週の上限に早く達する。
+  API・クラウドプロバイダ利用ならトークン従量課金。`/usage` で Workflow の割合を確認できる
+- **`/code-review ultra` だけはプランの枠ではなく usage credits（旧称 Extra usage、2.1.144 で改名）に課金される**。
+  Pro / Max はアカウントごとに一度きりの無料3回があり、以降は1回あたり約5〜25ドル（起動ダイアログに見積もり）。
+  途中で止めても1回と数える。usage credits を有効にしていないと有料実行は起動できない（`/usage-credits` で確認）。
+  Team / Enterprise の扱いはドキュメントに記載なし
+
 ## 操作・UI
 
 | 機能 | 導入 | 何ができるか |
