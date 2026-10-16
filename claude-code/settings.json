@@ -158,5 +158,8 @@
   "theme": "dark-daltonized",
   "preferredNotifChannel": "iterm2_with_bell",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "claude-security@anthropic-plugin-directory": true
+  }
 }
