@@ -37,6 +37,7 @@ Claude Code と Codex で共有するルール・ナレッジ・スキルを追�
 - 非公開のスケジュールや意思決定の経緯
 
 1つでも該当したら private へ落とす。判断に迷うものも private へ。
+rules・knowledge だけでなく **skills も同じ判定に従う**（手順に社内ツール名やエンドポイントが入るなら private）。
 後から public にするのは簡単だが、public に出したものは取り消せない。
 
 ## Step 3: 重複を確認する
@@ -52,10 +53,13 @@ auto memory 側に同趣旨があるなら、そちらは削除して二重管�
 
 ## Step 4: 書き込む
 
-パスは必ず `~/.agents/` 経由の絶対パスを使う。symlink がリポジトリへ解決するため、
-どの端末からでも同じパスで書ける。リポジトリの実パスを直接書かないこと。
+rules と knowledge のパスは必ず `~/.agents/` 経由の絶対パスを使う。symlink がリポジトリへ
+解決するため、どの端末からでも同じパスで書ける。リポジトリの実パスを直接書かないこと。
+skills の新規作成だけは例外（下記）。
 
-**rules の場合** — `~/.agents/rules/<topic>.md`
+**rules の場合** — `~/.agents/rules/<layer>/<topic>.md`（`<layer>` は `shared` か `private`）
+
+`~/.agents/rules/` 直下に書かないこと。どのリポジトリにも入らず、Claude Code にも読まれない。
 
 既存のトピックファイルに追記するのが基本。新規作成は、既存のどれにも属さないときだけ。
 ファイル冒頭にHTMLコメントで「何に関するルールか」を書く
@@ -67,7 +71,26 @@ auto memory 側に同趣旨があるなら、そちらは削除して二重管�
 frontmatter（`name`・`description`）を付け、本文の末尾に `**Why:**` と
 `**How to apply:**` を書く。auto memory と同じ流儀に揃えている。
 
-**skills の場合** — `~/.agents/skills/<name>/SKILL.md`
+**skills の場合** — 層のリポジトリに実体を書き、スキルごとにリンクを張る
+
+`~/.agents/skills/` と `~/.claude/skills/` は実ディレクトリで、各スキルへの symlink が並んでいる。
+既存スキルの更新はこのパス経由でよいが、**新規作成をここへ直接書くとどのリポジトリにも入らない。**
+実体は層のリポジトリに作る（local 層のスキルは置き場がない。shared か private に振り分ける）:
+
+| 層 | 実体 |
+| --- | --- |
+| shared | `$(ghq root)/github.com/nrhrhysd616/dotfiles/agents/skills/<name>/SKILL.md` |
+| private | `$(ghq root)/github.com/nrhrhysd616/agent-knowledge-private/skills/<name>/SKILL.md` |
+
+作成後、両エージェントの探索先へリンクを張る:
+
+```sh
+ln -s "<実体のディレクトリ>" ~/.claude/skills/<name>
+ln -s "<実体のディレクトリ>" ~/.agents/skills/<name>
+```
+
+他の端末では `init-mac.zsh` の再実行でリンクされる。
+shared と private で同じ名前のスキルを作らないこと（リンクは片方しか張れない）。
 
 frontmatter の `description` に「いつ起動すべきか / すべきでないか」を具体的に書く。
 Codex は description の一致でスキルを暗黙起動するため、ここが曖昧だと動かない。

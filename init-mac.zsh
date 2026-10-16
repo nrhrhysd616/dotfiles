@@ -87,6 +87,49 @@ function link_private_knowledge_fallback() {
   link_config $HOME/.agents/knowledge-private-unavailable $HOME/.agents/knowledge/private
 }
 
+# Link each skill directly under a skills directory the agents scan
+# (~/.claude/skills, ~/.agents/skills).
+# Both agents document only <dir>/<name>/SKILL.md, with <name> allowed to be a
+# symlink; whether nested folders are scanned is undocumented. So each skill
+# gets its own link instead of linking the whole folder, which also lets
+# several repositories (shared and private) feed the same directory.
+# @param dest Skills directory the agent scans (absolute path)
+# @param ... Skill source directories; later ones win on a name clash
+function link_agent_skills() {
+  local dest=$1
+  shift
+
+  # Older setups linked the whole directory to agents/skills. Removing a
+  # symlink never touches its target, so the repository is left as is.
+  if [ -L "$dest" ]; then
+    rm "$dest"
+  fi
+  mkdir -p "$dest"
+
+  # Drop links whose skill was deleted or renamed in its repository
+  local link
+  for link in "$dest"/*(N@); do
+    if [ ! -e "$link" ]; then
+      rm "$link"
+      print_info "Removed stale skill link $link"
+    fi
+  done
+
+  local src_dir skill
+  for src_dir in "$@"; do
+    for skill in "$src_dir"/*(N/); do
+      [ -f "$skill/SKILL.md" ] || continue
+      # A real directory here is not ours (ex. synced/ from claude.ai);
+      # `ln -nfs` would create the link inside it instead of replacing it
+      if [ -e "$dest/${skill:t}" ] && [ ! -L "$dest/${skill:t}" ]; then
+        print_warning "Skipped linking $dest/${skill:t} (a real directory exists)"
+        continue
+      fi
+      link_config "$skill" "$dest/${skill:t}"
+    done
+  done
+}
+
 # Check macOS
 print_section "Environment Check"
 if [ $(uname) != "Darwin" ] ; then
@@ -366,8 +409,6 @@ mkdir -p $HOME/.claude/rules $HOME/.codex
 
 link_config $SCRIPT_DIR/agents/AGENTS.md $HOME/.agents/AGENTS.md
 link_config $SCRIPT_DIR/agents/AGENTS.md $HOME/.codex/AGENTS.md
-link_config $SCRIPT_DIR/agents/skills $HOME/.agents/skills
-link_config $SCRIPT_DIR/agents/skills $HOME/.claude/skills
 link_config $SCRIPT_DIR/agents/rules $HOME/.agents/rules/shared
 link_config $SCRIPT_DIR/agents/rules $HOME/.claude/rules/shared
 link_config $SCRIPT_DIR/agents/knowledge $HOME/.agents/knowledge/shared
@@ -405,6 +446,14 @@ fi
 # Indexes for the layers no repository tracks (created only when missing)
 init_knowledge_index $HOME/.agents/knowledge/private/INDEX.md 'private・非公開'
 init_knowledge_index $HOME/.agents/knowledge-local/INDEX.md 'local・この端末限定'
+
+# Skills from the shared layer, plus the private one when it is on this machine
+SKILL_SOURCES=($SCRIPT_DIR/agents/skills)
+if [ -n "$PRIVATE_KNOWLEDGE_DIR" ] && [ -d "$PRIVATE_KNOWLEDGE_DIR/skills" ]; then
+  SKILL_SOURCES+=("$PRIVATE_KNOWLEDGE_DIR/skills")
+fi
+link_agent_skills $HOME/.claude/skills "${SKILL_SOURCES[@]}"
+link_agent_skills $HOME/.agents/skills "${SKILL_SOURCES[@]}"
 
 # Claude Code specific configuration
 print_section "Claude Code User Configuration"

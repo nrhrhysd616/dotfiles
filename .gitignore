@@ -31,7 +31,8 @@ id_ed25519
 
 # Claude Code
 .claude/plans/
-# claude.ai から同期されるスキル（~/.claude/skills が agents/skills を指すため実体がここに落ちる）
+# claude.ai から同期されるスキル。以前は ~/.claude/skills が agents/skills を指していたため実体がここに落ちた。
+# 今はスキルごとのリンクに変えたので新たには落ちないが、移行前の端末に残る実体を誤コミットしないよう除外を残す
 agents/skills/synced/
 agents/skills/.trash/
 
