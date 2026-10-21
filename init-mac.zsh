@@ -304,6 +304,13 @@ install_command 'Font Fira Code' 'FiraCode' 'ls $HOME/Library/Fonts/FiraCode-Reg
 
 # ngrok install
 # @see https://ngrok.com/docs/getting-started/
+# 公式caskで配布されているため、以前の手順で追加した ngrok/ngrok tap は不要
+# 残っているとtap trust未設定の警告がbrew実行のたびに出るので外す
+# untapもtap内のcaskを読み込むためtrustが要る。外した後にtrustも取り消す
+if brew tap | grep -qx 'ngrok/ngrok'; then
+  brew trust --tap ngrok/ngrok && brew untap ngrok/ngrok
+  brew untrust --tap ngrok/ngrok
+fi
 install_command 'ngrok' 'ngrok' 'brew list --cask ngrok' 'brew install ngrok' 'brew upgrade ngrok'
 
 # Stripe CLI install
