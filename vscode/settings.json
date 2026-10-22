@@ -2516,8 +2516,8 @@
   "terminal.integrated.tabs.enabled": true,
   // エージェントCLI（Claude Code等）にタブタイトルの変更を許可（既定値）
   "terminal.integrated.tabs.allowAgentCliTitle": true,
-  // ターミナルアイコンの既定の色（既定値）
-  "terminal.integrated.tabs.defaultColor": null,
+  // terminal.integrated.tabs.defaultColor（ターミナルアイコンの既定の色）は既定値の null が
+  // スキーマの選択肢に含まれず警告になるため書かない
   // ターミナルアイコンの既定のアイコン（既定値）
   "terminal.integrated.tabs.defaultIcon": "terminal",
   // タイトル右側に表示する説明の書式（既定値）
@@ -2799,8 +2799,11 @@
 
   // 拡張機能・MCPサーバーをモーダルエディタで開く（既定値）
   "extensions.allowOpenInModalEditor": false,
-  // 使用を許可する拡張機能の一覧（既定値）"*"はすべて許可
-  "extensions.allowed": "*",
+  // 使用を許可する拡張機能の一覧（既定値と同じ意味）すべて許可
+  // 既定値の "*" はスキーマ上オブジェクトしか受け付けず警告になるため、同義のオブジェクト形式で書く
+  "extensions.allowed": {
+    "*": true
+  },
   // 拡張機能の更新を自動確認する（既定値）
   "extensions.autoCheckUpdates": true,
   // 拡張機能の自動更新（既定値）
@@ -2931,14 +2934,8 @@
 
   // --- エージェントのネットワーク制限・サンドボックス ---
 
-  // エージェントツールのネットワークアクセスを許可するドメイン（既定値）
-  "chat.agent.allowedNetworkDomains": [],
-  // エージェントツールのネットワークアクセスを拒否するドメイン（既定値）
-  "chat.agent.deniedNetworkDomains": [],
   // ネットワークアクセスをドメインリストで制限する（既定値）
   "chat.agent.networkFilter": false,
-  // サンドボックス内で全ネットワークドメインを許可する（既定値）
-  "chat.agent.sandbox.allowNetwork": false,
   // サンドボックス外でのコマンド実行を確認付きで許可する（既定値）
   "chat.agent.sandbox.allowUnsandboxedCommands": true,
   // エージェントモードでサンドボックスを使う（既定値）
@@ -2949,6 +2946,12 @@
     "readonlyPaths": [],
     "deniedPaths": []
   },
+  // サンドボックス内で全ネットワークドメインを許可する（既定値）旧 chat.agent.sandbox.allowNetwork
+  "chat.agent.sandbox.network.allowNetwork": false,
+  // エージェントツールのネットワークアクセスを許可するドメイン（既定値）旧 chat.agent.allowedNetworkDomains
+  "chat.agent.sandbox.network.allowedDomains": [],
+  // エージェントツールのネットワークアクセスを拒否するドメイン（既定値）旧 chat.agent.deniedNetworkDomains
+  "chat.agent.sandbox.network.deniedDomains": [],
 
   // --- カスタマイズファイルの探索先 ---
 
@@ -3264,8 +3267,6 @@
   "chat.artifacts.rules.byMimeType": {
     "image/*": { "groupName": "Screenshots", "onlyShowGroup": true }
   },
-  // 承認ピッカーにアシスト付き権限を表示（既定値）
-  "chat.assistedPermissions.enabled": false,
 
   // --- ツールの自動承認 ---
 
@@ -3609,10 +3610,8 @@
 
   // Microsoftアカウントのサインイン実装（既定値）
   "microsoft-authentication.implementation": "msal",
-  // ソブリンクラウドのカスタム構成（既定値）
-  "microsoft-sovereign-cloud.customEnvironment": {},
-  // 認証に使うソブリンクラウド（既定値）
-  "microsoft-sovereign-cloud.environment": "",
+  // microsoft-sovereign-cloud.environment / customEnvironment（ソブリンクラウドの指定）は既定値が無く、
+  // 空の値は選択肢・必須項目を満たさず警告になるため書かない
 
   // --- Prettier ---
 
