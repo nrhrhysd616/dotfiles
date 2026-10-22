@@ -2985,10 +2985,6 @@
     "~/.copilot/instructions": true,
     "~/.claude/rules": true
   },
-  // 再利用可能なプロンプトファイル（*.prompt.md）の場所（既定値）
-  "chat.promptFilesLocations": {
-    ".github/prompts": true
-  },
   // ウェルカムビューで推奨するプロンプトファイル（既定値）
   "chat.promptFilesRecommendations": {},
 
