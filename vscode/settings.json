@@ -3592,14 +3592,9 @@
 
   // --- markdownlint ---
 
-  // ルール設定（デフォルト: {}）
-  // MD036=強調を見出し代わりに使う / MD040=コードブロックの言語指定 / MD060=テーブル記法 を無効化
-  // ※ この設定自体は非推奨扱いで、本来は .markdownlint.json での指定が推奨されている
-  "markdownlint.config": {
-    "MD036": false,
-    "MD040": false,
-    "MD060": false
-  },
+  // ルール設定ファイルのパス（デフォルト: なし）
+  // 非推奨になった markdownlint.config の代わりに、markdownlint/.markdownlint.jsonc のリンク先を参照する
+  "markdownlint.configFile": "${userHome}/.markdownlint.jsonc",
   // リントを実行するタイミング（デフォルト: "onType"）入力中の警告が煩雑なため保存時に
   "markdownlint.run": "onSave",
 

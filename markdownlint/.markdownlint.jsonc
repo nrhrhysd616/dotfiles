@@ -1,0 +1,12 @@
+{
+  // VSCodeのmarkdownlint拡張機能が使うユーザー共通のルール設定
+  // ~/.markdownlint.jsonc へシンボリックリンクされ、vscode/settings.json の
+  // markdownlint.configFile から参照される。プロジェクト側の .markdownlint.* があればそちらが優先される
+
+  // 強調を見出し代わりに使う
+  "MD036": false,
+  // コードブロックの言語指定
+  "MD040": false,
+  // テーブル記法
+  "MD060": false
+}
