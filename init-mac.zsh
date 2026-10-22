@@ -426,6 +426,9 @@ link_config $SCRIPT_DIR/vscode/keybindings.json "$HOME/Library/Application Suppo
 link_config $SCRIPT_DIR/vscode/settings.json "$HOME/Library/Application Support/Code - Insiders/User/settings.json"
 link_config $SCRIPT_DIR/vscode-insiders/keybindings.json "$HOME/Library/Application Support/Code - Insiders/User/keybindings.json"
 
+# markdownlint rules referenced by markdownlint.configFile in vscode/settings.json
+link_config $SCRIPT_DIR/markdownlint/.markdownlint.jsonc $HOME/.markdownlint.jsonc
+
 # Zed user settings
 link_config $SCRIPT_DIR/zed/settings.json $HOME/.config/zed/settings.json
 link_config $SCRIPT_DIR/zed/keymap.json $HOME/.config/zed/keymap.json

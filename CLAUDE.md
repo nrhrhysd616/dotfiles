@@ -145,7 +145,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 21（Amazon Corretto）。デフォルトは21
    - 各メジャーの最新パッチ版へ`~/.local/share/java/jdk-<major>`のリンクを張り、`vscode/settings.json`はこれを参照する
      （パッチ更新のたびにエディタ設定を書き換えずに済むようにするため。再実行すればリンクが張り替わる）
-6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Zed・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
+6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・markdownlint・Zed・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
    - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
      非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
      アクセス権のない端末でも初期化が止まらないよう、`ghq get`の前に`gh repo view`でアクセス可否を確認している
@@ -171,6 +171,7 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
 | `git/` | Git設定（`.gitconfig`、`.gitconfig.user.local`、`.gitignore_global`、`allowed_signers`※全端末の署名検証用公開鍵。`~/.ssh/`へsymlinkされる、`hooks/`※全リポジトリ共通のgitフック。`~/.git-hooks`へsymlinkされ`core.hooksPath`が指す） |
 | `iterm2/` | iTerm2の設定・プロファイル・カラースキーム（Monokaiテーマ各種） |
 | `java/` | Javaコードフォーマッター設定（Google Styleベースのフォーマットプロファイル） |
+| `markdownlint/` | VSCodeのmarkdownlint拡張機能が使うユーザー共通のルール設定（`.markdownlint.jsonc`）。`~/.markdownlint.jsonc`へシンボリックリンクされ、`vscode/settings.json`の`markdownlint.configFile`が参照する |
 | `ssh/` | SSHクライアント設定（`config`※GitHub認証にSecure Enclaveの鍵を使う設定、`authorized_keys`） |
 | `sshd/` | SSHサーバー設定（`sshd_config`。symlinkではなくコピーで配置される） |
 | `vscode/` | VSCodeの設定（`settings.json`※VSCode Insiders・Cursorと共有、`keybindings.json`、Cline拡張設定） |
