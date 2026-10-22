@@ -2040,8 +2040,9 @@
 
   // --- GitHub ---
 
-  // GitHub Enterprise / GHE.com のURI（既定値）
-  "github-enterprise.uri": "",
+  // GitHub Enterprise / GHE.com のURI一覧（既定値）旧設定 github-enterprise.uri を置き換えたもの
+  // 空配列を明示するとEnterpriseインスタンスを使わない（旧設定が残っていても無視される）
+  "github-enterprise.uris": [],
   // GitHubリポジトリのブランチ保護ルールを問い合わせる（既定値）
   "github.branchProtection": true,
   // gitコマンドのGitHub認証を自動化する（既定値）
@@ -2870,8 +2871,6 @@
   },
   // ワークスペースで転送したポートを復元する（既定値）
   "remote.restoreForwardedPorts": true,
-  // リモートトンネルでMicrosoftアカウント認証を有効化（既定値）
-  "remote.tunnels.access.enableMicrosoftAuth": false,
   // リモートトンネルの登録ホスト名（既定値）
   "remote.tunnels.access.hostNameOverride": "",
   // リモートトンネル有効時にスリープを抑止する（既定値）
@@ -2927,8 +2926,8 @@
   "chat.agentSessionProjection.enabled": false,
   // タイトルバーのエージェント状態インジケーターの表示（既定値）
   "chat.agentsControl.enabled": "compact",
-  // Agentsウィンドウへの引き継ぎヒントの表示（既定値）
-  "chat.agentsHandoffTip.mode": "hidden",
+  // Agentsウィンドウで実行中セッションの継続・管理を促す案内を表示（既定値）
+  "chat.agentsWindowBanner.enabled": false,
 
   // --- エージェントのネットワーク制限・サンドボックス ---
 
@@ -2938,42 +2937,18 @@
   "chat.agent.deniedNetworkDomains": [],
   // ネットワークアクセスをドメインリストで制限する（既定値）
   "chat.agent.networkFilter": false,
-  // サンドボックスランタイムの詳細設定（既定値）
-  "chat.agent.sandbox.advanced.runtime": {
-    "enableWeakerNestedSandbox": false
-  },
-  // サンドボックス内のターミナルコマンドを自動承認する（既定値）
-  "chat.agent.sandbox.allowAutoApprove": true,
   // サンドボックス内で全ネットワークドメインを許可する（既定値）
   "chat.agent.sandbox.allowNetwork": false,
   // サンドボックス外でのコマンド実行を確認付きで許可する（既定値）
   "chat.agent.sandbox.allowUnsandboxedCommands": true,
   // エージェントモードでサンドボックスを使う（既定値）
   "chat.agent.sandbox.enabled": "off",
-  // Windowsでサンドボックスを使う（既定値）
-  "chat.agent.sandbox.enabledWindows": "off",
-  // Linuxサンドボックスのファイルシステムアクセス制御（既定値）
-  "chat.agent.sandbox.fileSystem.linux": {
-    "denyRead": [],
-    "allowRead": [],
-    "allowWrite": [],
-    "denyWrite": []
+  // サンドボックスのファイルシステムアクセス制御（既定値）OS別の fileSystem.mac / linux を置き換えたもの
+  "chat.agent.sandbox.fileSystem.userConfiguredPaths": {
+    "readwritePaths": [],
+    "readonlyPaths": [],
+    "deniedPaths": []
   },
-  // macOSサンドボックスのファイルシステムアクセス制御（既定値）
-  "chat.agent.sandbox.fileSystem.mac": {
-    "denyRead": [],
-    "allowRead": [],
-    "allowWrite": [],
-    "denyWrite": []
-  },
-  // Windowsサンドボックスのファイルシステムアクセス制御（既定値）
-  "chat.agent.sandbox.fileSystem.windows": {
-    "denyRead": [],
-    "allowRead": [],
-    "allowWrite": []
-  },
-  // ネットワーク制限を緩めてサンドボックス内で再実行できるようにする（既定値）
-  "chat.agent.sandbox.retryWithAllowNetworkRequests": true,
 
   // --- カスタマイズファイルの探索先 ---
 
@@ -3016,8 +2991,6 @@
 
   // --- エージェントホスト（別プロセス実行）---
 
-  // 一部のエージェントを別プロセスで実行する（既定値）
-  "chat.agentHost.enabled": true,
   // エージェントホストのデバッグログを有効化（既定値）
   "chat.agentHost.agentDebugLog.enabled": false,
   // デバッグパネルがメモリに保持するイベント数（既定値）
@@ -3030,6 +3003,8 @@
   "chat.agentHost.claudeAgent.enabled": true,
   // エージェントホストにCodexプロバイダーを登録する（既定値）
   "chat.agentHost.codexAgent.enabled": false,
+  // Copilotのモデルごとの機能上書き（既定値）
+  "chat.agentHost.copilot.modelCapabilityOverrides": {},
   // 外部ツールをツール検索の後ろに回す最小ツール数（既定値）
   "chat.agentHost.copilot.toolSearch.deferThreshold": 1,
   // MCP・非コアツールをツール検索経由で遅延読み込みする（既定値）
@@ -3038,8 +3013,6 @@
   "chat.agentHost.copilotSdk.logLevel": "info",
   // Copilot SDKセッションで独自のターミナルツールを使う（既定値）
   "chat.agentHost.customTerminalTool.enabled": false,
-  // モデルごとの機能上書き（既定値）
-  "chat.agentHost.modelCapabilityOverrides": {},
   // Claude Opus 4.8向けのシステムプロンプト上書き（既定値）
   "chat.agentHost.opus48Prompt.enabled": false,
   // OTelスパンにプロンプト・応答の内容を含める（既定値）プライバシーに影響するため有効化しない
@@ -3054,16 +3027,8 @@
   "chat.agentHost.otel.otlpEndpoint": "",
   // OTelスパンのファイル出力先（既定値）
   "chat.agentHost.otel.outfile": "",
-  // Copilot SDKセッションの推論エフォートの上書き（既定値）
-  "chat.agentHost.reasoningEffortOverride": "",
-  // Copilot SDK内蔵シェルツールのサンドボックスモード（既定値）
-  "chat.agentHost.sdkSandbox.enabled": "off",
   // OSのプロキシ設定を自動で使う（既定値）
   "chat.agentHost.systemProxy.enabled": true,
-  // AgentsウィンドウのClaudeセッションをエージェントホストで実行（既定値）
-  "chat.agents.claude.preferAgentHost": true,
-  // Agentsウィンドウの選択肢から拡張機能ホストのCopilot CLIを隠す（既定値）
-  "chat.agents.copilotCli.hideExtensionHost": true,
 
   // --- チャットの表示 ---
 
@@ -3087,12 +3052,11 @@
   "chat.math.enabled": true,
   // チャット入力欄に進行中のグラデーション枠を表示（既定値）
   "chat.progressBorder.enabled": true,
-  // 現在のプロンプトを上部に固定表示する（既定値）
-  "chat.promptTimeline.stickyHeader": false,
+  // スクロール中に現在のプロンプトを上部に固定表示する（デフォルト: true）
+  // 旧設定 chat.promptTimeline.stickyHeader の既定値（false）を引き継いで挙動を維持
+  "chat.stickyScroll.enabled": false,
   // ユーザーメッセージの上にヒントを表示（既定値）
   "chat.tips.enabled": true,
-  // ターン進行中に状態ピルを表示（既定値）
-  "chat.turnStatusPills": true,
   // 高評価ボタンのアニメーション（既定値）
   "chat.upvoteAnimation": "floatingThumbs",
   // リクエスト・応答のタイムスタンプを表示（既定値）
@@ -3148,8 +3112,6 @@
   "chat.experimental.incrementalRendering.buffering": "word",
   // 応答の逐次描画を有効化（実験的機能・既定値）
   "chat.experimental.incrementalRendering.enabled": false,
-  // 権限ピッカーにサンドボックス切り替えを表示（実験的機能・既定値）
-  "chat.experimental.permissionsSandboxToggle.enabled": true,
   // セッションのアーカイブ操作の文言（実験的機能・既定値）
   "chat.experimental.sessionArchiveActionWording": "archive",
   // Exploreサブエージェントの既定モデル（既定値）
@@ -3191,10 +3153,9 @@
   "chat.sessionSync.excludeRepositories": [],
   // サブエージェントから別のサブエージェントを呼べるようにする（既定値）
   "chat.subagents.allowInvocationsFromSubagents": false,
-  // サブエージェントを個別のエディタで表示する（既定値）
-  "chat.subagents.useRichRendering": true,
-  // Agentsウィンドウにプロンプトタイムラインを表示（既定値）
-  "sessions.promptTimeline.rail": "off",
+  // Agentsウィンドウでのプロンプトタイムラインの表示（実験的機能・デフォルト: "gutter"）
+  // 旧設定 sessions.promptTimeline.rail の既定値（"off"）を引き継いで挙動を維持
+  "sessions.chatTimeline.display": "off",
 
   // --- コンテキスト・カスタマイズの利用 ---
 
@@ -3245,12 +3206,8 @@
   "chat.editing.revealNextChangeOnResolve": true,
   // チャットからファイルを開く際のエディタ関連付け（既定値）
   "chat.editorAssociations": {},
-  // サイドバーのClaudeセッションをエージェントホストで実行（既定値）
-  "chat.editor.claude.preferAgentHost": true,
   // サイドバーのCodexセッションをエージェントホストで実行（既定値）
   "chat.editor.codex.preferAgentHost": false,
-  // エディタチャットの選択肢から拡張機能ホストのCopilot CLIを隠す（既定値）
-  "chat.editor.copilotCli.hideExtensionHost": true,
   // チャットの選択肢にVSCodeローカルハーネスを表示（既定値）
   "chat.editor.localAgent.enabled": true,
   // 新規エディタチャットでAgent Host Copilot CLIを優先する（既定値）
@@ -3290,8 +3247,6 @@
   "chat.plugins.enabledPlugins": {},
   // 参照するプラグインマーケットプレイス（既定値）
   "chat.plugins.marketplaces": ["github/copilot-plugins", "github/awesome-copilot#marketplace"],
-  // 許可するマーケットプレイスの制限（既定値）
-  "chat.plugins.strictMarketplaces": null,
 
   // --- アーティファクト・権限 ---
 
@@ -3544,8 +3499,8 @@
 
   // Claude Codeの表示位置（既定値）新しい場所で開くと自動更新される
   "claudeCode.preferredLocation": "panel",
-    // Claude Codeの初回オンボーディングを非表示にする
-  "claudeCode.hideOnboarding": true
+  // Claude Codeの初回オンボーディングを非表示にする（デフォルト: false）
+  "claudeCode.hideOnboarding": true,
 
   // --- Docker DX ---
 
