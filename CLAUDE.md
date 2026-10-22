@@ -142,7 +142,9 @@ gitleaksでシークレットの混入を検査する。ローカルのpre-commi
    - フォント（Fira Code）、ngrok、Stripe CLI、VHS、Poppler（PDFユーティリティ）
    - ripgrep（VSCodeのTodo Tree拡張が利用する）
    - code-server（`csctl`コマンドが利用する）
-5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 18 / 21（Amazon Corretto）
+5. **Javaのインストール**（SDKMANで管理）: Java 11 / 17 / 21（Amazon Corretto）。デフォルトは21
+   - 各メジャーの最新パッチ版へ`~/.local/share/java/jdk-<major>`のリンクを張り、`vscode/settings.json`はこれを参照する
+     （パッチ更新のたびにエディタ設定を書き換えずに済むようにするため。再実行すればリンクが張り替わる）
 6. **設定ファイルの配置**: Git・Cursor・VSCode・VSCode Insiders・Zed・Claude Code・自作コマンド（`copy`、`csctl`、`gen-mac-git-signkey`、`mac-ssh-keygen`）・全リポジトリ共通のgitフック（`~/.git-hooks`）をシンボリックリンク、AWS CLI設定（`~/.aws/config`）をコピー（既存ファイルがある場合は上書きしない）
    - **エージェント共通設定**（`agents/`）: ルール・ナレッジ・スキルを`~/.agents/`と`~/.claude/`・`~/.codex/`へシンボリックリンク。
      非公開ナレッジのリポジトリ（`agent-knowledge-private`）を`ghq get`し、取得できた場合のみ`private`層をリンクする。
