@@ -353,15 +353,39 @@ function sdk_latest_java() {
   echo ${resolved:-$fallback}
 }
 
+# Link ~/.local/share/java/jdk-<major> to the newest installed patch version
+# エディタ設定(vscode/settings.json)はこのリンクを参照するため、パッチ更新で設定を書き換えずに済む
+# リンク先はsdk listの解決結果ではなくインストール済みの最新から選ぶ
+# (オフラインでfallbackの古い版が返っても、リンクが古い版へ巻き戻らないようにするため)
+# SDKMANのcandidates配下に置かないのは、sdk listがローカルのバージョンとして表示してしまうため
+# @param major Java major version (ex. '21')
+function link_java_major() {
+  local major=$1
+  local link_dir="$HOME/.local/share/java"
+  # n: 数値順に並べる (11.0.9 < 11.0.29)、/: ディレクトリのみ、N: 一致しなければ空
+  local installed=(${SDKMAN_DIR:-$HOME/.sdkman}/candidates/java/${major}.*-amzn(N/n))
+
+  if (( ${#installed} == 0 )); then
+    print_warning "Skipped linking jdk-$major (no Java $major installed)"
+    return 1
+  fi
+
+  mkdir -p "$link_dir"
+  link_config "${installed[-1]}" "$link_dir/jdk-$major"
+}
+
 # After setting sdk command path in .zshrc, install Java
-JAVA11_VERSION=$(sdk_latest_java 11 11.0.29-amzn)
-JAVA17_VERSION=$(sdk_latest_java 17 17.0.17-amzn)
-JAVA18_VERSION=$(sdk_latest_java 18 18.0.2-amzn)
-JAVA21_VERSION=$(sdk_latest_java 21 21.0.11-amzn)
+# Java 18はサポート終了済み(セキュリティ修正が出ない)のため導入しない
+JAVA11_VERSION=$(sdk_latest_java 11 11.0.32-amzn)
+JAVA17_VERSION=$(sdk_latest_java 17 17.0.20-amzn)
+JAVA21_VERSION=$(sdk_latest_java 21 21.0.12-amzn)
 install_command 'Java 11' 'java11' "sdk home java $JAVA11_VERSION" "sdk install java $JAVA11_VERSION"
 install_command 'Java 17' 'java17' "sdk home java $JAVA17_VERSION" "sdk install java $JAVA17_VERSION"
-install_command 'Java 18' 'java18' "sdk home java $JAVA18_VERSION" "sdk install java $JAVA18_VERSION"
 install_command 'Java 21' 'java21' "sdk home java $JAVA21_VERSION" "sdk install java $JAVA21_VERSION"
+link_java_major 11
+link_java_major 17
+link_java_major 21
+sdk default java "$JAVA21_VERSION"
 
 print_section "Setting Up Configuration Files"
 
