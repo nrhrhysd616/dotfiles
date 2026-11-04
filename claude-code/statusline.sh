@@ -30,7 +30,8 @@ CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 COST_USD=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 
 # レート制限の使用率（%）とリセット時刻（resets_at: Unix epoch秒）。
-# Pro/Maxプランかつ初回API応答後のみ存在し、各ウィンドウは独立して欠落しうるため、
+# Pro/Max/Ultraプランかつ初回API応答後のみ存在する。各ウィンドウは独立して欠落しうるうえ、
+# resets_atを過ぎたウィンドウはClaude Code側で落とされる（5hが出ず7日だけ出る時間帯がある）。
 # 値が無い場合は空文字のままにしておき、後段で存在チェックする
 FIVE_HOUR_PCT=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
 FIVE_HOUR_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
